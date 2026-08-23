@@ -95,19 +95,11 @@ The app tracks the status of messages and conversations. Status types are **cust
 
 Categories are **user-defined** and vary by person.
 
-**Example category types:**
-
-| Category Type | Examples |
-|---------------|----------|
-| **By platform** | Email, Slack, WhatsApp, Teams |
-| **By relationship** | Client, Subcontractor, Vendor, Personal, Family |
-| **By connection strength** | Close, Regular, Occasional, New |
-| **By project** | Project Alpha, Website Redesign, Q4 Campaign |
-| **By priority** | High Priority, Normal, Low Priority |
-| **By response time** | Urgent (same day), Standard, When possible |
-| **By custom labels** | Whatever the user creates |
-
-Users can create categories that make sense for their workflow.
+Examples:
+- By relationship type: Client, Subcontractor, Personal
+- By project: Project Alpha, Website Redesign
+- By urgency: High Priority, Low Priority
+- By custom labels the user creates
 
 ## 10. Filtering
 
@@ -132,16 +124,6 @@ Notifications are triggered by:
 5. **One source of truth** — All platforms, one place
 6. **Anxiety-reducing** — The goal is to make the app-switching worry go away
 
-## 12d. Emoji Support
-
-Full emoji support throughout the app:
-
-- **Messages** — Display emojis in message content
-- **Contact names** — Users can add emojis to contact names (e.g., "Sarah 🌟")
-- **Categories** — Emojis in category names (e.g., "🔥 Urgent", "💼 Work")
-- **Contact types** — Emojis in custom types (e.g., "⭐ VIP Client")
-- **Status types** — Emojis in custom statuses (e.g., "✅ Done", "⏳ Waiting")
-
 ## 12a. Visual Direction
 
 | Aspect | Decision |
@@ -150,32 +132,11 @@ Full emoji support throughout the app:
 | **Density** | Spacious with some efficiency — calm but scannable |
 | **Style** | Clean with a little modern |
 | **Information hierarchy** | Contact name and message preview are most prominent |
-| **Platform indicators** | Text label with colored badge — slightly larger, easy to see at a glance |
-| **Status actions** | Buttons visible on each row: Mark Read, Mark Responded, Flag (urgent), Unflag |
-| **Open in platform** | Each conversation shows "Open in [Platform]" button (e.g., "Open in Slack", "Open in Email") |
+| **Platform indicators** | Text label with colored badge (each platform has a color) |
+| **Status actions** | Buttons visible on each row — always there, one tap |
 | **Demo Mode label** | Subtle but persistent — small indicator in a corner |
 
-## 12b. Design System: Industry
-
-The app uses the **Industry** design system — a wireframe/blueprint aesthetic.
-
-| Element | Style |
-|---------|-------|
-| **Accent color** | Steel-blue (#5980a6) |
-| **Background** | Light gray (#f2f2f3), dark mode (#191b1e) |
-| **Typography** | Barlow Condensed (headings), Barlow (body) |
-| **Corners** | Square — no rounded corners |
-| **Cards/frames** | Transparent with hairline borders |
-| **Corner marks** | Blueprint registration marks (+) at corners |
-| **Icons** | Lucide icons, stroke-width 1.5 |
-| **Buttons** | Primary is solid accent fill with square corners |
-
-**Design files location:**
-- Full design: `design/Coms.dc.html` (open in browser)
-- Design system CSS: `design/_ds/industry-*/styles.css`
-- Update script: `./scripts/update-design.sh <export.zip>`
-
-## 12c. Empty State ("All Clear")
+## 12b. Empty State ("All Clear")
 
 When nothing needs attention, show:
 - A calming illustration: **an otter floating on an inflatable tube in a river**
@@ -191,7 +152,7 @@ The home screen answers: **"What's the status of everything?"**
 - Status indicators visible at a glance
 - Grouped by person (default) or by thread (user preference)
 - Newest activity appears first within each group
-- Action buttons visible on each row: Mark Read, Mark Responded, Flag/Unflag, Open in [Platform]
+- Status action buttons visible on each row
 
 ### Tabs
 
@@ -199,35 +160,13 @@ The main screen uses tabs to organize conversations:
 
 | Tab | Contents |
 |-----|----------|
-| **All** | Everything in one view (see below for layout) |
+| **All** | Everything in one view |
 | **Unread** | Messages she hasn't seen yet |
 | **Needs Response** | She's read it but hasn't replied |
 | **Done** | Nothing pending, resolved |
 | **Urgent** | Time-sensitive / flagged items |
 
 Default tab is customizable by user.
-
-### "All" Tab Layout
-
-The All tab shows everything, but with visual separation:
-
-```
-┌─────────────────────────────────┐
-│  ACTIVE                         │
-│  ─────────────────────────────  │
-│  [Urgent items]                 │
-│  [Unread items]                 │
-│  [Needs Response items]         │
-│                                 │
-│  ─────────────── divider ────── │
-│                                 │
-│  DONE                           │
-│  ─────────────────────────────  │
-│  [Resolved items]               │
-└─────────────────────────────────┘
-```
-
-Active items (urgent, unread, needs response) appear first, grouped together. A subtle divider separates them from Done items below.
 
 ## 14. Conversation Detail
 
@@ -241,13 +180,11 @@ When Maya taps a conversation:
 - Importance and category
 
 **Actions:**
-- **Open in [Platform]** — dynamic button (e.g., "Open in Slack", "Open in Email", "Open in WhatsApp")
-- **Mark Read** / **Mark Unread**
-- **Mark Responded** / **Mark Needs Response**
-- **Flag** (mark urgent) / **Unflag** (remove urgent)
-- **Set contact type** — Client, Close, Subcontractor, Vendor, Personal, Family, etc. (user-defined)
-- Change category
+- Open in original platform (to reply there)
+- Change status
 - Change importance
+- Change category
+- Mark time-sensitive
 
 ## 15. Core User Loop
 
@@ -281,23 +218,10 @@ A settings page where users can customize:
 |---------|---------|
 | **Theme** | Light / Dark / System |
 | **Categories** | Create, edit, delete custom categories |
-| **Contact types** | Create, edit, delete custom contact types (Client, Close, Subcontractor, etc.) |
 | **Status types** | Define custom statuses beyond defaults |
 | **Default tab** | Which tab opens first |
 | **Grouping** | By person (default) or separate threads |
-| **Notifications** | What triggers notifications (see below) |
-| **Account** | Log out, account info |
-
-### Notification Settings
-
-| Setting | Options |
-|---------|---------|
-| **Enable notifications** | On / Off |
-| **Notify on new message** | All / Only flagged contacts / Off |
-| **Notify on urgent/flagged** | On / Off |
-| **Notify on time-sensitive** | On / Off (auto-detected deadlines) |
-| **Quiet hours** | Set hours when notifications are silenced |
-| **Sound** | On / Off, choose sound |
+| **Notifications** | What triggers notifications |
 
 ---
 
@@ -360,23 +284,9 @@ For prototype testing, the user can simulate a new message:
 |-------|------|
 | id | string |
 | name | string |
-| type | ContactType (user-defined) |
+| type | string (user-defined) |
 | platforms | Platform[] |
 | conversations | Conversation[] |
-
-### Contact Types
-
-Users can assign a type to each contact to indicate their relationship.
-
-**Default types:**
-- Client
-- Close (friends, close colleagues)
-- Subcontractor
-- Vendor
-- Personal
-- Family
-
-**Custom types:** Users can create their own contact types in settings.
 
 ### Message
 
@@ -401,8 +311,8 @@ Users can assign a type to each contact to indicate their relationship.
 - [ ] Unified message list showing all conversations
 - [ ] Tabs (All, Unread, Needs Response, Done, Urgent)
 - [ ] At-a-glance status indicators (read, responded)
-- [ ] Action buttons on each row (Mark Read, Mark Responded, Flag/Unflag, Open in [Platform])
-- [ ] Platform labels with colored badges (larger size, prominent)
+- [ ] Status action buttons on each row
+- [ ] Platform labels with colored badges
 - [ ] Grouping by contact (default view)
 - [ ] Conversation detail view
 - [ ] Light and dark theme (system preference)
@@ -415,8 +325,6 @@ Users can assign a type to each contact to indicate their relationship.
 ## 22. Phase 2 — After MVP
 
 - [ ] Personalization page (full settings)
-- [ ] Notification settings (triggers, quiet hours, sounds)
-- [ ] Login / Logout / Account management
 - [ ] Help/tutorial page
 - [ ] Importance levels (auto-suggested + manual)
 - [ ] Time-sensitive detection and notifications
@@ -429,6 +337,7 @@ Users can assign a type to each contact to indicate their relationship.
 ## 23. Do Not Build Yet
 
 - Real platform integrations
+- Authentication
 - Subscriptions or payments
 - AI-generated replies
 - In-app message composer
@@ -436,9 +345,8 @@ Users can assign a type to each contact to indicate their relationship.
 - Analytics
 - CRM features
 - Task management
+- Complex settings
 - Native mobile app
-
-**Note:** Authentication (login/logout) is needed for the full product but can be simulated in the prototype.
 
 ## 24. Success Test
 

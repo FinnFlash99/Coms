@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+
+# Design backups (created by update-design.sh)
+design-backup-*/
+
+# Dependencies (when we add them)
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment files
+.env
+.env.local
