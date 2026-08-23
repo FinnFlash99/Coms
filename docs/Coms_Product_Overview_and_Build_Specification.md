@@ -124,6 +124,26 @@ Notifications are triggered by:
 5. **One source of truth** — All platforms, one place
 6. **Anxiety-reducing** — The goal is to make the app-switching worry go away
 
+## 12a. Visual Direction
+
+| Aspect | Decision |
+|--------|----------|
+| **Theme** | Light and dark mode — follows system preference or user toggle |
+| **Density** | Spacious with some efficiency — calm but scannable |
+| **Style** | Clean with a little modern |
+| **Information hierarchy** | Contact name and message preview are most prominent |
+| **Platform indicators** | Text label with colored badge (each platform has a color) |
+| **Status actions** | Buttons visible on each row — always there, one tap |
+| **Demo Mode label** | Subtle but persistent — small indicator in a corner |
+
+## 12b. Empty State ("All Clear")
+
+When nothing needs attention, show:
+- A calming illustration: **an otter floating on an inflatable tube in a river**
+- Simple message: "All clear" or "You're all caught up"
+
+This is the reward moment. Make it feel satisfying.
+
 ## 13. Main Screen
 
 The home screen answers: **"What's the status of everything?"**
@@ -132,7 +152,21 @@ The home screen answers: **"What's the status of everything?"**
 - Status indicators visible at a glance
 - Grouped by person (default) or by thread (user preference)
 - Newest activity appears first within each group
-- Filter options available but not required
+- Status action buttons visible on each row
+
+### Tabs
+
+The main screen uses tabs to organize conversations:
+
+| Tab | Contents |
+|-----|----------|
+| **All** | Everything in one view |
+| **Unread** | Messages she hasn't seen yet |
+| **Needs Response** | She's read it but hasn't replied |
+| **Done** | Nothing pending, resolved |
+| **Urgent** | Time-sensitive / flagged items |
+
+Default tab is customizable by user.
 
 ## 14. Conversation Detail
 
@@ -166,17 +200,42 @@ Message arrives on any platform
     → Maya has confidence nothing was missed
 ```
 
-## 16. Prototype / Demo Mode
+## 16. Onboarding & Help
+
+### First Launch
+
+Minimal onboarding — a single welcome screen explaining the concept, then she's in.
+
+### Tutorial (Help Page)
+
+A separate help page with text and images for users who want more guidance. Accessible from settings or a help link. Static documentation, not interactive.
+
+### Personalization Page
+
+A settings page where users can customize:
+
+| Setting | Options |
+|---------|---------|
+| **Theme** | Light / Dark / System |
+| **Categories** | Create, edit, delete custom categories |
+| **Status types** | Define custom statuses beyond defaults |
+| **Default tab** | Which tab opens first |
+| **Grouping** | By person (default) or separate threads |
+| **Notifications** | What triggers notifications |
+
+---
+
+## 17. Prototype / Demo Mode
 
 The prototype does not have real platform integrations.
 
 - No real Slack, Gmail, WhatsApp, iMessage, Instagram, or Teams connections
 - Uses realistic simulated data
-- Clearly labeled as Demo Mode
+- Subtle but persistent Demo Mode indicator in corner
 - Explains that the full product would sync automatically
 - Includes a "Simulate Incoming Message" feature for testing
 
-## 17. Simulate Incoming Message
+## 18. Simulate Incoming Message
 
 For prototype testing, the user can simulate a new message:
 
@@ -191,7 +250,7 @@ For prototype testing, the user can simulate a new message:
 - Timestamp set to now
 - Home screen updates immediately
 
-## 18. Prototype Data
+## 19. Prototype Data
 
 | Contact | Platforms | Latest Message | Status | Time |
 |---------|-----------|----------------|--------|------|
@@ -202,7 +261,7 @@ For prototype testing, the user can simulate a new message:
 | Anna K. | Email | Perfect, thank you! | Read, Responded | 2 days ago |
 | Brand Co. | WhatsApp | Could you send us a revised quote? | Read, Needs Response | 3 days ago |
 
-## 19. Minimum Data Model
+## 20. Minimum Data Model
 
 ### Conversation
 
@@ -247,28 +306,35 @@ For prototype testing, the user can simulate a new message:
 - **Platforms:** `email`, `slack`, `whatsapp`, `instagram`, `imessage`, `teams`
 - **Importance:** `low`, `normal`, `high` (or user-defined)
 
-## 20. MVP — Must Build
+## 21. MVP — Must Build
 
 - [ ] Unified message list showing all conversations
+- [ ] Tabs (All, Unread, Needs Response, Done, Urgent)
 - [ ] At-a-glance status indicators (read, responded)
+- [ ] Status action buttons on each row
+- [ ] Platform labels with colored badges
 - [ ] Grouping by contact (default view)
 - [ ] Conversation detail view
-- [ ] Platform labels on each message
-- [ ] Status change actions
+- [ ] Light and dark theme (system preference)
+- [ ] Empty state with otter illustration
+- [ ] Welcome screen (minimal onboarding)
 - [ ] Pre-loaded realistic demo data
 - [ ] Simulate Incoming Message
-- [ ] Demo Mode label
+- [ ] Demo Mode indicator (subtle, corner)
 
-## 21. Phase 2 — After MVP
+## 22. Phase 2 — After MVP
 
+- [ ] Personalization page (full settings)
+- [ ] Help/tutorial page
 - [ ] Importance levels (auto-suggested + manual)
 - [ ] Time-sensitive detection and notifications
 - [ ] User-defined categories
 - [ ] User-defined status types
-- [ ] Filtering options
+- [ ] Custom default tab
 - [ ] View toggle (grouped by person vs. separate threads)
+- [ ] Responsive phone layout
 
-## 22. Do Not Build Yet
+## 23. Do Not Build Yet
 
 - Real platform integrations
 - Authentication
@@ -282,7 +348,7 @@ For prototype testing, the user can simulate a new message:
 - Complex settings
 - Native mobile app
 
-## 23. Success Test
+## 24. Success Test
 
 Give a first-time user this scenario:
 
@@ -292,20 +358,29 @@ Give a first-time user this scenario:
 
 **Emotional success:** The user feels relief, not overwhelm.
 
-## 24. Build Order
+## 25. Build Order
 
+**MVP:**
 1. Data model and simulated data
-2. Home screen with message list
-3. Status indicators (read/responded)
-4. Grouping by contact
-5. Conversation detail screen
-6. Status change actions
-7. Simulate Incoming Message
-8. Demo Mode label
-9. Open-in-platform simulation
-10. Importance, categories, and filters (Phase 2)
+2. Home screen with conversation list
+3. Tabs (All, Unread, Needs Response, Done, Urgent)
+4. Status indicators and action buttons
+5. Platform labels with colored badges
+6. Grouping by contact
+7. Conversation detail screen
+8. Light/dark theme support
+9. Empty state (otter illustration)
+10. Welcome screen
+11. Simulate Incoming Message
+12. Demo Mode indicator
 
-## 25. Platform Strategy
+**Phase 2:**
+13. Personalization page
+14. Help/tutorial page
+15. Importance, categories, and custom statuses
+16. Responsive phone layout
+
+## 26. Platform Strategy
 
 | Platform | Role | Priority |
 |----------|------|----------|
@@ -319,7 +394,7 @@ Give a first-time user this scenario:
 
 ---
 
-## 26. Final Product Definition
+## 27. Final Product Definition
 
 | Attribute | Value |
 |-----------|-------|
