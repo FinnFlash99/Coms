@@ -215,6 +215,7 @@ When Maya taps a conversation:
 - **Mark Read** / **Mark Unread**
 - **Mark Responded** / **Mark Needs Response**
 - **Flag** (mark urgent) / **Unflag** (remove urgent)
+- **Set contact type** — Client, Close, Subcontractor, Vendor, Personal, Family, etc. (user-defined)
 - Change category
 - Change importance
 
@@ -250,10 +251,23 @@ A settings page where users can customize:
 |---------|---------|
 | **Theme** | Light / Dark / System |
 | **Categories** | Create, edit, delete custom categories |
+| **Contact types** | Create, edit, delete custom contact types (Client, Close, Subcontractor, etc.) |
 | **Status types** | Define custom statuses beyond defaults |
 | **Default tab** | Which tab opens first |
 | **Grouping** | By person (default) or separate threads |
-| **Notifications** | What triggers notifications |
+| **Notifications** | What triggers notifications (see below) |
+| **Account** | Log out, account info |
+
+### Notification Settings
+
+| Setting | Options |
+|---------|---------|
+| **Enable notifications** | On / Off |
+| **Notify on new message** | All / Only flagged contacts / Off |
+| **Notify on urgent/flagged** | On / Off |
+| **Notify on time-sensitive** | On / Off (auto-detected deadlines) |
+| **Quiet hours** | Set hours when notifications are silenced |
+| **Sound** | On / Off, choose sound |
 
 ---
 
@@ -316,9 +330,23 @@ For prototype testing, the user can simulate a new message:
 |-------|------|
 | id | string |
 | name | string |
-| type | string (user-defined) |
+| type | ContactType (user-defined) |
 | platforms | Platform[] |
 | conversations | Conversation[] |
+
+### Contact Types
+
+Users can assign a type to each contact to indicate their relationship.
+
+**Default types:**
+- Client
+- Close (friends, close colleagues)
+- Subcontractor
+- Vendor
+- Personal
+- Family
+
+**Custom types:** Users can create their own contact types in settings.
 
 ### Message
 
@@ -357,6 +385,8 @@ For prototype testing, the user can simulate a new message:
 ## 22. Phase 2 — After MVP
 
 - [ ] Personalization page (full settings)
+- [ ] Notification settings (triggers, quiet hours, sounds)
+- [ ] Login / Logout / Account management
 - [ ] Help/tutorial page
 - [ ] Importance levels (auto-suggested + manual)
 - [ ] Time-sensitive detection and notifications
@@ -369,7 +399,6 @@ For prototype testing, the user can simulate a new message:
 ## 23. Do Not Build Yet
 
 - Real platform integrations
-- Authentication
 - Subscriptions or payments
 - AI-generated replies
 - In-app message composer
@@ -377,8 +406,9 @@ For prototype testing, the user can simulate a new message:
 - Analytics
 - CRM features
 - Task management
-- Complex settings
 - Native mobile app
+
+**Note:** Authentication (login/logout) is needed for the full product but can be simulated in the prototype.
 
 ## 24. Success Test
 
