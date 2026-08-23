@@ -95,11 +95,19 @@ The app tracks the status of messages and conversations. Status types are **cust
 
 Categories are **user-defined** and vary by person.
 
-Examples:
-- By relationship type: Client, Subcontractor, Personal
-- By project: Project Alpha, Website Redesign
-- By urgency: High Priority, Low Priority
-- By custom labels the user creates
+**Example category types:**
+
+| Category Type | Examples |
+|---------------|----------|
+| **By platform** | Email, Slack, WhatsApp, Teams |
+| **By relationship** | Client, Subcontractor, Vendor, Personal, Family |
+| **By connection strength** | Close, Regular, Occasional, New |
+| **By project** | Project Alpha, Website Redesign, Q4 Campaign |
+| **By priority** | High Priority, Normal, Low Priority |
+| **By response time** | Urgent (same day), Standard, When possible |
+| **By custom labels** | Whatever the user creates |
+
+Users can create categories that make sense for their workflow.
 
 ## 10. Filtering
 
@@ -160,13 +168,35 @@ The main screen uses tabs to organize conversations:
 
 | Tab | Contents |
 |-----|----------|
-| **All** | Everything in one view |
+| **All** | Everything in one view (see below for layout) |
 | **Unread** | Messages she hasn't seen yet |
 | **Needs Response** | She's read it but hasn't replied |
 | **Done** | Nothing pending, resolved |
 | **Urgent** | Time-sensitive / flagged items |
 
 Default tab is customizable by user.
+
+### "All" Tab Layout
+
+The All tab shows everything, but with visual separation:
+
+```
+┌─────────────────────────────────┐
+│  ACTIVE                         │
+│  ─────────────────────────────  │
+│  [Urgent items]                 │
+│  [Unread items]                 │
+│  [Needs Response items]         │
+│                                 │
+│  ─────────────── divider ────── │
+│                                 │
+│  DONE                           │
+│  ─────────────────────────────  │
+│  [Resolved items]               │
+└─────────────────────────────────┘
+```
+
+Active items (urgent, unread, needs response) appear first, grouped together. A subtle divider separates them from Done items below.
 
 ## 14. Conversation Detail
 
