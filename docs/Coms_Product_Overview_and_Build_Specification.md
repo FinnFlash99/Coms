@@ -132,6 +132,16 @@ Notifications are triggered by:
 5. **One source of truth** — All platforms, one place
 6. **Anxiety-reducing** — The goal is to make the app-switching worry go away
 
+## 12c. Emoji Support
+
+Full emoji support throughout the app:
+
+- **Messages** — Display emojis in message content
+- **Contact names** — Users can add emojis to contact names (e.g., "Sarah 🌟")
+- **Categories** — Emojis in category names (e.g., "🔥 Urgent", "💼 Work")
+- **Contact types** — Emojis in custom types (e.g., "⭐ VIP Client")
+- **Status types** — Emojis in custom statuses (e.g., "✅ Done", "⏳ Waiting")
+
 ## 12a. Visual Direction
 
 | Aspect | Decision |
