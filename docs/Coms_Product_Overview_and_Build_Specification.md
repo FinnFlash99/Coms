@@ -305,7 +305,21 @@ Give a first-time user this scenario:
 9. Open-in-platform simulation
 10. Importance, categories, and filters (Phase 2)
 
-## 25. Final Product Definition
+## 25. Platform Strategy
+
+| Platform | Role | Priority |
+|----------|------|----------|
+| **Desktop (web)** | Full experience | MVP — design first |
+| **Phone (web, responsive)** | Full experience, adapted | After desktop |
+| **Watch** | Notifications only | Future — no app needed |
+
+**Approach:** Responsive web app. Design desktop first, then adapt to phone. One codebase.
+
+**Watch:** Push notifications only. No dedicated watch app for MVP.
+
+---
+
+## 26. Final Product Definition
 
 | Attribute | Value |
 |-----------|-------|
