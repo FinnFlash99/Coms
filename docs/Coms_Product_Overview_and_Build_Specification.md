@@ -140,8 +140,9 @@ Notifications are triggered by:
 | **Density** | Spacious with some efficiency — calm but scannable |
 | **Style** | Clean with a little modern |
 | **Information hierarchy** | Contact name and message preview are most prominent |
-| **Platform indicators** | Text label with colored badge (each platform has a color) |
-| **Status actions** | Buttons visible on each row — always there, one tap |
+| **Platform indicators** | Text label with colored badge — slightly larger, easy to see at a glance |
+| **Status actions** | Buttons visible on each row: Mark Read, Mark Responded, Flag (urgent), Unflag |
+| **Open in platform** | Each conversation shows "Open in [Platform]" button (e.g., "Open in Slack", "Open in Email") |
 | **Demo Mode label** | Subtle but persistent — small indicator in a corner |
 
 ## 12b. Empty State ("All Clear")
@@ -160,7 +161,7 @@ The home screen answers: **"What's the status of everything?"**
 - Status indicators visible at a glance
 - Grouped by person (default) or by thread (user preference)
 - Newest activity appears first within each group
-- Status action buttons visible on each row
+- Action buttons visible on each row: Mark Read, Mark Responded, Flag/Unflag, Open in [Platform]
 
 ### Tabs
 
@@ -210,11 +211,12 @@ When Maya taps a conversation:
 - Importance and category
 
 **Actions:**
-- Open in original platform (to reply there)
-- Change status
-- Change importance
+- **Open in [Platform]** — dynamic button (e.g., "Open in Slack", "Open in Email", "Open in WhatsApp")
+- **Mark Read** / **Mark Unread**
+- **Mark Responded** / **Mark Needs Response**
+- **Flag** (mark urgent) / **Unflag** (remove urgent)
 - Change category
-- Mark time-sensitive
+- Change importance
 
 ## 15. Core User Loop
 
@@ -341,8 +343,8 @@ For prototype testing, the user can simulate a new message:
 - [ ] Unified message list showing all conversations
 - [ ] Tabs (All, Unread, Needs Response, Done, Urgent)
 - [ ] At-a-glance status indicators (read, responded)
-- [ ] Status action buttons on each row
-- [ ] Platform labels with colored badges
+- [ ] Action buttons on each row (Mark Read, Mark Responded, Flag/Unflag, Open in [Platform])
+- [ ] Platform labels with colored badges (larger size, prominent)
 - [ ] Grouping by contact (default view)
 - [ ] Conversation detail view
 - [ ] Light and dark theme (system preference)
