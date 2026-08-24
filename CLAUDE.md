@@ -26,6 +26,16 @@ A unified inbox that aggregates messages from all platforms into one place. At a
 
 Single-developer repo (just Finn) — commit and push directly to `main`. Do not create feature branches or PRs unless explicitly asked.
 
+## Handling a Claude Design handoff
+
+When given a new Claude Design file/export (a `.dc.html` bundle, a "design handoff" ZIP, etc.), the job is narrow:
+
+1. Sync it into `design/` (per "Claude Design Integration" above), fixing any references broken by the sync (renamed `_ds/` UUID, etc.).
+2. Make sure the repo still compiles clean — `npm run lint`, `npm run check`, `npm run build` all pass.
+3. Commit and push to `main`.
+
+Do **not** treat a design handoff as a request to implement the design in `src/`, build new functionality, or otherwise expand scope — and do not stop to ask the user about scope/next-steps for that. If they want the design implemented in app code, or anything beyond sync-and-deploy, they'll ask for it explicitly.
+
 ## Development Commands
 
 ```bash
