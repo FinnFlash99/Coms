@@ -1,16 +1,46 @@
 # OS files
 .DS_Store
+Thumbs.db
 
 # Design backups (created by update-design.sh)
 design-backup-*/
 
-# Dependencies (when we add them)
+# Dependencies
 node_modules/
 
 # Build output
 dist/
 build/
+.svelte-kit/
 
 # Environment files
 .env
 .env.local
+.env.*.local
+
+# SvelteKit
+.svelte-kit
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.pem

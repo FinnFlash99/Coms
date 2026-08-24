@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip:*)",
+      "Bash(chmod:*)",
+      "Bash(du:*)",
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run check:*)",
+      "Bash(gh auth status:*)"
+    ]
+  }
+}

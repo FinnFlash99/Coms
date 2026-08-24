@@ -1,0 +1,28 @@
+# Cloudflare Pages configuration for Coms
+name = "coms"
+compatibility_date = "2024-12-01"
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "coms-db"
+database_id = "placeholder-replace-with-actual-id"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "placeholder-replace-with-actual-id"
+
+[[kv_namespaces]]
+binding = "OAUTH_STATE"
+id = "placeholder-replace-with-actual-id"
+
+# Queues (for background sync)
+# [[queues.producers]]
+# binding = "SYNC_QUEUE"
+# queue = "coms-sync"
+
+# Environment variables (secrets should be set via wrangler secret)
+[vars]
+ENVIRONMENT = "development"

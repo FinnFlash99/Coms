@@ -1,0 +1,104 @@
+/* Coms - Application Styles */
+
+/* Import the Industry design system */
+@import '$lib/styles/industry.css';
+
+/* Emoji font support */
+body {
+	font-family: var(--font-body), "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+/* Theme transitions */
+html {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	min-height: 100%;
+	background: var(--color-bg);
+	color: var(--color-text);
+	transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Link styles */
+a {
+	color: var(--color-accent);
+}
+
+a:hover {
+	color: var(--color-accent-700);
+}
+
+/* Muted text utility */
+.text-muted {
+	color: color-mix(in srgb, var(--color-text) 72%, transparent);
+}
+
+/* Dark theme overrides */
+html[data-theme="dark"] {
+	--color-bg: #191b1e;
+	--color-surface: #22252a;
+	--color-text: #e6e8eb;
+	--color-divider: color-mix(in srgb, #e6e8eb 18%, transparent);
+	--color-accent: #7fa3c7;
+	--color-accent-100: #22303f;
+	--color-accent-200: #2b3d50;
+	--color-accent-600: #96b7d6;
+	--color-accent-700: #b0cbe4;
+	--color-accent-800: #cbdff2;
+	--color-neutral-100: #26292d;
+	--color-neutral-800: #cfd3d8;
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+	--shadow-md: 0 3px 10px rgba(0, 0, 0, 0.55);
+	--shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme="dark"] a:hover {
+	color: var(--color-accent-600);
+}
+
+/* Animations */
+@keyframes coms-in {
+	from {
+		opacity: 0;
+		transform: translateY(-5px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes coms-pop {
+	from {
+		opacity: 0;
+		transform: scale(0.985);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes coms-pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.35;
+	}
+}
+
+/* Animation utilities */
+.animate-in {
+	animation: coms-in 0.25s ease;
+}
+
+.animate-pop {
+	animation: coms-pop 0.35s ease;
+}
+
+.animate-pulse {
+	animation: coms-pulse 2.4s ease infinite;
+}
