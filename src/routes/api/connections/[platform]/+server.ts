@@ -1,4 +1,4 @@
-import { json, error, redirect } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import {
 	OAUTH_CONFIGS,

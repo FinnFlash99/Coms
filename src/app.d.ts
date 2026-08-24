@@ -15,6 +15,8 @@ declare global {
 			};
 		}
 
+		// SvelteKit merges per-route `PageData` into this via declaration merging; intentionally empty.
+		// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 		interface PageData {}
 
 		interface Platform {

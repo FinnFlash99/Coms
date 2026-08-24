@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { activeTab, conversationCounts } from '$lib/stores';
-	import { TABS, type TabId } from '$lib/types';
+	import { TABS } from '$lib/types';
 
 	const tabs = TABS;
 </script>

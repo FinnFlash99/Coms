@@ -5,6 +5,7 @@ import {
 	type UserPreferences,
 	type TabId,
 	type Theme,
+	type Platform,
 	DEFAULT_PREFERENCES,
 	getConversationStatus
 } from '$lib/types';
@@ -12,7 +13,7 @@ import { DEMO_CONTACTS, DEMO_CONVERSATIONS, generateDemoMessage } from './demo-d
 
 // Theme store
 function createThemeStore() {
-	const { subscribe, set, update } = writable<Theme>('system');
+	const { subscribe, set } = writable<Theme>('system');
 
 	function applyTheme(theme: Theme) {
 		const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -201,9 +202,7 @@ export const filteredConversations = derived(
 );
 
 // Derived store for counts
-export const conversationCounts = derived([conversations, contacts], ([$conversations, $contacts]) => {
-	const contactById = (id: string) => $contacts.find((c) => c.id === id);
-
+export const conversationCounts = derived([conversations, contacts], ([$conversations]) => {
 	const counts = { all: 0, unread: 0, needs: 0, done: 0, urgent: 0 };
 
 	$conversations.forEach((conv) => {
@@ -248,7 +247,7 @@ export function updateContact(id: string, updates: Partial<Contact>) {
 
 export function simulateMessage(
 	contactId: string,
-	platform: string,
+	platform: Platform,
 	content: string,
 	importance: 'low' | 'normal' | 'high',
 	timeSensitive: boolean
@@ -286,7 +285,7 @@ export function simulateMessage(
 				{
 					id: 'v' + (Date.now() % 10000000),
 					contactId,
-					platform: platform as any,
+					platform,
 					isRead: false,
 					isResponded: false,
 					importance,

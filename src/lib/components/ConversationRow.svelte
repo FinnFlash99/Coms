@@ -10,7 +10,6 @@
 		type Conversation,
 		type Contact,
 		getConversationStatus,
-		getInitials,
 		relativeTime,
 		PLATFORMS
 	} from '$lib/types';

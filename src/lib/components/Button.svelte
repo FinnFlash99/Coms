@@ -8,11 +8,14 @@
 		children: Snippet;
 	}
 
+	// Not compiled as a custom element, so the rest-props/custom-element-prop-inference
+	// warning below doesn't apply here.
 	let {
 		variant = 'secondary',
 		block = false,
 		children,
 		class: className = '',
+		// eslint-disable-next-line svelte/valid-compile
 		...rest
 	}: Props = $props();
 

@@ -8,7 +8,7 @@
 		categoryFilter,
 		activeTab
 	} from '$lib/stores';
-	import { PLATFORMS, getConversationStatus } from '$lib/types';
+	import { PLATFORMS } from '$lib/types';
 	import Blueprint from '$components/Blueprint.svelte';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';

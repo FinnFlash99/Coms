@@ -47,7 +47,7 @@
 
 	<div class="sections">
 		<div class="field">
-			<label>Theme</label>
+			<span class="field-label">Theme</span>
 			<SegmentedControl
 				options={themeOptions}
 				value={$preferences.theme}
@@ -57,7 +57,7 @@
 		</div>
 
 		<div class="field">
-			<label>Default tab</label>
+			<span class="field-label">Default tab</span>
 			<SegmentedControl
 				options={tabOptions}
 				value={$preferences.defaultTab}
@@ -68,7 +68,7 @@
 		</div>
 
 		<div class="field">
-			<label>Notifications</label>
+			<span class="field-label">Notifications</span>
 			<label class="checkbox-row">
 				<input type="checkbox" checked={$preferences.notify} onchange={toggleNotify} />
 				Send me notifications
@@ -106,7 +106,7 @@
 		</div>
 
 		<div class="field">
-			<label>Account</label>
+			<span class="field-label">Account</span>
 			<div class="account-row">
 				<Avatar name="Maya" size="sm" />
 				<div class="account-info">
@@ -149,7 +149,7 @@
 		gap: 32px;
 	}
 
-	.field label:first-child {
+	.field .field-label {
 		display: block;
 		font-size: 12px;
 		margin-bottom: 5px;

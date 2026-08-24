@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
-	import { ChevronLeft, Flag, ExternalLink, Check } from 'lucide-svelte';
+	import { ChevronLeft, Flag, ExternalLink } from 'lucide-svelte';
 	import {
 		contacts,
 		conversations,
@@ -81,7 +80,7 @@
 
 		<div class="controls">
 			<div class="field">
-				<label>Relationship</label>
+				<span class="field-label">Relationship</span>
 				<SegmentedControl
 					options={relationshipOptions}
 					value={contact.type}
@@ -90,7 +89,7 @@
 				/>
 			</div>
 			<div class="field">
-				<label>Connection</label>
+				<span class="field-label">Connection</span>
 				<SegmentedControl
 					options={connectionOptions}
 					value={contact.connection}
@@ -241,7 +240,7 @@
 		margin: 0;
 	}
 
-	.field label {
+	.field .field-label {
 		display: block;
 		font-size: 12px;
 		margin-bottom: 5px;

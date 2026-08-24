@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
-	import { theme, preferences, toast as toastStore } from '$lib/stores';
+	import { theme, preferences } from '$lib/stores';
 	import Toast from '$components/Toast.svelte';
 
 	let { children } = $props();

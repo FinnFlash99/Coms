@@ -73,7 +73,7 @@
 
 	<div class="options-row">
 		<div class="field" style="margin: 0;">
-			<label>Importance</label>
+			<span class="field-label">Importance</span>
 			<SegmentedControl
 				options={importanceOptions}
 				value={importance}
@@ -138,7 +138,7 @@
 		gap: 5px;
 	}
 
-	.field label {
+	.field .field-label {
 		font-size: 12px;
 		color: color-mix(in srgb, var(--color-text) 70%, transparent);
 	}

@@ -24,9 +24,17 @@ export default ts.config(
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+		rules: {
+			// TypeScript already checks this; the core rule doesn't understand Svelte 5's
+			// `generics="T"` script attribute and false-positives on the type parameter.
+			'no-undef': 'off'
 		}
 	},
 	{
-		ignores: ['build/', '.svelte-kit/', 'dist/', 'node_modules/', '.wrangler/']
+		// design/ is a Claude Design export: vendored/generated runtime and design-system
+		// files that get wholesale replaced by scripts/update-design.sh, not hand-maintained
+		// app source, so they're excluded from lint the same way build output is.
+		ignores: ['build/', '.svelte-kit/', 'dist/', 'node_modules/', '.wrangler/', 'design/']
 	}
 );
