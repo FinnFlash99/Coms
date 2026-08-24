@@ -134,7 +134,7 @@ Before committing documentation changes:
 | Project structure | `docs/reference/project-structure.md` |
 | Architecture | `docs/explanation/architecture.md` |
 | Design decisions | `docs/explanation/design-decisions.md` |
-| Design system source | `design/_ds/industry-*/readme.md` |
+| Design system source | `design/_ds/nocturne-*/readme.md` |
 
 ## Development Lifecycle with Documentation
 

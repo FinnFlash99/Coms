@@ -57,7 +57,7 @@ html[data-theme="light"] .dialog-backdrop{background:color-mix(in srgb,#22242e 3
         </div>
       </div>
       <button class="btn btn-primary" onClick="{{ enterApp }}">Enter Coms</button>
-      <p class="text-muted" style="font-size:12px;margin:16px 0 0">Demo mode — messages are simulated. The full product syncs your platforms automatically.</p>
+      <p class="text-muted" style="font-size:12px;margin:16px 0 0">Demo mode with sample conversations. The full product syncs your platforms automatically.</p>
     </div>
   </div>
 </sc-if>
@@ -68,7 +68,7 @@ html[data-theme="light"] .dialog-backdrop{background:color-mix(in srgb,#22242e 3
       <span style="font-family:var(--font-heading);font-weight:500;font-size:26px;letter-spacing:-.02em">Coms</span>
       <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px">Unified inbox</span>
       <span style="flex:1"></span>
-      <button class="btn btn-secondary" onClick="{{ openSimulate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Simulate message</button>
+      <button class="btn btn-primary" onClick="{{ openCompose }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>New message</button>
       <button class="btn btn-secondary btn-icon" title="Settings" onClick="{{ openSettings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="15" cy="7" r="2.2" fill="var(--color-bg)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="9" cy="17" r="2.2" fill="var(--color-bg)"></circle></svg></button>
     </div>
     <p class="text-muted" style="font-size:13px;margin:8px 0 30px">{{ summary }}</p>
@@ -172,6 +172,10 @@ html[data-theme="light"] .dialog-backdrop{background:color-mix(in srgb,#22242e 3
               </div>
             </sc-for>
           </div>
+          <div style="display:flex;align-items:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--color-divider)">
+            <textarea class="input" style="flex:1;min-height:44px;max-height:120px;font-size:14px;padding:11px 13px;resize:vertical" placeholder="{{ th.replyPlaceholder }}" value="{{ th.draft }}" onChange="{{ th.setDraft }}" onKeyDown="{{ th.replyKey }}"></textarea>
+            <button class="btn btn-primary" style="flex:none" disabled="{{ th.replyEmpty }}" onClick="{{ th.send }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>Send</button>
+          </div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 24px;border-top:1px solid var(--color-divider)">
             <sc-if value="{{ th.canRead }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" onClick="{{ th.markRead }}">Mark read</button></sc-if>
             <sc-if value="{{ th.canRespond }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" style="font-size:12px;padding:5px 11px" onClick="{{ th.markResponded }}">Mark responded</button></sc-if>
@@ -235,39 +239,31 @@ html[data-theme="light"] .dialog-backdrop{background:color-mix(in srgb,#22242e 3
   </div>
 </sc-if>
 
-<sc-if value="{{ showSimulate }}" hint-placeholder-val="{{ false }}">
-  <div class="dialog-backdrop" style="z-index:70" onClick="{{ closeSimulate }}">
+<sc-if value="{{ showCompose }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:70" onClick="{{ closeCompose }}">
     <div class="dialog" style="animation:coms-pop .25s ease" onClick="{{ swallow }}">
-            <div class="dialog-title">Simulate incoming message</div>
+      <div class="dialog-title">New message</div>
       <div class="dialog-body" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label>Contact</label>
-            <select class="input" value="{{ simContact }}" onChange="{{ setSimContact }}">
+          <div class="field"><label>To</label>
+            <select class="input" value="{{ cmpContact }}" onChange="{{ setCmpContact }}">
               <sc-for list="{{ contactOpts }}" as="c" hint-placeholder-count="6"><option value="{{ c.id }}">{{ c.name }}</option></sc-for>
             </select>
           </div>
-          <div class="field"><label>Platform</label>
-            <select class="input" value="{{ simPlatform }}" onChange="{{ setSimPlatform }}">
+          <div class="field"><label>Send via</label>
+            <select class="input" value="{{ cmpPlatform }}" onChange="{{ setCmpPlatform }}">
               <sc-for list="{{ platformOpts }}" as="p" hint-placeholder-count="6"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
             </select>
           </div>
         </div>
         <div class="field"><label>Message</label>
-          <textarea class="input" placeholder="e.g. Can you send the files by tomorrow 3pm?" value="{{ simContent }}" onChange="{{ setSimContent }}"></textarea>
+          <textarea class="input" style="min-height:96px" placeholder="Write your message…" value="{{ cmpContent }}" onChange="{{ setCmpContent }}"></textarea>
         </div>
-        <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center">
-          <div class="field" style="margin:0"><label>Importance</label>
-            <span class="seg">
-              <sc-for list="{{ simImpOpts }}" as="o" hint-placeholder-count="3"><label class="seg-opt"><input type="radio" name="coms-sim-imp" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
-            </span>
-          </div>
-          <label class="radio" style="font-size:13px;align-self:flex-end;padding-bottom:8px"><input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;accent-color:var(--color-accent)" checked="{{ simTs }}" onChange="{{ toggleSimTs }}">Time-sensitive</label>
-        </div>
-        <p class="text-muted" style="font-size:12px;margin:0">Deadlines like "tomorrow at 3pm" are auto-detected as time-sensitive.</p>
+        <p class="text-muted" style="font-size:12px;margin:0">{{ cmpHint }}</p>
       </div>
       <div class="dialog-actions">
-        <button class="btn btn-secondary" onClick="{{ closeSimulate }}">Cancel</button>
-        <button class="btn btn-primary" onClick="{{ deliverSim }}">Deliver message</button>
+        <button class="btn btn-secondary" onClick="{{ closeCompose }}">Cancel</button>
+        <button class="btn btn-primary" disabled="{{ cmpEmpty }}" onClick="{{ sendCompose }}">Send</button>
       </div>
     </div>
   </div>
@@ -303,8 +299,9 @@ class Component extends DCLogic {
     } catch (e) {}
     return {
       screen: 'home', tab: prefs.defaultTab, cat: 'all', prefs, welcomed,
-      detail: null, showSimulate: false, toast: '',
-      sim: { contactId: 'c1', platform: 'slack', content: '', importance: 'normal', ts: false },
+      detail: null, showCompose: false, toast: '',
+      compose: { contactId: 'c1', platform: 'slack', content: '' },
+      drafts: {},
       contacts: Component.CONTACTS.map(c => Object.assign({}, c)),
       convs: [
         { id: 'v1', contactId: 'c1', platform: 'slack', isRead: false, isResponded: false, importance: 'high', timeSensitive: true, messages: [
@@ -346,12 +343,12 @@ class Component extends DCLogic {
     { id: 'c6', name: 'Brand Co.', type: 'Client', connection: 'Occasional' }
   ];
   static PLATFORMS = {
-    email: { label: 'Email', color: '#7f96c8' },
-    slack: { label: 'Slack', color: '#a98ad0' },
-    whatsapp: { label: 'WhatsApp', color: '#79b28d' },
-    instagram: { label: 'Instagram', color: '#c98ba0' },
-    imessage: { label: 'iMessage', color: '#7fb0d6' },
-    teams: { label: 'Teams', color: '#8b90d9' }
+    email: { label: 'Email', color: '#6d92e0' },
+    slack: { label: 'Slack', color: '#b478e8' },
+    whatsapp: { label: 'WhatsApp', color: '#5cc389' },
+    instagram: { label: 'Instagram', color: '#e07ba0' },
+    imessage: { label: 'iMessage', color: '#5cb4ec' },
+    teams: { label: 'Teams', color: '#7d84f0' }
   };
   static TABS = [['all', 'All'], ['unread', 'Unread'], ['needs', 'Needs Response'], ['done', 'Done'], ['urgent', 'Urgent']];
 
@@ -429,7 +426,7 @@ class Component extends DCLogic {
     const contactById = id => s.contacts.find(c => c.id === id);
     const latest = v => v.messages[v.messages.length - 1];
     const urgentOf = v => v.timeSensitive && !(v.isRead && v.isResponded);
-    const pchip = p => 'display:inline-flex;align-items:center;font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;border-radius:calc(var(--radius-md) * .75);padding:3px 9px;background:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 18%, transparent);color:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 62%, var(--color-text))';
+    const pchip = p => 'display:inline-flex;align-items:center;font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;border-radius:calc(var(--radius-md) * .75);padding:3px 9px;background:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 26%, transparent);color:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 88%, var(--color-text))';
 
     // one entry per thread — no grouping
     let entries = s.convs.map(v => {
@@ -551,6 +548,14 @@ class Component extends DCLogic {
           tsTitle: v.timeSensitive ? 'Unflag — remove urgent' : 'Flag as urgent',
           markRead: () => this.markConvsRead([v.id]),
           markResponded: () => this.markConvsResponded([v.id]),
+          draft: s.drafts[v.id] || '',
+          replyEmpty: !(s.drafts[v.id] || '').trim(),
+          replyPlaceholder: 'Reply to ' + c.name.split(' (')[0] + ' on ' + C.PLATFORMS[v.platform].label + '…',
+          setDraft: ev => this.setDraft(v.id, ev.target.value),
+          replyKey: ev => {
+            if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); this.sendReply(v.id); }
+          },
+          send: () => this.sendReply(v.id),
           toggleTs: () => this.patchConv(v.id, { timeSensitive: !v.timeSensitive }),
           openIn: () => this.toast('The full product would open this thread in ' + C.PLATFORMS[v.platform].label + '.'),
           msgs: v.messages.map(m => {
@@ -559,7 +564,7 @@ class Component extends DCLogic {
               sender: m.sender, time: this.full(m.ts), content: m.content,
               wrapStyle: 'display:flex;flex-direction:column;gap:4px;max-width:78%;' + (out ? 'align-self:flex-end;align-items:flex-end' : 'align-self:flex-start'),
               metaStyle: 'font-size:11.5px;color:color-mix(in srgb, var(--color-text) 72%, transparent)',
-              bubbleStyle: 'padding:10px 14px;font-size:14px;line-height:1.5;border-radius:var(--radius-md);border:1px solid var(--color-divider);' + (out ? 'background:color-mix(in srgb, var(--color-accent) 16%, transparent)' : 'background:color-mix(in srgb, var(--color-text) 6%, transparent)')
+              bubbleStyle: 'padding:10px 14px;font-size:14px;line-height:1.5;border-radius:var(--radius-md);border:1px solid var(--color-divider);' + (out ? 'background:color-mix(in srgb, var(--color-accent) 24%, transparent)' : 'background:color-mix(in srgb, var(--color-text) 6%, transparent)')
             };
           })
         };
@@ -571,8 +576,8 @@ class Component extends DCLogic {
     const themeOpts = segOpts([['light', 'Light'], ['dark', 'Dark'], ['system', 'System']], s.prefs.theme, v => this.savePrefs({ theme: v }));
     const tabOpts = segOpts(C.TABS, s.prefs.defaultTab, v => this.savePrefs({ defaultTab: v }));
 
-    const simImpOpts = segOpts([['low', 'Low'], ['normal', 'Normal'], ['high', 'High']], s.sim.importance,
-      v => this.setState(st => ({ sim: Object.assign({}, st.sim, { importance: v }) })));
+    const cmpContact = contactById(s.compose.contactId);
+    const cmpExisting = s.convs.find(v => v.contactId === s.compose.contactId && v.platform === s.compose.platform);
 
     return {
       showWelcome: !s.welcomed,
@@ -600,47 +605,70 @@ class Component extends DCLogic {
       ].map(([k, label]) => ({ label, on: s.prefs[k], sel: () => this.savePrefs({ [k]: !s.prefs[k] }) })),
       showDemoBadge: this.props.showDemoBadge ?? true,
       toast: s.toast,
-      // simulate
-      showSimulate: s.showSimulate,
-      openSimulate: () => this.setState({ showSimulate: true }),
-      closeSimulate: () => this.setState({ showSimulate: false }),
+      // compose
+      showCompose: s.showCompose,
+      openCompose: () => this.setState({ showCompose: true }),
+      closeCompose: () => this.setState({ showCompose: false }),
       swallow: ev => ev.stopPropagation(),
       contactOpts: s.contacts.map(c => ({ id: c.id, name: c.name })),
       platformOpts: Object.entries(C.PLATFORMS).map(([id, p]) => ({ id, label: p.label })),
-      simContact: s.sim.contactId, simPlatform: s.sim.platform, simContent: s.sim.content, simTs: s.sim.ts,
-      simImpOpts,
-      setSimContact: ev => this.setState({ sim: Object.assign({}, s.sim, { contactId: ev.target.value }) }),
-      setSimPlatform: ev => this.setState({ sim: Object.assign({}, s.sim, { platform: ev.target.value }) }),
-      setSimContent: ev => this.setState({ sim: Object.assign({}, s.sim, { content: ev.target.value }) }),
-      toggleSimTs: () => this.setState({ sim: Object.assign({}, s.sim, { ts: !s.sim.ts }) }),
-      deliverSim: () => this.deliverSim()
+      cmpContact: s.compose.contactId, cmpPlatform: s.compose.platform, cmpContent: s.compose.content,
+      cmpEmpty: !s.compose.content.trim(),
+      cmpHint: cmpExisting
+        ? 'Adds to your existing ' + C.PLATFORMS[s.compose.platform].label + ' thread with ' + cmpContact.name.split(' (')[0] + '.'
+        : 'Starts a new ' + C.PLATFORMS[s.compose.platform].label + ' thread with ' + cmpContact.name.split(' (')[0] + '.',
+      setCmpContact: ev => this.setState({ compose: Object.assign({}, s.compose, { contactId: ev.target.value }) }),
+      setCmpPlatform: ev => this.setState({ compose: Object.assign({}, s.compose, { platform: ev.target.value }) }),
+      setCmpContent: ev => this.setState({ compose: Object.assign({}, s.compose, { content: ev.target.value }) }),
+      sendCompose: () => this.sendCompose()
     };
   }
 
-  deliverSim() {
-    const s = this.state, sim = s.sim, now = Date.now();
-    const content = sim.content.trim() || 'Hey — quick question when you have a minute.';
-    const autoTs = /\b(today|tomorrow|tonight|asap|urgent|deadline|by (mon|tue|wed|thu|fri|sat|sun|end)|\d{1,2}\s?(am|pm))\b/i.test(content);
-    const c = this.state.contacts.find(x => x.id === sim.contactId);
-    const msg = { dir: 'in', sender: c.name.split(' (')[0], content, ts: now };
-    const existing = s.convs.find(v => v.contactId === sim.contactId && v.platform === sim.platform);
-    let convs;
-    if (existing) {
-      convs = s.convs.map(v => v === existing ? Object.assign({}, v, {
-        isRead: false, isResponded: false,
-        importance: sim.importance !== 'normal' ? sim.importance : v.importance,
-        timeSensitive: v.timeSensitive || sim.ts || autoTs,
+  setDraft(convId, text) {
+    this.setState(s => ({ drafts: Object.assign({}, s.drafts, { [convId]: text }) }));
+  }
+
+  // Sending marks the thread handled: read, responded, no longer time-sensitive.
+  sendReply(convId) {
+    const text = (this.state.drafts[convId] || '').trim();
+    if (!text) return;
+    const msg = { dir: 'out', sender: 'You', content: text, ts: Date.now() };
+    this.setState(s => ({
+      convs: s.convs.map(v => v.id === convId ? Object.assign({}, v, {
+        isRead: true, isResponded: true, timeSensitive: false,
         messages: [...v.messages, msg]
+      }) : v),
+      drafts: Object.assign({}, s.drafts, { [convId]: '' })
+    }));
+    this.toast('Sent — thread marked responded');
+  }
+
+  sendCompose() {
+    const s = this.state, cmp = s.compose, now = Date.now();
+    const content = cmp.content.trim();
+    if (!content) return;
+    const msg = { dir: 'out', sender: 'You', content, ts: now };
+    const existing = s.convs.find(v => v.contactId === cmp.contactId && v.platform === cmp.platform);
+    let convs, convId;
+    if (existing) {
+      convId = existing.id;
+      convs = s.convs.map(v => v === existing ? Object.assign({}, v, {
+        isRead: true, isResponded: true, timeSensitive: false, messages: [...v.messages, msg]
       }) : v);
     } else {
+      convId = 'v' + (now % 1e7);
       convs = [...s.convs, {
-        id: 'v' + (now % 1e7), contactId: sim.contactId, platform: sim.platform,
-        isRead: false, isResponded: false, importance: sim.importance,
-        timeSensitive: sim.ts || autoTs, messages: [msg]
+        id: convId, contactId: cmp.contactId, platform: cmp.platform,
+        isRead: true, isResponded: true, importance: 'normal', timeSensitive: false, messages: [msg]
       }];
     }
-    this.setState({ convs, showSimulate: false, screen: 'home', sim: Object.assign({}, sim, { content: '', ts: false, importance: 'normal' }) });
-    this.toast('Message delivered' + ((sim.ts || autoTs) ? ' — flagged time-sensitive' : ''));
+    const name = s.contacts.find(c => c.id === cmp.contactId).name.split(' (')[0];
+    this.setState({
+      convs, showCompose: false, screen: 'detail',
+      detail: { contactId: cmp.contactId, convIds: [convId] },
+      compose: Object.assign({}, cmp, { content: '' })
+    });
+    this.toast('Sent to ' + name + ' on ' + Component.PLATFORMS[cmp.platform].label);
   }
 }
 </script>

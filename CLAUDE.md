@@ -66,7 +66,7 @@ Claude Design is connected directly to this GitHub repo (`FinnFlash99/Coms`). De
 - `design/styles.css` is a stable entry point that imports the design system
 - The app imports `$design/styles.css` directly — no manual copy/sync needed
 
-**If the design system folder changes** (new UUID in `_ds/industry-*/`):
+**If the design system folder changes** (new UUID in `_ds/nocturne-*/`):
 1. Update the import path in `design/styles.css`
 
 ## Project Structure
@@ -76,7 +76,7 @@ Finn-Comms/
 ├── design/                   # Claude Design exports (auto-committed)
 │   ├── Coms.dc.html          # Interactive prototype
 │   ├── styles.css            # Stable entry point for app imports
-│   └── _ds/industry-*/       # Design system (CSS, components)
+│   └── _ds/nocturne-*/       # Design system (CSS, components)
 ├── docs/                     # Documentation (Diátaxis structure)
 │   ├── tutorials/            # Learning-oriented
 │   ├── how-to/               # Task-oriented
@@ -121,17 +121,17 @@ Finn-Comms/
 - API routes in `src/routes/api/`
 - Component library in `src/lib/components/`
 
-## Design System: Industry
+## Design System: Nocturne
 
-Wireframe/blueprint aesthetic — steel-blue on light/dark grounds.
+Quiet, compact dark interface — near-neutral blue-grey ground with a blurple accent.
 
-- **Accent:** `#5980a6`
-- **Typography:** Barlow Condensed (headings), Barlow (body)
-- **Style:** Square corners, hairline borders, registration marks (+)
-- **Icons:** Lucide, stroke-width 1.5
-- **Components:** Blueprint, Button, Tag, Avatar, Dialog, Input, SegmentedControl
+- **Accent:** `#9184d9`
+- **Typography:** Inter (headings and body), heading weight capped at 500
+- **Style:** 8px radii, outlined (never filled) primary buttons, tonal ramps
+- **Icons:** Phosphor
+- **Components:** Button, Tag, Field/Input, SegmentedControl, Card, Nav, Table, Dialog
 
-See: [`design/_ds/industry-*/readme.md`](design/_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/readme.md)
+See: [`design/_ds/nocturne-*/readme.md`](design/_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/readme.md)
 
 ## Environment Setup
 

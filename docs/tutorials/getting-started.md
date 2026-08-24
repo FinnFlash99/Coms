@@ -50,22 +50,22 @@ Or manually open `design/Coms.dc.html` in your browser.
 
 ## Step 3: Explore the Design System
 
-The project uses the Industry design system — a wireframe/blueprint aesthetic.
+The project uses the Nocturne design system — a quiet, compact dark interface.
 
 Open the design system documentation:
 
 ```bash
-open design/_ds/industry-*/readme.md
+open design/_ds/nocturne-*/readme.md
 ```
 
-Or browse to `design/_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/readme.md`.
+Or browse to `design/_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/readme.md`.
 
 **Key visual elements:**
-- Steel-blue accent color (`#5980a6`)
-- Square corners (no rounded edges)
+- Blurple accent color (`#9184d9`)
+- 8px radii (softly rounded)
 - Hairline borders
-- Blueprint registration marks (`+`) at corners
-- Barlow typography family
+- Outlined (never filled) primary buttons
+- Inter typography family
 
 ## Step 4: Review the Project Structure
 
@@ -73,7 +73,7 @@ Or browse to `design/_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/readme.md
 Finn-Comms/
 ├── design/                 # Claude Design exports
 │   ├── Coms.dc.html        # Interactive prototype (open in browser)
-│   └── _ds/industry-*/     # Design system CSS and docs
+│   └── _ds/nocturne-*/     # Design system CSS and docs
 ├── docs/                   # Documentation (you are here)
 ├── scripts/                # Automation scripts
 │   └── update-design.sh    # Update design from exports
@@ -113,7 +113,7 @@ The project is ready for implementation. The next phase will involve:
 1. Setting up a JavaScript build system
 2. Creating the `src/` directory structure
 3. Implementing the MVP features from the specification
-4. Integrating the Industry design system CSS
+4. Integrating the Nocturne design system CSS
 
 ---
 

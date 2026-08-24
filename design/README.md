@@ -7,8 +7,8 @@ This folder contains exports from [Claude Design](https://claude.ai/design).
 ```
 design/
 ├── Coms.dc.html          # Main design file (open in browser to view)
-├── _ds/                  # Design system (Industry)
-│   └── industry-*/
+├── _ds/                  # Design system (Nocturne)
+│   └── nocturne-*/
 │       ├── styles.css    # All CSS variables and components
 │       ├── readme.md     # Design system documentation
 │       └── ...
@@ -35,22 +35,22 @@ This will:
 2. Extract the new export
 3. Preserve any files in `design/local/`
 
-## Design System: Industry
+## Design System: Nocturne
 
-The app uses the **Industry** design system — a wireframe/blueprint aesthetic.
+The app uses the **Nocturne** design system — a quiet, compact dark interface.
 
-- **Accent:** Steel-blue (#5980a6)
-- **Typography:** Barlow Condensed (headings), Barlow (body)
-- **Style:** Square corners, hairline borders, corner registration marks
+- **Accent:** Blurple (#9184d9)
+- **Typography:** Inter (headings and body)
+- **Style:** 8px radii, outlined (never filled) primary buttons, tonal ramps instead of ad-hoc saturation
 
-See `_ds/industry-*/readme.md` for full design system documentation.
+See `_ds/nocturne-*/readme.md` for full design system documentation.
 
 ## Using in Code
 
 Link the design system CSS in your HTML:
 
 ```html
-<link rel="stylesheet" href="design/_ds/industry-{id}/styles.css">
+<link rel="stylesheet" href="design/_ds/nocturne-{id}/styles.css">
 ```
 
 Use CSS variables for colors, spacing, typography:
