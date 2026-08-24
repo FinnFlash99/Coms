@@ -22,6 +22,10 @@ A unified inbox that aggregates messages from all platforms into one place. At a
 
 **Status:** Active development. SvelteKit application with Cloudflare Pages deployment.
 
+## Git Workflow
+
+Single-developer repo (just Finn) — commit and push directly to `main`. Do not create feature branches or PRs unless explicitly asked.
+
 ## Development Commands
 
 ```bash
