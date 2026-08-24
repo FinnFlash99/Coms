@@ -8,23 +8,28 @@
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/styles.css">
-<script src="_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/_ds_bundle.js"></script>
+<link rel="stylesheet" href="_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/styles.css">
+<script src="_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/_ds_bundle.js"></script>
 <script src="./image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <style>
 html{height:100%}
-body{margin:0;min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body),"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;transition:background .25s ease,color .25s ease}
-a{color:var(--color-accent)}a:hover{color:var(--color-accent-700)}
-.text-muted{color:color-mix(in srgb, var(--color-text) 72%, transparent)}
-html[data-theme="dark"]{
-  --color-bg:#191b1e; --color-surface:#22252a; --color-text:#e6e8eb;
-  --color-divider:color-mix(in srgb,#e6e8eb 18%,transparent);
-  --color-accent:#7fa3c7;
-  --color-accent-100:#22303f; --color-accent-200:#2b3d50; --color-accent-600:#96b7d6; --color-accent-700:#b0cbe4; --color-accent-800:#cbdff2;
-  --color-neutral-100:#26292d; --color-neutral-800:#cfd3d8;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.5); --shadow-md:0 3px 10px rgba(0,0,0,.55); --shadow-lg:0 12px 32px rgba(0,0,0,.6);
+body{margin:0;min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);transition:background .25s ease,color .25s ease}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-400)}
+.text-muted{color:color-mix(in srgb, var(--color-text) 62%, transparent)}
+html[data-theme="light"]{
+  --color-bg:#f4f5fb; --color-surface:#fbfbfe; --color-text:#22242e;
+  --color-accent:#5d5294;
+  --color-divider:color-mix(in srgb,#22242e 15%,transparent);
+  --color-neutral-100:#292b31;--color-neutral-200:#3f424d;--color-neutral-300:#595d6c;--color-neutral-400:#75798c;--color-neutral-600:#b2b6ca;--color-neutral-700:#cfd3e5;--color-neutral-800:#e4e7f5;--color-neutral-900:#f3f5fe;
+  --color-accent-100:#2b2741;--color-accent-200:#423a6a;--color-accent-300:#5d5294;--color-accent-400:#796cbf;--color-accent-600:#b5abfc;--color-accent-700:#d2cefd;--color-accent-800:#e7e5fe;--color-accent-900:#f5f4ff;
+  --color-accent-2-100:#2b293a;--color-accent-2-800:#e7e5fe;
+  --shadow-sm:0 0 0 1px color-mix(in srgb,#22242e 12%,transparent);
+  --shadow-md:0 0 0 1px color-mix(in srgb,#22242e 10%,transparent),0 6px 18px rgba(30,32,45,.10);
+  --shadow-lg:0 0 0 1px color-mix(in srgb,#22242e 10%,transparent),0 16px 40px rgba(30,32,45,.16);
 }
-html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
+html[data-theme="light"] .dialog-backdrop{background:color-mix(in srgb,#22242e 34%,transparent)}
 @keyframes coms-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 @keyframes coms-pop{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
 @keyframes coms-pulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -33,22 +38,21 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
 
 <sc-if value="{{ showWelcome }}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--color-bg);padding:24px">
-    <div class="blueprint" style="max-width:540px;padding:46px 50px;animation:coms-pop .35s ease">
-      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-      <div class="card-kicker" style="margin-bottom:10px">Unified inbox</div>
+    <div style="max-width:540px;padding:46px 50px;animation:coms-pop .35s ease;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
+            <div class="card-kicker" style="margin-bottom:10px">Unified inbox</div>
       <h1 style="font-size:54px;margin:0 0 6px">Coms</h1>
       <p style="font-size:17px;margin:0 0 24px">One place to see the status of all your conversations.</p>
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
         <div style="display:flex;gap:12px;align-items:center">
-          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14"></rect><polyline points="3 9 12 14 21 9"></polyline></svg></span>
+          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-sm);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14"></rect><polyline points="3 9 12 14 21 9"></polyline></svg></span>
           <span style="font-size:14px">Slack, Email, WhatsApp and more — aggregated in one inbox.</span>
         </div>
         <div style="display:flex;gap:12px;align-items:center">
-          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"></circle><polyline points="8 12.5 11 15.5 16 9.5"></polyline></svg></span>
+          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-sm);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"></circle><polyline points="8 12.5 11 15.5 16 9.5"></polyline></svg></span>
           <span style="font-size:14px">The status of everything — read, responded, needs attention — at a glance.</span>
         </div>
         <div style="display:flex;gap:12px;align-items:center">
-          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15.5 14"></polyline></svg></span>
+          <span style="width:32px;height:32px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-sm);color:var(--color-accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15.5 14"></polyline></svg></span>
           <span style="font-size:14px">Nothing slips. The app does the tracking so you don't have to.</span>
         </div>
       </div>
@@ -61,7 +65,7 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <div style="max-width:960px;margin:0 auto;padding:38px 32px 100px">
     <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-family:var(--font-heading);font-weight:600;font-size:24px;letter-spacing:.02em">COMS</span>
+      <span style="font-family:var(--font-heading);font-weight:500;font-size:26px;letter-spacing:-.02em">Coms</span>
       <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px">Unified inbox</span>
       <span style="flex:1"></span>
       <button class="btn btn-secondary" onClick="{{ openSimulate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Simulate message</button>
@@ -83,19 +87,18 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
         <div>
         <sc-if value="{{ sec.label }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
-            <span style="font-family:var(--font-heading);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ sec.label }}</span>
+            <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">{{ sec.label }}</span>
             <span class="text-muted" style="font-size:11px">{{ sec.count }}</span>
           </div>
         </sc-if>
-        <div class="blueprint">
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <sc-for list="{{ sec.rows }}" as="g" hint-placeholder-count="5">
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+                <sc-for list="{{ sec.rows }}" as="g" hint-placeholder-count="5">
           <div style="{{ g.rowStyle }}" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)" onClick="{{ g.open }}">
-            <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:16px;color:var(--color-accent)">{{ g.initials }}</div>
+            <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:16px;color:var(--color-accent)">{{ g.initials }}</div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                 <sc-if value="{{ g.unread }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;flex:none;background:var(--color-accent);border-radius:50%"></span></sc-if>
-                <span style="font-family:var(--font-heading);font-weight:600;font-size:18px;line-height:1.1">{{ g.name }}</span>
+                <span style="font-family:var(--font-heading);font-weight:500;font-size:17px;line-height:1.2;letter-spacing:-.01em">{{ g.name }}</span>
                 <span style="display:inline-flex;gap:12px;flex-wrap:wrap">
                   <sc-for list="{{ g.platforms }}" as="p" hint-placeholder-count="1">
                     <span style="{{ p.chipStyle }}">{{ p.label }}</span>
@@ -124,9 +127,8 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
     </sc-if>
     <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;align-items:center;padding:52px 0 20px;text-align:center;animation:coms-pop .35s ease">
-        <div class="blueprint" style="width:320px;height:220px;margin-bottom:22px">
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-          <image-slot id="otter-allclear" shape="rect" placeholder="otter floating on an inflatable tube in a river" style="width:100%;height:100%"></image-slot>
+        <div style="width:320px;height:220px;margin-bottom:22px;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;background:var(--color-surface)">
+                    <image-slot id="otter-allclear" shape="rect" placeholder="otter floating on an inflatable tube in a river" style="width:100%;height:100%"></image-slot>
         </div>
         <h3 style="margin:0 0 4px">All clear</h3>
         <p class="text-muted" style="font-size:14px;margin:0">You're all caught up. Nothing needs your attention.</p>
@@ -139,7 +141,7 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
   <div style="max-width:840px;margin:0 auto;padding:38px 32px 100px;animation:coms-in .25s ease">
     <button class="btn btn-ghost" style="font-size:13px;padding:4px 6px;margin:0 0 30px -6px" onClick="{{ goHome }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="14 6 8 12 14 18"></polyline></svg>Back to inbox</button>
     <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">
-      <div style="width:58px;height:58px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:22px;color:var(--color-accent)">{{ detailInitials }}</div>
+      <div style="width:58px;height:58px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:22px;color:var(--color-accent)">{{ detailInitials }}</div>
       <div>
         <h2 style="margin:0;font-size:32px;line-height:1.1">{{ detailName }}</h2>
         <p class="text-muted" style="font-size:14.5px;margin:4px 0 0">{{ detailType }} · {{ detailSub }}</p>
@@ -155,9 +157,8 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
     </div>
     <div style="display:flex;flex-direction:column;gap:32px">
       <sc-for list="{{ threads }}" as="th" hint-placeholder-count="1">
-        <div class="blueprint">
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:20px 24px;border-bottom:1px solid var(--color-divider)">
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:20px 24px;border-bottom:1px solid var(--color-divider)">
             <span style="{{ th.chipStyle }}">{{ th.platform }}</span>
             <sc-for list="{{ th.chips }}" as="c" hint-placeholder-count="1"><span class="tag {{ c.cls }}">{{ c.label }}</span></sc-for>
             <span style="flex:1"></span>
@@ -222,7 +223,7 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
       <div class="field">
         <label>Account</label>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <div style="width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);font-family:var(--font-heading);font-weight:600;font-size:15px;color:var(--color-accent)">M</div>
+          <div style="width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:15px;color:var(--color-accent)">M</div>
           <div style="flex:1;min-width:160px">
             <div style="font-size:14px;font-weight:500">Maya</div>
             <div class="text-muted" style="font-size:12px">maya@freelance.co</div>
@@ -236,9 +237,8 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
 
 <sc-if value="{{ showSimulate }}" hint-placeholder-val="{{ false }}">
   <div class="dialog-backdrop" style="z-index:70" onClick="{{ closeSimulate }}">
-    <div class="dialog blueprint" style="background:var(--color-bg);animation:coms-pop .25s ease" onClick="{{ swallow }}">
-      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-      <div class="dialog-title">Simulate incoming message</div>
+    <div class="dialog" style="animation:coms-pop .25s ease" onClick="{{ swallow }}">
+            <div class="dialog-title">Simulate incoming message</div>
       <div class="dialog-body" style="display:flex;flex-direction:column;gap:14px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="field"><label>Contact</label>
@@ -274,13 +274,13 @@ html[data-theme="dark"] a:hover{color:var(--color-accent-600)}
 </sc-if>
 
 <sc-if value="{{ showDemoBadge }}" hint-placeholder-val="{{ true }}">
-  <div style="position:fixed;left:14px;bottom:14px;z-index:50;display:inline-flex;align-items:center;gap:7px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--color-divider);padding:5px 9px;background:var(--color-bg);color:var(--color-text);opacity:.85">
+  <div style="position:fixed;left:14px;bottom:14px;z-index:50;display:inline-flex;align-items:center;gap:7px;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--color-divider);border-radius:999px;padding:5px 10px;background:var(--color-surface);color:var(--color-text);opacity:.85">
     <i style="width:6px;height:6px;background:var(--color-accent);animation:coms-pulse 2.4s ease infinite"></i>Demo mode
   </div>
 </sc-if>
 
 <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:80;border:1px solid var(--color-divider);background:var(--color-bg);box-shadow:var(--shadow-md);padding:9px 16px;font-size:13px;animation:coms-in .2s ease">{{ toast }}</div>
+  <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:80;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface);box-shadow:var(--shadow-md);padding:9px 16px;font-size:13px;animation:coms-in .2s ease">{{ toast }}</div>
 </sc-if>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{
@@ -346,12 +346,12 @@ class Component extends DCLogic {
     { id: 'c6', name: 'Brand Co.', type: 'Client', connection: 'Occasional' }
   ];
   static PLATFORMS = {
-    email: { label: 'Email', color: '#5980a6' },
-    slack: { label: 'Slack', color: '#a06ca8' },
-    whatsapp: { label: 'WhatsApp', color: '#5b9e6f' },
-    instagram: { label: 'Instagram', color: '#bd6f86' },
-    imessage: { label: 'iMessage', color: '#5a95c8' },
-    teams: { label: 'Teams', color: '#6f74bd' }
+    email: { label: 'Email', color: '#7f96c8' },
+    slack: { label: 'Slack', color: '#a98ad0' },
+    whatsapp: { label: 'WhatsApp', color: '#79b28d' },
+    instagram: { label: 'Instagram', color: '#c98ba0' },
+    imessage: { label: 'iMessage', color: '#7fb0d6' },
+    teams: { label: 'Teams', color: '#8b90d9' }
   };
   static TABS = [['all', 'All'], ['unread', 'Unread'], ['needs', 'Needs Response'], ['done', 'Done'], ['urgent', 'Urgent']];
 
@@ -429,7 +429,7 @@ class Component extends DCLogic {
     const contactById = id => s.contacts.find(c => c.id === id);
     const latest = v => v.messages[v.messages.length - 1];
     const urgentOf = v => v.timeSensitive && !(v.isRead && v.isResponded);
-    const pchip = p => 'display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;background:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 18%, transparent);color:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 62%, var(--color-text))';
+    const pchip = p => 'display:inline-flex;align-items:center;font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;border-radius:calc(var(--radius-md) * .75);padding:3px 9px;background:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 18%, transparent);color:color-mix(in srgb,' + C.PLATFORMS[p].color + ' 62%, var(--color-text))';
 
     // one entry per thread — no grouping
     let entries = s.convs.map(v => {
@@ -511,10 +511,10 @@ class Component extends DCLogic {
       return {
         label, count: counts[id],
         style: 'background:none;border:none;border-bottom:2px solid ' + (active ? 'var(--color-accent)' : 'transparent') +
-          ';cursor:pointer;font-family:var(--font-heading);font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:9px 2px;margin-bottom:-1px;display:inline-flex;gap:7px;align-items:center;color:' +
+          ';cursor:pointer;font-family:var(--font-heading);font-weight:500;font-size:14.5px;letter-spacing:-.01em;padding:9px 2px;margin-bottom:-1px;display:inline-flex;gap:7px;align-items:center;color:' +
           (active ? 'var(--color-accent)' : 'inherit'),
-        countStyle: 'font-size:10.5px;font-family:var(--font-body);padding:1px 6px;min-width:16px;text-align:center;' +
-          (active ? 'background:var(--color-accent-100);color:var(--color-accent-800)' : 'background:var(--color-neutral-100);color:var(--color-neutral-800)'),
+        countStyle: 'font-size:10.5px;font-family:var(--font-body);padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;' +
+          (active ? 'background:var(--color-accent-800);color:var(--color-accent-100)' : 'background:var(--color-neutral-800);color:var(--color-neutral-100)'),
         sel: () => this.setState({ tab: id })
       };
     });
@@ -559,7 +559,7 @@ class Component extends DCLogic {
               sender: m.sender, time: this.full(m.ts), content: m.content,
               wrapStyle: 'display:flex;flex-direction:column;gap:4px;max-width:78%;' + (out ? 'align-self:flex-end;align-items:flex-end' : 'align-self:flex-start'),
               metaStyle: 'font-size:11.5px;color:color-mix(in srgb, var(--color-text) 72%, transparent)',
-              bubbleStyle: 'padding:10px 14px;font-size:14px;line-height:1.5;border:1px solid var(--color-divider);' + (out ? 'background:var(--color-accent-100)' : 'background:var(--color-surface)')
+              bubbleStyle: 'padding:10px 14px;font-size:14px;line-height:1.5;border-radius:var(--radius-md);border:1px solid var(--color-divider);' + (out ? 'background:color-mix(in srgb, var(--color-accent) 16%, transparent)' : 'background:color-mix(in srgb, var(--color-text) 6%, transparent)')
             };
           })
         };
