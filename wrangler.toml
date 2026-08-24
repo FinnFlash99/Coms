@@ -7,16 +7,16 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 [[d1_databases]]
 binding = "DB"
 database_name = "coms-db"
-database_id = "placeholder-replace-with-actual-id"
+database_id = "fc100fdf-8a6e-47c7-832c-325ea57e03a0"
 
 # KV Namespaces
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "placeholder-replace-with-actual-id"
+id = "8c2d31fbf05145f5807cca06b252ab67"
 
 [[kv_namespaces]]
 binding = "OAUTH_STATE"
-id = "placeholder-replace-with-actual-id"
+id = "84099b06344b4125a95b07d57a87dc4a"
 
 # Queues (for background sync)
 # [[queues.producers]]
