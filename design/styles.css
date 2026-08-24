@@ -1,0 +1,5 @@
+/* Design System Entry Point
+   This file provides a stable import path for the app.
+   Update the import below if the design system folder changes. */
+
+@import './_ds/industry-38d33b4e-b88e-4a40-acf0-47d74689c7ea/styles.css';

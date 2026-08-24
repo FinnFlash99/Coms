@@ -53,12 +53,25 @@ npm run db:migrate:local
 npm run db:migrate:remote
 ```
 
+## Claude Design Integration
+
+Claude Design is connected directly to this GitHub repo (`FinnFlash99/Coms`). Design changes commit automatically.
+
+**How it works:**
+- Claude Design exports to `design/` folder
+- `design/styles.css` is a stable entry point that imports the design system
+- The app imports `$design/styles.css` directly — no manual copy/sync needed
+
+**If the design system folder changes** (new UUID in `_ds/industry-*/`):
+1. Update the import path in `design/styles.css`
+
 ## Project Structure
 
 ```
 Finn-Comms/
-├── design/                   # Claude Design exports
+├── design/                   # Claude Design exports (auto-committed)
 │   ├── Coms.dc.html          # Interactive prototype
+│   ├── styles.css            # Stable entry point for app imports
 │   └── _ds/industry-*/       # Design system (CSS, components)
 ├── docs/                     # Documentation (Diátaxis structure)
 │   ├── tutorials/            # Learning-oriented
@@ -69,13 +82,12 @@ Finn-Comms/
 ├── scripts/                  # Automation scripts
 ├── src/                      # Application source code
 │   ├── app.html              # HTML template
-│   ├── app.css               # Global styles
+│   ├── app.css               # Global styles (imports $design/styles.css)
 │   ├── app.d.ts              # TypeScript declarations
 │   ├── lib/                  # Shared library code
 │   │   ├── components/       # Svelte components
 │   │   ├── stores/           # Svelte stores (state management)
 │   │   ├── server/           # Server-side utilities
-│   │   ├── styles/           # CSS (including Industry design system)
 │   │   └── types/            # TypeScript types
 │   └── routes/               # SvelteKit routes
 │       ├── +layout.svelte    # Root layout

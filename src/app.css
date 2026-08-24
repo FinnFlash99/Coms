@@ -1,7 +1,7 @@
 /* Coms - Application Styles */
 
-/* Import the Industry design system */
-@import '$lib/styles/industry.css';
+/* Import the Industry design system directly from design folder */
+@import '$design/styles.css';
 
 /* Emoji font support */
 body {
