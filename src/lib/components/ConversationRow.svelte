@@ -87,7 +87,7 @@
 			{/if}
 
 			{#if urgent}
-				<Tag variant="accent">Time-sensitive</Tag>
+				<Tag variant="alert">Time-sensitive</Tag>
 			{/if}
 
 			{#if conversation.importance === 'high'}
@@ -125,8 +125,8 @@
 			<Flag
 				size={13}
 				strokeWidth={1.5}
-				fill={urgent ? 'var(--color-accent)' : 'none'}
-				color={urgent ? 'var(--color-accent)' : 'currentColor'}
+				fill={urgent ? 'var(--color-alert)' : 'none'}
+				color={urgent ? 'var(--color-alert)' : 'currentColor'}
 			/>
 			{urgent ? 'Unflag' : 'Flag'}
 		</Button>

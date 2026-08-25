@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface Props {
-		variant?: 'accent' | 'accent-2' | 'neutral' | 'outline';
+		variant?: 'accent' | 'accent-2' | 'neutral' | 'outline' | 'alert';
 		children: import('svelte').Snippet;
 	}
 
@@ -10,7 +10,8 @@
 		accent: 'tag-accent',
 		'accent-2': 'tag-accent-2',
 		neutral: 'tag-neutral',
-		outline: 'tag-outline'
+		outline: 'tag-outline',
+		alert: 'tag-alert'
 	};
 </script>
 

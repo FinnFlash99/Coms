@@ -74,6 +74,25 @@ html[data-theme="light"] .dialog-backdrop {
 	background: color-mix(in srgb, #22242e 34%, transparent);
 }
 
+/* Alert -- a distinct red-orange for urgent/time-sensitive items, separate from the accent */
+:root {
+	--color-alert: #ff6b4a;
+	--color-alert-tint: color-mix(in srgb, #ff6b4a 22%, transparent);
+	--color-alert-text: #ffb9a6;
+}
+
+html[data-theme="light"] {
+	--color-alert: #d8401c;
+	--color-alert-tint: color-mix(in srgb, #d8401c 14%, transparent);
+	--color-alert-text: #a72d0f;
+}
+
+.tag-alert {
+	background: var(--color-alert-tint);
+	color: var(--color-alert-text);
+	border: 1px solid color-mix(in srgb, var(--color-alert) 45%, transparent);
+}
+
 /* Animations */
 @keyframes coms-in {
 	from {

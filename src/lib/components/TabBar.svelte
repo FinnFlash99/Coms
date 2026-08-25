@@ -9,13 +9,15 @@
 	{#each tabs as [id, label]}
 		{@const isActive = $activeTab === id}
 		{@const count = $conversationCounts[id]}
+		{@const isAlert = id === 'urgent' && count > 0}
 		<button
 			class="tab"
 			class:active={isActive}
+			class:alert={isAlert}
 			onclick={() => activeTab.set(id)}
 		>
 			{label}
-			<span class="count" class:active={isActive}>{count}</span>
+			<span class="count" class:active={isActive} class:alert={isAlert}>{count}</span>
 		</button>
 	{/each}
 </div>
@@ -49,18 +51,34 @@
 		color: var(--color-accent);
 	}
 
+	/* Urgent tab with items pending: a subtle alert tint even when not selected */
+	.tab.alert {
+		color: var(--color-alert-text);
+	}
+
+	.tab.active.alert {
+		border-bottom-color: var(--color-alert);
+		color: var(--color-alert);
+	}
+
 	.count {
 		font-size: 10.5px;
 		font-family: var(--font-body);
 		padding: 1px 6px;
 		min-width: 16px;
 		text-align: center;
-		background: var(--color-neutral-100);
-		color: var(--color-neutral-800);
+		background: var(--color-neutral-800);
+		color: var(--color-neutral-100);
 	}
 
 	.count.active {
-		background: var(--color-accent-100);
-		color: var(--color-accent-800);
+		background: var(--color-accent-800);
+		color: var(--color-accent-100);
+	}
+
+	/* Urgent tab's count pill is always solid-alert, active or not */
+	.count.alert {
+		background: var(--color-alert);
+		color: #fff;
 	}
 </style>

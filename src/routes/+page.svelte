@@ -93,7 +93,7 @@
 <div class="inbox">
 	<header class="header">
 		<span class="logo">COMS</span>
-		<Tag variant="neutral">BANANA</Tag>
+		<Tag variant="neutral">UNIFIED INBOX</Tag>
 		<span class="spacer"></span>
 		<Button variant="primary" onclick={() => (showCompose = true)}>
 			<Send size={14} strokeWidth={1.5} />
