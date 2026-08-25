@@ -169,12 +169,9 @@ See: [`design/_ds/nocturne-*/readme.md`](design/_ds/nocturne-91aaaa64-e109-471d-
 3. Configure OAuth credentials for each platform (Gmail, Outlook, Slack, Discord)
 4. Run database migrations: `npm run db:migrate:local`
 
-## GitHub Secrets Required
+## Deployment
 
-```
-CLOUDFLARE_API_TOKEN    # For deployment
-CLOUDFLARE_ACCOUNT_ID   # Account identifier
-```
+Cloudflare Pages deploys via its own native Git integration (configured in the Cloudflare dashboard, not GitHub Actions) -- it builds and deploys automatically on every push to `main`. `.github/workflows/deploy.yml` (job name `CI`) only runs lint/type-check/build as a merge gate; it does not deploy and needs no Cloudflare secrets. A prior version of this workflow also tried to deploy via `wrangler pages deploy` using `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets -- this was removed because it was redundant with the Git integration and had never once succeeded (wrangler.toml is a Workers config -- `main` + `[assets]` binding -- which `wrangler pages deploy` rejects as invalid; the correct command for this config shape would have been `wrangler deploy`, but since Cloudflare's Git integration already handles deployment, fixing it wasn't necessary).
 
 ## Documentation Maintenance
 
