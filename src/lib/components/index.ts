@@ -13,6 +13,8 @@ export { default as Toast } from './Toast.svelte';
 export { default as DemoBadge } from './DemoBadge.svelte';
 export { default as WelcomeDialog } from './WelcomeDialog.svelte';
 export { default as ComposeDialog } from './ComposeDialog.svelte';
+export { default as SimulateDialog } from './SimulateDialog.svelte';
+export { default as EventPrepDialog } from './EventPrepDialog.svelte';
 export { default as ConversationRow } from './ConversationRow.svelte';
 export { default as TabBar } from './TabBar.svelte';
 export { default as EmptyState } from './EmptyState.svelte';

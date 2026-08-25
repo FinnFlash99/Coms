@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import { theme, preferences } from '$lib/stores';
 	import Toast from '$components/Toast.svelte';
+	import ComposeDialog from '$components/ComposeDialog.svelte';
+	import SimulateDialog from '$components/SimulateDialog.svelte';
 
 	let { children } = $props();
 
@@ -18,11 +20,13 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
-		href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
 		rel="stylesheet"
 	/>
 </svelte:head>
 
 {@render children()}
 
+<ComposeDialog />
+<SimulateDialog />
 <Toast />

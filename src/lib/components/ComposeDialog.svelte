@@ -1,51 +1,36 @@
 <script lang="ts">
-	import { contacts, conversations, sendNewMessage } from '$lib/stores';
+	import { contacts, conversations, showCompose, composeState, closeComposeDialog, sendComposeAndNavigate } from '$lib/stores';
 	import { PLATFORMS, type Platform } from '$lib/types';
 	import Dialog from './Dialog.svelte';
 	import Button from './Button.svelte';
-
-	interface Props {
-		open: boolean;
-		onclose: () => void;
-		onsent: (conversationId: string, contactId: string, platform: Platform) => void;
-	}
-
-	let { open, onclose, onsent }: Props = $props();
-
-	let contactId = $state('c1');
-	let platform = $state<Platform>('slack');
-	let content = $state('');
 
 	const platformOptions = Object.entries(PLATFORMS).map(([id, p]) => ({
 		id: id as Platform,
 		label: p.label
 	}));
 
-	const contactName = $derived($contacts.find((c) => c.id === contactId)?.name.split(' (')[0] ?? '');
-	const platformLabel = $derived(PLATFORMS[platform].label);
+	const contactName = $derived(
+		$contacts.find((c) => c.id === $composeState.contactId)?.name.split(' (')[0] ?? ''
+	);
+	const platformLabel = $derived(PLATFORMS[$composeState.platform].label);
 	const hasExisting = $derived(
-		$conversations.some((v) => v.contactId === contactId && v.platform === platform)
+		$conversations.some(
+			(v) => v.contactId === $composeState.contactId && v.platform === $composeState.platform
+		)
 	);
 	const hint = $derived(
 		hasExisting
 			? `Adds to your existing ${platformLabel} thread with ${contactName}.`
 			: `Starts a new ${platformLabel} thread with ${contactName}.`
 	);
-	const isEmpty = $derived(!content.trim());
-
-	function send() {
-		const result = sendNewMessage(contactId, platform, content);
-		if (!result) return;
-		content = '';
-		onsent(result.conversationId, contactId, platform);
-	}
+	const isEmpty = $derived(!$composeState.content.trim());
 </script>
 
-<Dialog title="New message" {open} {onclose}>
+<Dialog title="New message" open={$showCompose} onclose={closeComposeDialog}>
 	<div class="form-grid">
 		<div class="field">
 			<label for="cmp-contact">To</label>
-			<select id="cmp-contact" class="input" bind:value={contactId}>
+			<select id="cmp-contact" class="input" bind:value={$composeState.contactId}>
 				{#each $contacts as c}
 					<option value={c.id}>{c.name}</option>
 				{/each}
@@ -53,7 +38,7 @@
 		</div>
 		<div class="field">
 			<label for="cmp-platform">Send via</label>
-			<select id="cmp-platform" class="input" bind:value={platform}>
+			<select id="cmp-platform" class="input" bind:value={$composeState.platform}>
 				{#each platformOptions as p}
 					<option value={p.id}>{p.label}</option>
 				{/each}
@@ -67,15 +52,15 @@
 			id="cmp-message"
 			class="input"
 			placeholder="Write your message…"
-			bind:value={content}
+			bind:value={$composeState.content}
 		></textarea>
 	</div>
 
 	<p class="text-muted hint">{hint}</p>
 
 	{#snippet actions()}
-		<Button variant="secondary" onclick={onclose}>Cancel</Button>
-		<Button variant="primary" disabled={isEmpty} onclick={send}>Send</Button>
+		<Button variant="secondary" onclick={closeComposeDialog}>Cancel</Button>
+		<Button variant="primary" disabled={isEmpty} onclick={sendComposeAndNavigate}>Send</Button>
 	{/snippet}
 </Dialog>
 

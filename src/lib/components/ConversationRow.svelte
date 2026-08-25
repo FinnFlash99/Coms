@@ -4,6 +4,8 @@
 		markConversationRead,
 		markConversationResponded,
 		toggleTimeSensitive,
+		togglePriority,
+		preferences,
 		toast
 	} from '$lib/stores';
 	import {
@@ -11,13 +13,15 @@
 		type Contact,
 		getConversationStatus,
 		relativeTime,
+		isMailPlatform,
+		familyOf,
 		PLATFORMS
 	} from '$lib/types';
 	import Avatar from './Avatar.svelte';
 	import Tag from './Tag.svelte';
 	import PlatformChip from './PlatformChip.svelte';
 	import Button from './Button.svelte';
-	import { Check, Flag, ExternalLink } from 'lucide-svelte';
+	import { Check, Flag, ExternalLink, Star } from 'lucide-svelte';
 
 	interface Props {
 		conversation: Conversation;
@@ -32,6 +36,13 @@
 	const canRead = $derived(status === 'unread');
 	const canRespond = $derived(status !== 'done');
 	const isDone = $derived(status === 'done');
+	const isMail = $derived(isMailPlatform(conversation.platform));
+	const lastMessage = $derived(conversation.messages[conversation.messages.length - 1]);
+	const previewText = $derived(
+		isMail ? lastMessage?.subject || lastMessage?.content || '' : lastMessage?.content || conversation.lastMessagePreview
+	);
+	const platformLabel = $derived(`${familyOf(conversation.platform).label} · ${PLATFORMS[conversation.platform].label}`);
+	const isPriority = $derived(($preferences.priority || []).includes(contact.id));
 
 	function handleClick() {
 		goto(`/conversation/${contact.id}?conv=${conversation.id}`);
@@ -52,6 +63,11 @@
 		toggleTimeSensitive(conversation.id);
 	}
 
+	function handleTogglePriority(e: MouseEvent) {
+		e.stopPropagation();
+		togglePriority(contact.id);
+	}
+
 	function handleOpenIn(e: MouseEvent) {
 		e.stopPropagation();
 		toast.show(`The full product would open this in ${PLATFORMS[conversation.platform].label}.`);
@@ -69,12 +85,12 @@
 			{/if}
 			<span class="name">{contact.name}</span>
 			<span class="platforms">
-				<PlatformChip platform={conversation.platform} />
+				<PlatformChip platform={conversation.platform} label={platformLabel} />
 			</span>
 		</div>
 
-		<p class="preview" class:unread={status === 'unread'}>
-			{conversation.lastMessagePreview}
+		<p class="preview" class:mail={isMail} class:unread={status === 'unread'}>
+			{previewText}
 		</p>
 
 		<div class="chips">
@@ -94,8 +110,19 @@
 				<Tag variant="outline">High</Tag>
 			{/if}
 
+			{#if isPriority}
+				<Tag variant="outline">Priority sender</Tag>
+			{/if}
+
 			<Tag variant="neutral">{contact.type}</Tag>
 			<Tag variant="neutral">{contact.connection}</Tag>
+		</div>
+
+		<div class="open-in-row">
+			<button class="btn btn-ghost open-btn" onclick={handleOpenIn}>
+				Open in {PLATFORMS[conversation.platform].label}
+				<ExternalLink size={12} strokeWidth={1.5} />
+			</button>
 		</div>
 	</div>
 
@@ -119,6 +146,20 @@
 
 		<Button
 			variant="secondary"
+			title={isPriority ? 'Remove from priority list' : 'Add sender to priority list'}
+			onclick={handleTogglePriority}
+		>
+			<Star
+				size={13}
+				strokeWidth={1.5}
+				fill={isPriority ? 'var(--color-accent)' : 'none'}
+				color={isPriority ? 'var(--color-accent)' : 'currentColor'}
+			/>
+			Priority
+		</Button>
+
+		<Button
+			variant="secondary"
 			title={urgent ? 'Unflag — remove urgent' : 'Flag as urgent'}
 			onclick={handleToggleFlag}
 		>
@@ -130,11 +171,6 @@
 			/>
 			{urgent ? 'Unflag' : 'Flag'}
 		</Button>
-
-		<button class="btn btn-ghost open-btn" onclick={handleOpenIn}>
-			Open in {PLATFORMS[conversation.platform].label}
-			<ExternalLink size={12} strokeWidth={1.5} />
-		</button>
 	</div>
 </div>
 
@@ -190,12 +226,27 @@
 	}
 
 	.preview {
-		margin: 7px 0 10px;
+		display: inline-block;
+		max-width: 100%;
+		margin: 8px 0 10px;
+		padding: 7px 13px;
 		font-size: 14.5px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		border: 1px solid var(--color-divider);
+		border-radius: 16px;
+		border-bottom-left-radius: 5px;
+		background: color-mix(in srgb, var(--color-text) 6%, transparent);
 		opacity: 0.92;
+	}
+
+	.preview.mail {
+		display: block;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background: none;
 	}
 
 	.preview.unread {
@@ -208,6 +259,11 @@
 		gap: 6px;
 		align-items: center;
 		flex-wrap: wrap;
+	}
+
+	.open-in-row {
+		display: flex;
+		margin: 10px 0 0 -6px;
 	}
 
 	.actions {

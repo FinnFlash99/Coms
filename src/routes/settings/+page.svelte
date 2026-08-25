@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ChevronLeft, LogOut } from 'lucide-svelte';
-	import { preferences, welcomed, toast } from '$lib/stores';
+	import { preferences, welcomed, toast, contacts, togglePriority } from '$lib/stores';
 	import { TABS, type Theme, type TabId } from '$lib/types';
 	import Avatar from '$components/Avatar.svelte';
 	import Button from '$components/Button.svelte';
@@ -30,6 +30,17 @@
 	function toggleNotifyOption(key: 'notifyDeadlines' | 'notifyFlagged' | 'notifyUnread') {
 		preferences.update((p) => ({ ...p, [key]: !p[key] }));
 	}
+
+	function togglePriorityFirst() {
+		preferences.update((p) => ({ ...p, priorityFirst: !p.priorityFirst }));
+	}
+
+	const priorityHint = $derived(() => {
+		const count = ($preferences.priority || []).length;
+		return count
+			? `${count} sender${count === 1 ? '' : 's'} flagged — their messages sort to the top of the inbox.`
+			: 'No priority senders yet. Flag anyone whose messages should always surface first.';
+	});
 
 	function handleLogout() {
 		welcomed.reset();
@@ -103,6 +114,28 @@
 				</label>
 			</div>
 			<p class="hint text-muted">Choose what triggers a notification.</p>
+		</div>
+
+		<div class="field">
+			<span class="field-label">Priority senders</span>
+			<label class="checkbox-row">
+				<input type="checkbox" checked={$preferences.priorityFirst} onchange={togglePriorityFirst} />
+				Sort priority senders to the top
+			</label>
+			<div class="priority-list">
+				{#each $contacts as c}
+					<label class="priority-row">
+						<input
+							type="checkbox"
+							checked={($preferences.priority || []).includes(c.id)}
+							onchange={() => togglePriority(c.id)}
+						/>
+						<span class="priority-name">{c.name}</span>
+						<span class="text-muted priority-meta">{c.type} · {c.connection}</span>
+					</label>
+				{/each}
+			</div>
+			<p class="hint text-muted">{priorityHint()}</p>
 		</div>
 
 		<div class="field">
@@ -195,6 +228,49 @@
 	.notify-options.disabled {
 		opacity: 0.4;
 		pointer-events: none;
+	}
+
+	.priority-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		margin-top: 12px;
+		background: var(--color-divider);
+		border: 1px solid var(--color-divider);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+
+	.priority-row {
+		display: flex;
+		align-items: center;
+		gap: 11px;
+		padding: 11px 14px;
+		background: var(--color-surface);
+		cursor: pointer;
+	}
+
+	.priority-row:hover {
+		background: color-mix(in srgb, var(--color-text) 4%, transparent);
+	}
+
+	.priority-row input {
+		width: 15px;
+		height: 15px;
+		flex: none;
+		accent-color: var(--color-accent);
+	}
+
+	.priority-name {
+		flex: 1;
+		min-width: 0;
+		font-family: var(--font-heading);
+		font-weight: 500;
+		font-size: 14px;
+	}
+
+	.priority-meta {
+		font-size: 12px;
 	}
 
 	.account-row {

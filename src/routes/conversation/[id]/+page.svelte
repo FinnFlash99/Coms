@@ -7,6 +7,7 @@
 		drafts,
 		setDraft,
 		sendReply,
+		setDue,
 		updateContact,
 		markConversationRead,
 		markConversationResponded,
@@ -21,6 +22,8 @@
 		getConversationStatus,
 		relativeTime,
 		formatTime,
+		dateKey,
+		isMailPlatform,
 		PLATFORMS
 	} from '$lib/types';
 	import Blueprint from '$components/Blueprint.svelte';
@@ -121,6 +124,7 @@
 				{@const urgent = conv.timeSensitive && !(conv.isRead && conv.isResponded)}
 				{@const canRead = status === 'unread'}
 				{@const canRespond = status !== 'done'}
+				{@const isMail = isMailPlatform(conv.platform)}
 				<Blueprint>
 					<div class="thread-header">
 						<PlatformChip platform={conv.platform} />
@@ -144,13 +148,20 @@
 					<div class="messages">
 						{#each conv.messages as msg}
 							{@const isOutbound = msg.direction === 'outbound'}
-							<div class="message" class:outbound={isOutbound}>
+							<div class="message" class:outbound={isOutbound} class:mail={isMail}>
 								<div class="message-meta text-muted">
 									{msg.senderName} · {formatTime(msg.timestamp)}
 								</div>
-								<div class="message-bubble" class:outbound={isOutbound}>
-									{msg.content}
-								</div>
+								{#if isMail}
+									<div class="message-bubble mail" class:outbound={isOutbound}>
+										{msg.subject || msg.content}
+									</div>
+									<p class="text-muted mail-snippet">{msg.content}</p>
+								{:else}
+									<div class="message-bubble" class:outbound={isOutbound}>
+										{msg.content}
+									</div>
+								{/if}
 							</div>
 						{/each}
 					</div>
@@ -199,6 +210,15 @@
 							{urgent ? 'Unflag' : 'Flag time-sensitive'}
 						</Button>
 						<span class="spacer"></span>
+						<label class="importance-label text-muted">
+							Due
+							<input
+								class="input due-input"
+								type="date"
+								value={conv.dueTs ? dateKey(conv.dueTs) : ''}
+								onchange={(e) => setDue(conv.id, e.currentTarget.value)}
+							/>
+						</label>
 						<label class="importance-label text-muted">
 							Importance
 							<select
@@ -325,6 +345,11 @@
 		align-items: flex-end;
 	}
 
+	.message.mail {
+		max-width: 100%;
+		align-self: stretch;
+	}
+
 	.message-meta {
 		font-size: 11.5px;
 	}
@@ -339,6 +364,29 @@
 
 	.message-bubble.outbound {
 		background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+	}
+
+	.message-bubble.mail {
+		font-family: var(--font-heading);
+		font-weight: 500;
+		font-size: 15px;
+		line-height: 1.4;
+		letter-spacing: -0.01em;
+		padding: 0 0 0 12px;
+		border: none;
+		border-left: 2px solid var(--color-divider);
+		background: none;
+	}
+
+	.message-bubble.mail.outbound {
+		border-left-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+		background: none;
+	}
+
+	.mail-snippet {
+		margin: 2px 0 0 14px;
+		font-size: 13px;
+		line-height: 1.5;
 	}
 
 	.reply-row {
@@ -384,6 +432,13 @@
 	}
 
 	.importance-select {
+		width: auto;
+		min-height: 30px;
+		font-size: 13px;
+		padding: 3px 8px;
+	}
+
+	.due-input {
 		width: auto;
 		min-height: 30px;
 		font-size: 13px;

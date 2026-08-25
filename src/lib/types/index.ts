@@ -17,6 +17,59 @@ export const PLATFORMS: Record<Platform, PlatformInfo> = {
 	discord: { label: 'Discord', color: '#5865f2' }
 };
 
+// Mail-style platforms read as subject lines, not chat bubbles.
+export const MAIL_PLATFORMS: Platform[] = ['email'];
+export function isMailPlatform(platform: Platform): boolean {
+	return MAIL_PLATFORMS.includes(platform);
+}
+
+// Platform families -- how a message arrives shapes how you answer it.
+export interface PlatformFamily {
+	id: string;
+	label: string;
+	platforms: Platform[];
+}
+
+export const PLATFORM_FAMILIES: PlatformFamily[] = [
+	{ id: 'mail', label: 'Mail', platforms: ['email'] },
+	{ id: 'work', label: 'Work chat', platforms: ['slack', 'teams'] },
+	{ id: 'personal', label: 'Messaging', platforms: ['whatsapp', 'imessage'] },
+	{ id: 'social', label: 'Social', platforms: ['instagram'] }
+];
+
+export function familyOf(platform: Platform): { id: string; label: string } {
+	const family = PLATFORM_FAMILIES.find((f) => f.platforms.includes(platform));
+	return family ? { id: family.id, label: family.label } : { id: 'other', label: 'Other' };
+}
+
+export type EventKind = 'meeting' | 'call' | 'deadline' | 'appointment';
+
+export const EVENT_KINDS: Record<EventKind, { label: string; tagVariant: 'accent' | 'outline' | 'alert' | 'neutral' }> = {
+	meeting: { label: 'Meeting', tagVariant: 'accent' },
+	call: { label: 'Call', tagVariant: 'outline' },
+	deadline: { label: 'Deadline', tagVariant: 'alert' },
+	appointment: { label: 'Appointment', tagVariant: 'neutral' }
+};
+
+export interface CalendarEvent {
+	id: string;
+	title: string;
+	kind: EventKind;
+	startTs: number;
+	mins: number;
+	where: string;
+	attendees: string[];
+	convIds: string[];
+}
+
+export interface FollowUp {
+	id: string;
+	eventId: string;
+	text: string;
+	dueTs: number;
+	done: boolean;
+}
+
 export type ContactType = 'Client' | 'Subcontractor' | 'Vendor' | 'Personal';
 export type ConnectionStrength = 'Close' | 'Regular' | 'Occasional' | 'New';
 export type Importance = 'low' | 'normal' | 'high';
@@ -37,6 +90,7 @@ export interface Message {
 	platform: Platform;
 	platformMessageId?: string;
 	content: string;
+	subject?: string;
 	senderName: string;
 	direction: MessageDirection;
 	timestamp: number;
@@ -52,6 +106,7 @@ export interface Conversation {
 	isResponded: boolean;
 	importance: Importance;
 	timeSensitive: boolean;
+	dueTs?: number | null;
 	lastMessageAt: number;
 	lastMessagePreview: string;
 	messages: Message[];
@@ -79,6 +134,8 @@ export interface UserPreferences {
 	notifyDeadlines: boolean;
 	notifyFlagged: boolean;
 	notifyUnread: boolean;
+	priorityFirst: boolean;
+	priority: string[];
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -87,7 +144,9 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 	notify: true,
 	notifyDeadlines: true,
 	notifyFlagged: true,
-	notifyUnread: false
+	notifyUnread: false,
+	priorityFirst: true,
+	priority: ['c1']
 };
 
 export const TABS: Array<[TabId, string]> = [
@@ -132,4 +191,23 @@ export function formatTime(timestamp: number): string {
 		hour: 'numeric',
 		minute: '2-digit'
 	});
+}
+
+export function dueLabel(ts: number): string {
+	const days = Math.round((ts - Date.now()) / 86400000);
+	if (days === 0) return 'today';
+	if (days === 1) return 'tomorrow';
+	if (days > 1 && days < 7) return 'in ' + days + ' days';
+	return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+// <input type="date"> gives a Y-M-D string; a shared key so calendar cells and
+// date inputs agree on what "day" a timestamp belongs to.
+export function dateKey(ts: number): string {
+	const d = new Date(ts);
+	return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+export function hhmm(ts: number): string {
+	return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }

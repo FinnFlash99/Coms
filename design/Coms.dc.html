@@ -72,6 +72,8 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
       <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px">UNIFIED INBOX</span>
       <span style="flex:1"></span>
       <button class="btn btn-primary" onClick="{{ openCompose }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>New message</button>
+      <button class="btn btn-secondary" title="Simulate an incoming message" onClick="{{ openSimulate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Simulate</button>
+      <button class="btn btn-secondary" title="Calendar" onClick="{{ openCalendar }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="5" width="17" height="15" rx="1.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3" x2="8" y2="6"></line><line x1="16" y1="3" x2="16" y2="6"></line></svg>Calendar<sc-if value="{{ dueSoonCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-alert);color:#fff">{{ dueSoonCount }}</span></sc-if></button>
       <button class="btn btn-secondary btn-icon" title="Settings" onClick="{{ openSettings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="15" cy="7" r="2.2" fill="var(--color-bg)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="9" cy="17" r="2.2" fill="var(--color-bg)"></circle></svg></button>
     </div>
     <p class="text-muted" style="font-size:13px;margin:8px 0 30px">{{ summary }}</p>
@@ -94,7 +96,7 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
             <span class="text-muted" style="font-size:11px">{{ sec.count }}</span>
           </div>
         </sc-if>
-        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:24px;border-bottom-left-radius:8px;overflow:hidden">
                 <sc-for list="{{ sec.rows }}" as="g" hint-placeholder-count="5">
           <div style="{{ g.rowStyle }}" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)" onClick="{{ g.open }}">
             <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:16px;color:var(--color-accent)">{{ g.initials }}</div>
@@ -112,14 +114,17 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
               <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
                 <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="1"><span class="tag {{ c.cls }}">{{ c.label }}</span></sc-for>
               </div>
+              <div style="display:flex;margin-top:10px;margin-left:-6px">
+                <button class="btn btn-ghost" style="font-size:12px;padding:4px 6px" onClick="{{ g.openIn }}">Open in {{ g.openLabel }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 5h5v5"></path><path d="M19 5 10 14"></path><path d="M18 13v6H5V6h6"></path></svg></button>
+              </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:7px;flex:none;align-items:flex-end;min-width:150px">
               <span class="text-muted" style="font-size:12px">{{ g.time }}</span>
               <sc-if value="{{ g.canRead }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" onClick="{{ g.markRead }}">Mark read</button></sc-if>
               <sc-if value="{{ g.canRespond }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" onClick="{{ g.markResponded }}">Mark responded</button></sc-if>
               <sc-if value="{{ g.done }}" hint-placeholder-val="{{ false }}"><span class="text-muted" style="display:inline-flex;align-items:center;gap:5px;font-size:12px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="4 12.5 9.5 18 20 7"></polyline></svg>Done</span></sc-if>
+              <button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" title="{{ g.starTitle }}" onClick="{{ g.toggleStar }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="{{ g.starFill }}" stroke="{{ g.starColor }}" stroke-width="1.5"><path d="M12 3.5l2.6 5.6 6 .7-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.8l6-.7z"></path></svg>Priority</button>
               <button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" title="{{ g.flagTitle }}" onClick="{{ g.toggleFlag }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="{{ g.flagFill }}" stroke="{{ g.flagColor }}" stroke-width="1.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>{{ g.flagLabel }}</button>
-              <button class="btn btn-ghost" style="font-size:12px;padding:4px 6px" onClick="{{ g.openIn }}">Open in {{ g.openLabel }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 5h5v5"></path><path d="M19 5 10 14"></path><path d="M18 13v6H5V6h6"></path></svg></button>
             </div>
           </div>
         </sc-for>
@@ -172,6 +177,9 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
               <div style="{{ m.wrapStyle }}">
                 <div style="{{ m.metaStyle }}">{{ m.sender }} · {{ m.time }}</div>
                 <div style="{{ m.bubbleStyle }}">{{ m.content }}</div>
+                <sc-if value="{{ m.isMail }}" hint-placeholder-val="{{ false }}">
+                  <p class="text-muted" style="margin:2px 0 0 14px;font-size:13px;line-height:1.5">{{ m.snippet }}</p>
+                </sc-if>
               </div>
             </sc-for>
           </div>
@@ -184,6 +192,9 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
             <sc-if value="{{ th.canRespond }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" style="font-size:12px;padding:5px 11px" onClick="{{ th.markResponded }}">Mark responded</button></sc-if>
             <button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" title="{{ th.tsTitle }}" onClick="{{ th.toggleTs }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="{{ th.tsFill }}" stroke="{{ th.tsColor }}" stroke-width="1.5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>{{ th.tsLabel }}</button>
             <span style="flex:1"></span>
+            <label class="text-muted" style="display:inline-flex;align-items:center;gap:8px;font-size:13px">Due
+              <input class="input" type="date" style="width:auto;min-height:30px;font-size:13px;padding:3px 8px" value="{{ th.dueValue }}" onChange="{{ th.setDue }}">
+            </label>
             <label class="text-muted" style="display:inline-flex;align-items:center;gap:8px;font-size:13px">Importance
               <select class="input" style="width:auto;min-height:30px;font-size:13px;padding:3px 8px" value="{{ th.imp }}" onChange="{{ th.setImp }}">
                 <option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option>
@@ -193,6 +204,277 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
           </div>
         </div>
       </sc-for>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1080px;margin:0 auto;padding:38px 32px 100px;animation:coms-in .25s ease">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+      <button class="btn btn-secondary btn-icon" onClick="{{ goHome }}" title="Back to inbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="14 6 8 12 14 18"></polyline></svg></button>
+      <h2 style="margin:0;font-size:30px;letter-spacing:-.01em">{{ calTitle }}</h2>
+      <span style="flex:1"></span>
+      <span class="seg">
+        <sc-for list="{{ calViewOpts }}" as="o" hint-placeholder-count="2" hint-placeholder-index="1"><label class="seg-opt"><input type="radio" name="coms-calview" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
+      </span>
+      <sc-if value="{{ isMonthView }}" hint-placeholder-val="{{ false }}">
+        <span style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="font-size:13px" onClick="{{ calToday }}">This month</button>
+          <button class="btn btn-secondary btn-icon" title="Previous month" onClick="{{ calPrev }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="14 6 8 12 14 18"></polyline></svg></button>
+          <button class="btn btn-secondary btn-icon" title="Next month" onClick="{{ calNext }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="10 6 16 12 10 18"></polyline></svg></button>
+        </span>
+      </sc-if>
+    </div>
+    <p class="text-muted" style="font-size:13px;margin:0 0 26px">{{ calSummary }}</p>
+
+    <sc-if value="{{ isTodayView }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:1.45fr 1fr;gap:26px;align-items:start">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+            <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">Schedule</span>
+            <span class="text-muted" style="font-size:11px">{{ todayDateLabel }}</span>
+          </div>
+          <sc-if value="{{ hasTodayEvents }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ todayEvents }}" as="e" hint-placeholder-count="3">
+                <div style="{{ e.cardStyle }}">
+                  <div style="display:flex;gap:16px;align-items:flex-start">
+                    <div style="flex:none;width:74px;text-align:right">
+                      <div style="font-family:var(--font-heading);font-weight:500;font-size:15px">{{ e.startLabel }}</div>
+                      <div class="text-muted" style="font-size:11.5px">{{ e.durationLabel }}</div>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <span class="tag {{ e.kindCls }}">{{ e.kindLabel }}</span>
+                        <span style="font-family:var(--font-heading);font-weight:500;font-size:17px;letter-spacing:-.01em">{{ e.title }}</span>
+                        <sc-if value="{{ e.isNow }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-alert)">Now</span></sc-if>
+                      </div>
+                      <p class="text-muted" style="font-size:13px;margin:6px 0 0">{{ e.meta }}</p>
+                      <sc-if value="{{ e.hasUnread }}" hint-placeholder-val="{{ false }}">
+                        <p style="font-size:13px;margin:8px 0 0;color:var(--color-alert-text)">{{ e.unreadNote }}</p>
+                      </sc-if>
+                    </div>
+                    <button class="btn btn-secondary" style="flex:none;font-size:12px;padding:5px 11px" onClick="{{ e.openPrep }}">Prep</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noTodayEvents }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:26px;text-align:center">
+              <p class="text-muted" style="font-size:14px;margin:0">Nothing scheduled today.</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasFollowUps }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:32px">
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+                <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">Follow-ups</span>
+                <span class="text-muted" style="font-size:11px">{{ followUpCount }}</span>
+              </div>
+              <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+                <sc-for list="{{ followUps }}" as="f" hint-placeholder-count="1">
+                  <div style="{{ f.rowStyle }}">
+                    <button class="btn btn-ghost btn-icon" style="flex:none;padding:3px" title="Mark done" onClick="{{ f.done }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8.5"></circle></svg></button>
+                    <span style="flex:1;min-width:0;font-size:13.5px">{{ f.text }}</span>
+                    <span style="{{ f.dueStyle }}">{{ f.dueLabel }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+            <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">Needs attention</span>
+            <span class="text-muted" style="font-size:11px">{{ attnCount }}</span>
+          </div>
+          <sc-if value="{{ hasAttn }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+              <sc-for list="{{ attnRows }}" as="a" hint-placeholder-count="4">
+                <div style="{{ a.rowStyle }}" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)" onClick="{{ a.open }}">
+                  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                    <span style="{{ a.chipStyle }}">{{ a.platform }}</span>
+                    <span style="font-family:var(--font-heading);font-weight:500;font-size:14.5px">{{ a.name }}</span>
+                    <sc-if value="{{ a.urgent }}" hint-placeholder-val="{{ false }}"><span class="tag tag-alert">{{ a.urgentLabel }}</span></sc-if>
+                  </div>
+                  <p class="text-muted" style="font-size:12.5px;margin:6px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.preview }}</p>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noAttn }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:22px;text-align:center">
+              <p class="text-muted" style="font-size:13.5px;margin:0">All clear — nothing waiting on you.</p>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMonthView }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+      <sc-for list="{{ calDows }}" as="d" hint-placeholder-count="7">
+        <div style="background:var(--color-surface);padding:9px 10px;font-family:var(--font-heading);font-weight:500;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 58%, transparent)">{{ d }}</div>
+      </sc-for>
+      <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="35">
+        <div style="{{ c.cellStyle }}">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="{{ c.numStyle }}">{{ c.day }}</span>
+            <sc-if value="{{ c.isToday }}" hint-placeholder-val="{{ false }}"><span style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent)">Today</span></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ c.items }}" as="it" hint-placeholder-count="0">
+              <button style="{{ it.pillStyle }}" title="{{ it.title }}" onClick="{{ it.open }}">
+                <span style="width:5px;height:5px;flex:none;border-radius:50%;background:{{ it.dot }}"></span>
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ it.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:16px 0 0">
+      <span class="text-muted" style="display:inline-flex;align-items:center;gap:6px;font-size:12px"><span style="width:7px;height:7px;border-radius:50%;background:var(--color-alert)"></span>Deadline or overdue</span>
+      <span class="text-muted" style="display:inline-flex;align-items:center;gap:6px;font-size:12px"><span style="width:7px;height:7px;border-radius:50%;background:var(--color-accent)"></span>Meeting, call or appointment</span>
+      <span class="text-muted" style="display:inline-flex;align-items:center;gap:6px;font-size:12px"><span style="width:7px;height:7px;border-radius:50%;background:color-mix(in srgb, var(--color-text) 35%, transparent)"></span>Resolved</span>
+    </div>
+    <sc-if value="{{ hasUnscheduled }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:38px">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+          <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">Time-sensitive, no date yet</span>
+          <span class="text-muted" style="font-size:11px">{{ unscheduledCount }}</span>
+        </div>
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ unscheduled }}" as="u" hint-placeholder-count="1">
+            <div style="{{ u.rowStyle }}">
+              <span style="{{ u.chipStyle }}">{{ u.platform }}</span>
+              <span style="font-family:var(--font-heading);font-weight:500;font-size:15px">{{ u.name }}</span>
+              <span class="text-muted" style="flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ u.preview }}</span>
+              <input class="input" type="date" style="width:auto;min-height:30px;font-size:12.5px;padding:3px 8px" value="{{ u.dueValue }}" onChange="{{ u.setDue }}">
+              <button class="btn btn-ghost" style="font-size:12px;padding:4px 6px" onClick="{{ u.open }}">Open</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showSimulate }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:70" onClick="{{ closeSimulate }}">
+    <div class="dialog" style="animation:coms-pop .25s ease" onClick="{{ swallow }}">
+      <div class="dialog-title">Simulate incoming message</div>
+      <div class="dialog-body" style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label>From</label>
+            <select class="input" value="{{ simContact }}" onChange="{{ setSimContact }}">
+              <sc-for list="{{ contactOpts }}" as="c" hint-placeholder-count="6"><option value="{{ c.id }}">{{ c.name }}</option></sc-for>
+            </select>
+          </div>
+          <div class="field"><label>Platform</label>
+            <select class="input" value="{{ simPlatform }}" onChange="{{ setSimPlatform }}">
+              <sc-for list="{{ platformOpts }}" as="p" hint-placeholder-count="6"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Message</label>
+          <textarea class="input" style="min-height:80px" placeholder="e.g. Can you send the files by tomorrow 3pm?" value="{{ simContent }}" onChange="{{ setSimContent }}"></textarea>
+        </div>
+        <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin:0"><label>Importance</label>
+            <span class="seg">
+              <sc-for list="{{ simImpOpts }}" as="o" hint-placeholder-count="3"><label class="seg-opt"><input type="radio" name="coms-sim-imp" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
+            </span>
+          </div>
+          <label class="radio" style="font-size:13px;padding-bottom:8px"><input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;accent-color:var(--color-accent)" checked="{{ simTs }}" onChange="{{ toggleSimTs }}">Time-sensitive</label>
+        </div>
+        <p class="text-muted" style="font-size:12px;margin:0">Deadlines like "tomorrow at 3pm" are auto-detected as time-sensitive.</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" onClick="{{ closeSimulate }}">Cancel</button>
+        <button class="btn btn-primary" onClick="{{ deliverSim }}">Deliver message</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showPrep }}" hint-placeholder-val="{{ false }}">
+  <div class="dialog-backdrop" style="z-index:70" onClick="{{ closePrep }}">
+    <div class="dialog" style="animation:coms-pop .25s ease;max-width:620px;width:min(620px,92vw)" onClick="{{ swallow }}">
+      <div class="dialog-title">
+        <span class="tag {{ prep.kindCls }}" style="margin-right:9px">{{ prep.kindLabel }}</span>{{ prep.title }}
+      </div>
+      <div class="dialog-body" style="display:flex;flex-direction:column;gap:22px;max-height:min(66vh,540px);overflow:auto">
+        <p class="text-muted" style="font-size:13.5px;margin:0">{{ prep.meta }}</p>
+
+        <div>
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent);margin-bottom:10px">Who's coming</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ prep.attendees }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:34px;height:34px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:13px;color:var(--color-accent)">{{ a.initials }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="font-family:var(--font-heading);font-weight:500;font-size:14.5px">{{ a.name }}</span>
+                    <span class="tag tag-neutral">{{ a.type }}</span>
+                    <sc-for list="{{ a.chips }}" as="c" hint-placeholder-count="0"><span class="tag {{ c.cls }}">{{ c.label }}</span></sc-for>
+                  </div>
+                  <p class="text-muted" style="font-size:12.5px;margin:5px 0 0">{{ a.lastLine }}</p>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent);margin-bottom:10px">Context from your conversations</div>
+          <sc-if value="{{ prep.hasContext }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ prep.context }}" as="c" hint-placeholder-count="2">
+                <div style="display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:color-mix(in srgb, var(--color-text) 4%, transparent)">
+                  <span style="{{ c.chipStyle }}">{{ c.platform }}</span>
+                  <div style="flex:1;min-width:0">
+                    <p style="font-size:13px;margin:0;line-height:1.5">{{ c.content }}</p>
+                    <p class="text-muted" style="font-size:11.5px;margin:5px 0 0">{{ c.who }} · {{ c.time }}</p>
+                  </div>
+                  <button class="btn btn-ghost" style="flex:none;font-size:11.5px;padding:3px 6px" onClick="{{ c.open }}">Open</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ prep.noContext }}" hint-placeholder-val="{{ false }}">
+            <p class="text-muted" style="font-size:13px;margin:0">No linked conversations yet.</p>
+          </sc-if>
+        </div>
+
+        <div class="field" style="margin:0">
+          <label>Set a follow-up reminder</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input class="input" style="flex:1;min-width:180px" placeholder="{{ prep.followPlaceholder }}" value="{{ prep.followText }}" onChange="{{ prep.setFollowText }}">
+            <input class="input" type="date" style="width:auto" value="{{ prep.followDate }}" onChange="{{ prep.setFollowDate }}">
+            <button class="btn btn-secondary" disabled="{{ prep.followEmpty }}" onClick="{{ prep.addFollow }}">Add</button>
+          </div>
+          <sc-if value="{{ prep.hasFollowUps }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px">
+              <sc-for list="{{ prep.followUps }}" as="f" hint-placeholder-count="1">
+                <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+                  <span style="width:5px;height:5px;flex:none;border-radius:50%;background:var(--color-accent)"></span>
+                  <span style="flex:1;min-width:0">{{ f.text }}</span>
+                  <span class="text-muted" style="font-size:11.5px">{{ f.dueLabel }}</span>
+                  <button class="btn btn-ghost" style="font-size:11.5px;padding:2px 5px" onClick="{{ f.done }}">Done</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" onClick="{{ closePrep }}">Close</button>
+        <button class="btn btn-primary" onClick="{{ prep.messageAll }}">Message attendees</button>
+      </div>
     </div>
   </div>
 </sc-if>
@@ -226,6 +508,20 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
           </sc-for>
         </div>
         <p class="text-muted" style="font-size:12px;margin:8px 0 0">Choose what triggers a notification.</p>
+      </div>
+      <div class="field">
+        <label>Priority senders</label>
+        <label class="radio" style="font-size:14px"><input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;accent-color:var(--color-accent)" checked="{{ priorityFirst }}" onChange="{{ togglePriorityFirst }}">Sort priority senders to the top</label>
+        <div style="display:flex;flex-direction:column;gap:1px;margin-top:12px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ priorityRows }}" as="p" hint-placeholder-count="6">
+            <label style="display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--color-surface);cursor:pointer" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)">
+              <input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;flex:none;accent-color:var(--color-accent)" checked="{{ p.on }}" onChange="{{ p.toggle }}">
+              <span style="flex:1;min-width:0;font-family:var(--font-heading);font-weight:500;font-size:14px">{{ p.name }}</span>
+              <span class="text-muted" style="font-size:12px">{{ p.meta }}</span>
+            </label>
+          </sc-for>
+        </div>
+        <p class="text-muted" style="font-size:12px;margin:10px 0 0">{{ priorityHint }}</p>
       </div>
       <div class="field">
         <label>Account</label>
@@ -293,7 +589,8 @@ class Component extends DCLogic {
   initState() {
     const now = Date.now(), M = 6e4, H = 36e5, D = 864e5;
     let prefs = { theme: 'system', defaultTab: 'all', grouping: 'person', notify: true,
-      notifyDeadlines: true, notifyFlagged: true, notifyUnread: false };
+      notifyDeadlines: true, notifyFlagged: true, notifyUnread: false,
+      priorityFirst: true, priority: ['c1'] };
     let welcomed = false;
     try {
       const p = JSON.parse(localStorage.getItem('coms.prefs') || 'null');
@@ -302,12 +599,19 @@ class Component extends DCLogic {
     } catch (e) {}
     return {
       screen: 'home', tab: prefs.defaultTab, cat: 'all', prefs, welcomed,
-      detail: null, showCompose: false, toast: '',
+      detail: null, showCompose: false, showSimulate: false, toast: '', monthOffset: 0,
+      sim: { contactId: 'c1', platform: 'slack', content: '', importance: 'normal', ts: false },
+      calView: 'month', prepEventId: null,
+      followDraft: { text: '', date: '' },
+      followUps: [
+        { id: 'f1', eventId: 'e2', text: 'Send James the revised scope', dueTs: now + D, done: false }
+      ],
+      events: Component.seedEvents(now, H, D),
       compose: { contactId: 'c1', platform: 'slack', content: '' },
       drafts: {},
       contacts: Component.CONTACTS.map(c => Object.assign({}, c)),
       convs: [
-        { id: 'v1', contactId: 'c1', platform: 'slack', isRead: false, isResponded: false, importance: 'high', timeSensitive: true, messages: [
+        { id: 'v1', contactId: 'c1', platform: 'slack', isRead: false, isResponded: false, importance: 'high', timeSensitive: true, dueTs: now + D, messages: [
           { dir: 'out', sender: 'You', content: 'Sent over the homepage concepts — let me know your thoughts before our sync.', ts: now - 3 * H },
           { dir: 'in', sender: 'Sarah Chen', content: 'These look great. A few small notes on the hero section coming your way.', ts: now - 90 * M },
           { dir: 'in', sender: 'Sarah Chen', content: "Can we move tomorrow's meeting to 3pm?", ts: now - 25 * M }] },
@@ -317,21 +621,21 @@ class Component extends DCLogic {
           { dir: 'in', sender: 'James', content: 'Contract draft is in your inbox whenever you have a sec.', ts: now - 26 * H },
           { dir: 'out', sender: 'You', content: 'Got it — will review tonight and send comments.', ts: now - 25 * H }] },
         { id: 'v4', contactId: 'c2', platform: 'email', isRead: true, isResponded: true, importance: 'normal', timeSensitive: false, messages: [
-          { dir: 'in', sender: 'James', content: 'Re: Q3 retainer — attached the updated scope document.', ts: now - 3 * D },
-          { dir: 'out', sender: 'You', content: 'Thanks James, scope looks right. Signed copy attached.', ts: now - 3 * D + 2 * H }] },
-        { id: 'v5', contactId: 'c3', platform: 'email', isRead: true, isResponded: false, importance: 'normal', timeSensitive: false, messages: [
-          { dir: 'out', sender: 'You', content: 'Ravi — any update on the revised illustrations?', ts: now - 8 * H },
-          { dir: 'in', sender: 'Ravi Sharma', content: "I've sent over the revised files. Let me know what you think.", ts: now - 4 * H }] },
+          { dir: 'in', sender: 'James', subject: 'Re: Q3 retainer — updated scope', content: 'Re: Q3 retainer — attached the updated scope document.', ts: now - 3 * D },
+          { dir: 'out', sender: 'You', subject: 'Re: Q3 retainer — updated scope', content: 'Thanks James, scope looks right. Signed copy attached.', ts: now - 3 * D + 2 * H }] },
+        { id: 'v5', contactId: 'c3', platform: 'email', isRead: true, isResponded: false, importance: 'normal', timeSensitive: false, dueTs: now + 4 * D, messages: [
+          { dir: 'out', sender: 'You', subject: 'Revised illustrations — status?', content: 'Ravi — any update on the revised illustrations?', ts: now - 8 * H },
+          { dir: 'in', sender: 'Ravi Sharma', subject: 'Re: Revised illustrations — status?', content: "I've sent over the revised files. Let me know what you think.", ts: now - 4 * H }] },
         { id: 'v6', contactId: 'c3', platform: 'slack', isRead: true, isResponded: true, importance: 'normal', timeSensitive: false, messages: [
           { dir: 'in', sender: 'Ravi Sharma', content: 'Kicking off the icon set today.', ts: now - 2 * D },
           { dir: 'out', sender: 'You', content: 'Great — reference board is in the shared folder 👍', ts: now - 2 * D + H }] },
-        { id: 'v7', contactId: 'c4', platform: 'slack', isRead: true, isResponded: true, importance: 'normal', timeSensitive: false, messages: [
+        { id: 'v7', contactId: 'c4', platform: 'slack', isRead: true, isResponded: true, importance: 'normal', timeSensitive: false, dueTs: now + 8 * D, messages: [
           { dir: 'out', sender: 'You', content: "Here's the delivery timeline for the rebrand — phased over six weeks.", ts: now - 26 * H },
           { dir: 'in', sender: 'Studio Collective', content: "Thanks! We'll review the timeline and get back to you.", ts: now - 24 * H }] },
         { id: 'v8', contactId: 'c5', platform: 'email', isRead: true, isResponded: true, importance: 'low', timeSensitive: false, messages: [
-          { dir: 'out', sender: 'You', content: 'Final invoice attached — thanks for a smooth project!', ts: now - 2 * D - H },
-          { dir: 'in', sender: 'Anna K.', content: 'Perfect, thank you!', ts: now - 2 * D }] },
-        { id: 'v9', contactId: 'c6', platform: 'whatsapp', isRead: true, isResponded: false, importance: 'normal', timeSensitive: false, messages: [
+          { dir: 'out', sender: 'You', subject: 'Final invoice — Northwind rebrand', content: 'Final invoice attached — thanks for a smooth project!', ts: now - 2 * D - H },
+          { dir: 'in', sender: 'Anna K.', subject: 'Re: Final invoice — Northwind rebrand', content: 'Perfect, thank you!', ts: now - 2 * D }] },
+        { id: 'v9', contactId: 'c6', platform: 'whatsapp', isRead: true, isResponded: false, importance: 'normal', timeSensitive: true, dueTs: now - 2 * D, messages: [
           { dir: 'in', sender: 'Brand Co.', content: 'Could you send us a revised quote?', ts: now - 3 * D }] }
       ]
     };
@@ -353,6 +657,53 @@ class Component extends DCLogic {
     imessage: { label: 'iMessage', color: '#5cb4ec' },
     teams: { label: 'Teams', color: '#7d84f0' }
   };
+  // Mail-style platforms read as subject lines, not chat bubbles.
+  static MAIL_PLATFORMS = ['email', 'gmail', 'mail', 'outlook', 'dropbox'];
+  static isMail(p) { return Component.MAIL_PLATFORMS.includes(p); }
+
+  // Platform families — how a message arrives shapes how you answer it.
+  static FAMILIES = [
+    ['mail', 'Mail', ['email', 'gmail', 'mail', 'outlook', 'dropbox']],
+    ['work', 'Work chat', ['slack', 'teams']],
+    ['personal', 'Messaging', ['whatsapp', 'imessage']],
+    ['social', 'Social', ['instagram']]
+  ];
+  static familyOf(p) {
+    const f = Component.FAMILIES.find(([, , list]) => list.includes(p));
+    return f ? { id: f[0], label: f[1] } : { id: 'other', label: 'Other' };
+  }
+
+  static KINDS = {
+    meeting: { label: 'Meeting', cls: 'tag-accent' },
+    call: { label: 'Call', cls: 'tag-outline' },
+    deadline: { label: 'Deadline', cls: 'tag-alert' },
+    appointment: { label: 'Appointment', cls: 'tag-neutral' }
+  };
+  // Times are anchored to today so the demo always has a populated schedule.
+  static seedEvents(now, H, D) {
+    const at = (dayOffset, hour, min) => {
+      const d = new Date(now);
+      d.setDate(d.getDate() + dayOffset);
+      d.setHours(hour, min || 0, 0, 0);
+      return d.getTime();
+    };
+    return [
+      { id: 'e1', title: 'Homepage design review', kind: 'meeting', startTs: at(0, 9, 30), mins: 45,
+        where: 'Google Meet', attendees: ['c1'], convIds: ['v1'] },
+      { id: 'e2', title: 'TechCo retainer check-in', kind: 'call', startTs: at(0, 13, 0), mins: 30,
+        where: 'Phone', attendees: ['c2'], convIds: ['v2', 'v3', 'v4'] },
+      { id: 'e3', title: 'Illustration handoff', kind: 'deadline', startTs: at(0, 17, 0), mins: 0,
+        where: '', attendees: ['c3'], convIds: ['v5'] },
+      { id: 'e4', title: 'Dentist', kind: 'appointment', startTs: at(1, 8, 15), mins: 60,
+        where: 'Bridge St. Dental', attendees: [], convIds: [] },
+      { id: 'e5', title: 'Rebrand kickoff', kind: 'meeting', startTs: at(2, 11, 0), mins: 60,
+        where: 'Studio', attendees: ['c4'], convIds: ['v7'] },
+      { id: 'e6', title: 'Brand Co. quote due', kind: 'deadline', startTs: at(4, 12, 0), mins: 0,
+        where: '', attendees: ['c6'], convIds: ['v9'] },
+      { id: 'e7', title: 'Q4 planning with Sarah', kind: 'meeting', startTs: at(9, 15, 0), mins: 90,
+        where: 'Google Meet', attendees: ['c1'], convIds: ['v1'] }
+    ];
+  }
   static TABS = [['all', 'All'], ['unread', 'Unread'], ['needs', 'Needs Response'], ['done', 'Done'], ['urgent', 'Urgent']];
 
   componentDidMount() {
@@ -424,6 +775,85 @@ class Component extends DCLogic {
     this.setState(s => ({ convs: s.convs.map(v => ids.includes(v.id) && !(v.isRead && v.isResponded) ? Object.assign({}, v, { isRead: true, isResponded: true }) : v) }));
   }
 
+  dateKey(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  // <input type="date"> gives a Y-M-D string; anchor it at 9am local so it lands on the intended day
+  setDue(convId, value) {
+    if (!value) { this.patchConv(convId, { dueTs: null }); return; }
+    const [y, m, d] = value.split('-').map(Number);
+    this.patchConv(convId, { dueTs: new Date(y, m - 1, d, 9, 0).getTime() });
+    this.toast('Due ' + new Date(y, m - 1, d).toLocaleDateString([], { month: 'short', day: 'numeric' }));
+  }
+  hhmm(ts) { return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+  pill(kind, muted) {
+    const alert = kind === 'deadline';
+    return 'display:flex;align-items:center;gap:5px;width:100%;min-width:0;text-align:left;cursor:pointer;font-family:var(--font-body);font-size:11.5px;padding:3px 6px;border-radius:calc(var(--radius-sm) * .75);border:1px solid ' +
+      (muted ? 'var(--color-divider)' : alert ? 'color-mix(in srgb, var(--color-alert) 40%, transparent)' : 'color-mix(in srgb, var(--color-accent) 40%, transparent)') +
+      ';background:' + (muted ? 'color-mix(in srgb, var(--color-text) 5%, transparent)'
+        : alert ? 'var(--color-alert-tint)' : 'color-mix(in srgb, var(--color-accent) 18%, transparent)') +
+      ';color:' + (muted ? 'color-mix(in srgb, var(--color-text) 65%, transparent)' : 'var(--color-text)') +
+      (muted ? ';text-decoration:line-through' : '');
+  }
+  buildCalendar() {
+    const s = this.state, C = Component, now = new Date();
+    const base = new Date(now.getFullYear(), now.getMonth() + s.monthOffset, 1);
+    const todayKey = this.dateKey(Date.now());
+    const byDay = {};
+    // scheduled events
+    s.events.forEach(e => {
+      const past = e.startTs < Date.now() - 36e5;
+      (byDay[this.dateKey(e.startTs)] ||= []).push({
+        sort: e.startTs,
+        label: (e.mins ? this.hhmm(e.startTs).replace(':00', '') + ' ' : '') + e.title,
+        title: e.title + ' · ' + C.KINDS[e.kind].label + (e.where ? ' · ' + e.where : ''),
+        dot: past ? 'color-mix(in srgb, var(--color-text) 35%, transparent)'
+          : e.kind === 'deadline' ? 'var(--color-alert)' : 'var(--color-accent)',
+        pillStyle: this.pill(e.kind, past),
+        open: () => this.setState({ screen: 'calendar', prepEventId: e.id })
+      });
+    });
+    // thread deadlines that aren't already an event
+    s.convs.filter(v => v.dueTs).forEach(v => {
+      const c = s.contacts.find(x => x.id === v.contactId);
+      const resolved = v.isRead && v.isResponded;
+      (byDay[this.dateKey(v.dueTs)] ||= []).push({
+        sort: v.dueTs,
+        label: c.name.split(' (')[0],
+        title: c.name + ' · ' + C.PLATFORMS[v.platform].label + (resolved ? ' · resolved' : ' · open'),
+        dot: resolved ? 'color-mix(in srgb, var(--color-text) 35%, transparent)' : 'var(--color-alert)',
+        pillStyle: this.pill('deadline', resolved),
+        open: () => this.setState({ screen: 'detail', detail: { contactId: v.contactId, convIds: [v.id] } })
+      });
+    });
+    Object.values(byDay).forEach(list => list.sort((a, b) => a.sort - b.sort));
+    const first = new Date(base.getFullYear(), base.getMonth(), 1);
+    const start = new Date(first);
+    start.setDate(1 - first.getDay());
+    const cells = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      const key = this.dateKey(d.getTime()), inMonth = d.getMonth() === base.getMonth();
+      const isToday = key === todayKey;
+      cells.push({
+        day: d.getDate(), isToday, items: byDay[key] || [],
+        cellStyle: 'min-height:104px;padding:8px 9px;background:' +
+          (inMonth ? 'var(--color-surface)' : 'color-mix(in srgb, var(--color-bg) 70%, var(--color-surface))') +
+          (isToday ? ';box-shadow:inset 0 0 0 1px var(--color-accent)' : ''),
+        numStyle: 'font-family:var(--font-heading);font-weight:500;font-size:13px;' +
+          (inMonth ? (isToday ? 'color:var(--color-accent)' : '') : 'color:color-mix(in srgb, var(--color-text) 38%, transparent)')
+      });
+    }
+    // trim a trailing all-empty week
+    if (cells.slice(35).every(c => !c.items.length && c.day < 15)) cells.length = 35;
+    return {
+      calTitle: base.toLocaleDateString([], { month: 'long', year: 'numeric' }),
+      calDows: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      calCells: cells
+    };
+  }
+
   renderVals() {
     const s = this.state, C = Component;
     const contactById = id => s.contacts.find(c => c.id === id);
@@ -437,7 +867,8 @@ class Component extends DCLogic {
       return {
         key: v.id, contact: c, convIds: [v.id], platforms: [v.platform],
         status: this.convStatus(v), urgent: urgentOf(v), imp: v.importance,
-        lastTs: last.ts, preview: last.content, lastPlatform: v.platform
+        lastTs: last.ts, lastPlatform: v.platform,
+        preview: Component.isMail(v.platform) ? (last.subject || last.content) : last.content
       };
     });
     entries.sort((a, b) => b.lastTs - a.lastTs);
@@ -447,6 +878,8 @@ class Component extends DCLogic {
       entries = entries.filter(e =>
         kind === 'rel' ? e.contact.type === val :
         kind === 'con' ? e.contact.connection === val :
+        kind === 'prio' ? (s.prefs.priority || []).includes(e.contact.id) :
+        kind === 'fam' ? e.platforms.some(p => C.familyOf(p).id === val) :
         e.platforms.includes(val));
     }
 
@@ -456,16 +889,29 @@ class Component extends DCLogic {
     let visible = entries.filter(inTab);
     if (this.props.forceEmptyState) visible = [];
 
+    const prioritySet = s.prefs.priority || [];
+    const isPriority = e => prioritySet.includes(e.contact.id);
     const mkRow = e => ({
+      priority: isPriority(e),
+      starTitle: isPriority(e) ? 'Remove from priority list' : 'Add sender to priority list',
+      starFill: isPriority(e) ? 'var(--color-accent)' : 'none',
+      starColor: isPriority(e) ? 'var(--color-accent)' : 'currentColor',
+      toggleStar: ev => { ev.stopPropagation(); this.togglePriority(e.contact.id); },
       initials: e.contact.name.split(/[\s(]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(),
       name: e.contact.name,
       unread: e.status === 'unread',
-      platforms: e.platforms.map(p => ({ label: C.PLATFORMS[p].label, chipStyle: pchip(p) })),
+      platforms: e.platforms.map(p => ({ label: C.familyOf(p).label + ' · ' + C.PLATFORMS[p].label, chipStyle: pchip(p) })),
       time: this.rel(e.lastTs),
       preview: e.preview,
-      previewStyle: 'margin:7px 0 10px;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' + (e.status === 'unread' ? 'font-weight:500' : 'opacity:.92'),
+      previewStyle: (C.isMail(e.lastPlatform)
+        ? 'display:block;max-width:100%;margin:8px 0 10px;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'
+        : 'display:inline-block;max-width:100%;margin:8px 0 10px;padding:7px 13px;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' +
+          'border:1px solid var(--color-divider);border-radius:16px;border-bottom-left-radius:5px;background:color-mix(in srgb, var(--color-text) 6%, transparent);') +
+        (e.status === 'unread' ? 'font-weight:500' : 'opacity:.92'),
       rowStyle: 'display:flex;align-items:flex-start;gap:16px;padding:19px 22px;cursor:pointer;border-bottom:1px solid var(--color-divider)',
-      chips: [...this.entryChips(e.status, e.urgent, e.imp), { cls: 'tag-neutral', label: e.contact.type }, { cls: 'tag-neutral', label: e.contact.connection }],
+      chips: [...this.entryChips(e.status, e.urgent, e.imp),
+        ...(isPriority(e) ? [{ cls: 'tag-outline', label: 'Priority sender' }] : []),
+        { cls: 'tag-neutral', label: e.contact.type }, { cls: 'tag-neutral', label: e.contact.connection }],
       canRead: e.status === 'unread',
       canRespond: e.status !== 'done',
       done: e.status === 'done',
@@ -488,10 +934,15 @@ class Component extends DCLogic {
     let sections;
     if (s.tab === 'all') {
       const rank = e => e.urgent ? 0 : e.status === 'unread' ? 1 : 2;
-      const active = visible.filter(e => e.status !== 'done').sort((a, b) => rank(a) - rank(b) || b.lastTs - a.lastTs);
+      const byRank = (a, b) => rank(a) - rank(b) || b.lastTs - a.lastTs;
+      const open = visible.filter(e => e.status !== 'done');
+      const usePriority = s.prefs.priorityFirst && prioritySet.length > 0;
+      const prio = usePriority ? open.filter(isPriority).sort(byRank) : [];
+      const active = (usePriority ? open.filter(e => !isPriority(e)) : open).sort(byRank);
       const doneList = visible.filter(e => e.status === 'done');
       sections = [];
-      if (active.length) sections.push({ label: 'Active', count: active.length, rows: active.map(mkRow) });
+      if (prio.length) sections.push({ label: 'Priority senders', count: prio.length, rows: prio.map(mkRow) });
+      if (active.length) sections.push({ label: usePriority ? 'Everything else' : 'Active', count: active.length, rows: active.map(mkRow) });
       if (doneList.length) sections.push({ label: 'Done', count: doneList.length, rows: doneList.map(mkRow) });
     } else {
       sections = [{ label: '', count: 0, rows: visible.map(mkRow) }];
@@ -501,10 +952,17 @@ class Component extends DCLogic {
       const lr = sec.rows[sec.rows.length - 1];
       lr.rowStyle = lr.rowStyle.replace('border-bottom:1px solid var(--color-divider)', 'border-bottom:none');
     });
+    const livePlatforms = [...new Set(s.convs.map(v => v.platform))];
+    const liveFamilies = C.FAMILIES.filter(([id]) => livePlatforms.some(p => C.familyOf(p).id === id));
     const catOpts = [{ id: 'all', label: 'All categories' },
-      ...[...new Set(s.contacts.map(c => c.type))].map(t => ({ id: 'rel:' + t, label: t })),
-      ...[...new Set(s.contacts.map(c => c.connection))].map(t => ({ id: 'con:' + t, label: t })),
-      ...[...new Set(s.convs.map(v => v.platform))].map(p => ({ id: 'pf:' + p, label: C.PLATFORMS[p].label }))];
+      ...(prioritySet.length ? [{ id: 'prio:1', label: 'Priority senders only' }] : []),
+      ...liveFamilies.map(([id, label, list]) => ({
+        id: 'fam:' + id,
+        label: label + ' — ' + list.filter(p => livePlatforms.includes(p)).map(p => C.PLATFORMS[p].label).join(', ')
+      })),
+      ...livePlatforms.map(p => ({ id: 'pf:' + p, label: C.familyOf(p).label + ' · ' + C.PLATFORMS[p].label })),
+      ...[...new Set(s.contacts.map(c => c.type))].map(t => ({ id: 'rel:' + t, label: 'Relationship · ' + t })),
+      ...[...new Set(s.contacts.map(c => c.connection))].map(t => ({ id: 'con:' + t, label: 'Connection · ' + t }))];
 
     const tabs = C.TABS.map(([id, label]) => {
       const active = s.tab === id;
@@ -546,6 +1004,8 @@ class Component extends DCLogic {
           time: this.rel(latest(v).ts),
           imp: v.importance,
           setImp: ev => this.patchConv(v.id, { importance: ev.target.value }),
+          dueValue: v.dueTs ? this.dateKey(v.dueTs) : '',
+          setDue: ev => this.setDue(v.id, ev.target.value),
           chips: this.entryChips(st, urgentOf(v), v.importance),
           canRead: st === 'unread', canRespond: st !== 'done',
           tsLabel: v.timeSensitive ? 'Unflag' : 'Flag time-sensitive',
@@ -566,11 +1026,21 @@ class Component extends DCLogic {
           openIn: () => this.toast('The full product would open this thread in ' + C.PLATFORMS[v.platform].label + '.'),
           msgs: v.messages.map(m => {
             const out = m.dir === 'out';
+            const mail = C.isMail(v.platform);
             return {
-              sender: m.sender, time: this.full(m.ts), content: m.content,
-              wrapStyle: 'display:flex;flex-direction:column;gap:4px;max-width:78%;' + (out ? 'align-self:flex-end;align-items:flex-end' : 'align-self:flex-start'),
+              sender: m.sender, time: this.full(m.ts),
+              content: mail ? (m.subject || m.content) : m.content,
+              isMail: mail, notMail: !mail, snippet: mail ? m.content : '',
+              wrapStyle: mail
+                ? 'display:flex;flex-direction:column;gap:4px;max-width:100%;align-self:stretch'
+                : 'display:flex;flex-direction:column;gap:4px;max-width:78%;' + (out ? 'align-self:flex-end;align-items:flex-end' : 'align-self:flex-start'),
               metaStyle: 'font-size:11.5px;color:color-mix(in srgb, var(--color-text) 72%, transparent)',
-              bubbleStyle: 'padding:10px 14px;font-size:14px;line-height:1.5;border-radius:var(--radius-md);border:1px solid var(--color-divider);' + (out ? 'background:color-mix(in srgb, var(--color-accent) 24%, transparent)' : 'background:color-mix(in srgb, var(--color-text) 6%, transparent)')
+              bubbleStyle: mail
+                ? 'font-family:var(--font-heading);font-weight:500;font-size:15px;line-height:1.4;letter-spacing:-.01em;padding:0 0 0 12px;border-left:2px solid ' +
+                  (out ? 'color-mix(in srgb, var(--color-accent) 60%, transparent)' : 'var(--color-divider)')
+                : 'padding:10px 15px;font-size:14px;line-height:1.5;border:1px solid var(--color-divider);border-radius:18px;' +
+                (out ? 'border-bottom-right-radius:5px;background:color-mix(in srgb, var(--color-accent) 24%, transparent)'
+                     : 'border-bottom-left-radius:5px;background:color-mix(in srgb, var(--color-text) 6%, transparent)')
             };
           })
         };
@@ -582,6 +1052,132 @@ class Component extends DCLogic {
     const themeOpts = segOpts([['light', 'Light'], ['dark', 'Dark'], ['system', 'System']], s.prefs.theme, v => this.savePrefs({ theme: v }));
     const tabOpts = segOpts(C.TABS, s.prefs.defaultTab, v => this.savePrefs({ defaultTab: v }));
 
+    // calendar
+    const cal = this.buildCalendar();
+    const dayMs = 864e5, nowMs = Date.now();
+    const todayKey = this.dateKey(nowMs);
+    const kindOf = e => C.KINDS[e.kind];
+    const nameOf = c => c.name.split(' (')[0];
+    const convsFor = e => s.convs.filter(v => e.convIds.includes(v.id));
+
+    const todayEvents = s.events.filter(e => this.dateKey(e.startTs) === todayKey)
+      .sort((a, b) => a.startTs - b.startTs).map(e => {
+        const endTs = e.startTs + e.mins * 6e4;
+        const cs = convsFor(e);
+        const unread = cs.filter(v => !v.isRead).length;
+        const people = e.attendees.map(id => nameOf(contactById(id)));
+        return {
+          startLabel: this.hhmm(e.startTs),
+          durationLabel: e.mins ? e.mins + ' min' : 'due',
+          kindLabel: kindOf(e).label, kindCls: kindOf(e).cls,
+          title: e.title,
+          isNow: nowMs >= e.startTs && nowMs < Math.max(endTs, e.startTs + 15 * 6e4),
+          meta: [people.length ? people.join(', ') : null, e.where || null,
+            cs.length ? cs.length + (cs.length === 1 ? ' linked thread' : ' linked threads') : null]
+            .filter(Boolean).join(' · '),
+          hasUnread: unread > 0,
+          unreadNote: unread + (unread === 1 ? ' unread message' : ' unread messages') + ' before this — worth a look',
+          cardStyle: 'background:var(--color-surface);border:1px solid ' +
+            (nowMs >= e.startTs && nowMs < Math.max(endTs, e.startTs + 15 * 6e4)
+              ? 'color-mix(in srgb, var(--color-alert) 45%, transparent)' : 'var(--color-divider)') +
+            ';border-radius:var(--radius-md);padding:16px 18px',
+          openPrep: () => this.setState({ prepEventId: e.id })
+        };
+      });
+
+    const attnEntries = entries.filter(e => e.status !== 'done')
+      .sort((a, b) => (b.urgent - a.urgent) || b.lastTs - a.lastTs).slice(0, 6);
+    const attnRows = attnEntries.map((e, i, arr) => ({
+      name: e.contact.name, platform: C.PLATFORMS[e.lastPlatform].label, chipStyle: pchip(e.lastPlatform),
+      preview: e.preview, urgent: e.urgent, urgentLabel: 'Time-sensitive',
+      rowStyle: 'padding:13px 16px;cursor:pointer' + (i < arr.length - 1 ? ';border-bottom:1px solid var(--color-divider)' : ''),
+      open: () => this.setState({ screen: 'detail', detail: { contactId: e.contact.id, convIds: e.convIds } })
+    }));
+
+    const openFollowUps = s.followUps.filter(f => !f.done).sort((a, b) => a.dueTs - b.dueTs);
+    const followUpRow = (f, i, arr) => {
+      const late = f.dueTs < nowMs;
+      return {
+        text: f.text,
+        dueLabel: late ? 'overdue' : this.dueLabel(f.dueTs),
+        dueStyle: 'flex:none;font-size:11.5px;' + (late ? 'color:var(--color-alert-text)' : 'color:color-mix(in srgb, var(--color-text) 62%, transparent)'),
+        rowStyle: 'display:flex;align-items:center;gap:10px;padding:11px 14px' + (i < arr.length - 1 ? ';border-bottom:1px solid var(--color-divider)' : ''),
+        done: () => this.completeFollowUp(f.id)
+      };
+    };
+
+    // meeting prep
+    const pe = s.events.find(e => e.id === s.prepEventId);
+    let prep = null;
+    if (pe) {
+      const cs = convsFor(pe);
+      const ctx = cs.flatMap(v => v.messages.slice(-2).map(m => ({ v, m })))
+        .sort((a, b) => b.m.ts - a.m.ts).slice(0, 4)
+        .map(({ v, m }) => ({
+          platform: C.PLATFORMS[v.platform].label, chipStyle: pchip(v.platform),
+          content: m.content, who: m.sender, time: this.rel(m.ts),
+          open: () => this.setState({ screen: 'detail', prepEventId: null, detail: { contactId: v.contactId, convIds: [v.id] } })
+        }));
+      const evFollows = openFollowUps.filter(f => f.eventId === pe.id);
+      prep = {
+        title: pe.title, kindLabel: kindOf(pe).label, kindCls: kindOf(pe).cls,
+        meta: [new Date(pe.startTs).toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' }),
+          pe.mins ? this.hhmm(pe.startTs) + ' · ' + pe.mins + ' min' : 'due ' + this.hhmm(pe.startTs),
+          pe.where || null].filter(Boolean).join(' · '),
+        attendees: pe.attendees.map(id => {
+          const c = contactById(id);
+          const theirs = s.convs.filter(v => v.contactId === id);
+          const last = theirs.map(latest).sort((a, b) => b.ts - a.ts)[0];
+          const open = theirs.filter(v => !(v.isRead && v.isResponded)).length;
+          return {
+            initials: c.name.split(/[\s(]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(),
+            name: c.name, type: c.type + ' · ' + c.connection,
+            chips: open ? [{ cls: 'tag-outline', label: open + ' open' }] : [],
+            lastLine: last ? 'Last: “' + last.content + '” — ' + this.rel(last.ts) : 'No messages yet.'
+          };
+        }),
+        context: ctx, hasContext: ctx.length > 0, noContext: ctx.length === 0,
+        followPlaceholder: 'e.g. Send recap and next steps',
+        followText: s.followDraft.text, followDate: s.followDraft.date,
+        followEmpty: !s.followDraft.text.trim(),
+        setFollowText: ev => this.setState({ followDraft: Object.assign({}, s.followDraft, { text: ev.target.value }) }),
+        setFollowDate: ev => this.setState({ followDraft: Object.assign({}, s.followDraft, { date: ev.target.value }) }),
+        addFollow: () => this.addFollowUp(pe.id),
+        followUps: evFollows.map((f, i, arr) => followUpRow(f, i, arr)),
+        hasFollowUps: evFollows.length > 0,
+        messageAll: () => {
+          const first = pe.attendees[0];
+          if (!first) { this.toast('No attendees to message.'); return; }
+          this.setState({ showCompose: true, prepEventId: null, screen: 'home',
+            compose: Object.assign({}, s.compose, { contactId: first, content: 'Ahead of ' + pe.title + ' — ' }) });
+        }
+      };
+    }
+
+    const dated = s.convs.filter(v => v.dueTs && !(v.isRead && v.isResponded));
+    const overdueCount = dated.filter(v => v.dueTs < nowMs).length;
+    const soon = dated.filter(v => v.dueTs >= nowMs && v.dueTs < nowMs + 3 * dayMs).length;
+    const unscheduledConvs = s.convs.filter(v => v.timeSensitive && !v.dueTs && !(v.isRead && v.isResponded));
+    const unscheduled = unscheduledConvs.map((v, i, arr) => {
+      const c = contactById(v.contactId);
+      return {
+        name: c.name.split(' (')[0], platform: C.PLATFORMS[v.platform].label, chipStyle: pchip(v.platform),
+        preview: latest(v).content, dueValue: '',
+        rowStyle: 'display:flex;align-items:center;gap:12px;padding:13px 18px' + (i < arr.length - 1 ? ';border-bottom:1px solid var(--color-divider)' : ''),
+        setDue: ev => this.setDue(v.id, ev.target.value),
+        open: () => this.setState({ screen: 'detail', detail: { contactId: v.contactId, convIds: [v.id] } })
+      };
+    });
+    const calSummary = s.events.length + ' scheduled' +
+      (dated.length ? ' · ' + dated.length + ' open thread ' + (dated.length === 1 ? 'deadline' : 'deadlines') : '') +
+      (overdueCount ? ' · ' + overdueCount + ' overdue' : '');
+    const attnTotal = counts.unread + counts.needs;
+    const todaySummary = (todayEvents.length
+      ? todayEvents.length + (todayEvents.length === 1 ? ' thing' : ' things') + ' on your schedule'
+      : 'Nothing scheduled') +
+      ' · ' + (attnTotal ? attnTotal + ' ' + (attnTotal === 1 ? 'conversation needs' : 'conversations need') + ' attention' : 'inbox is clear') +
+      (openFollowUps.length ? ' · ' + openFollowUps.length + ' follow-up' + (openFollowUps.length === 1 ? '' : 's') : '');
+
     const cmpContact = contactById(s.compose.contactId);
     const cmpExisting = s.convs.find(v => v.contactId === s.compose.contactId && v.platform === s.compose.platform);
 
@@ -589,8 +1185,28 @@ class Component extends DCLogic {
       showWelcome: !s.welcomed,
       enterApp: () => { try { localStorage.setItem('coms.welcomed', '1'); } catch (e) {} this.setState({ welcomed: true }); },
       isHome: s.screen === 'home', isDetail: s.screen === 'detail', isSettings: s.screen === 'settings',
+      isCalendar: s.screen === 'calendar',
       goHome: () => this.setState({ screen: 'home', detail: null }),
       openSettings: () => this.setState({ screen: 'settings' }),
+      openCalendar: () => this.setState({ screen: 'calendar', monthOffset: 0, calView: 'month' }),
+      calDows: cal.calDows, calCells: cal.calCells,
+      calTitle: s.calView === 'today' ? 'Today' : cal.calTitle,
+      calSummary: s.calView === 'today' ? todaySummary : calSummary,
+      isTodayView: s.calView === 'today', isMonthView: s.calView === 'month',
+      calViewOpts: [['month', 'Month'], ['today', 'Today']].map(([id, label]) => ({
+        label, on: s.calView === id, sel: () => this.setState({ calView: id })
+      })),
+      todayDateLabel: new Date().toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' }),
+      todayEvents, hasTodayEvents: todayEvents.length > 0, noTodayEvents: todayEvents.length === 0,
+      attnRows, attnCount: attnRows.length, hasAttn: attnRows.length > 0, noAttn: attnRows.length === 0,
+      followUps: openFollowUps.map((f, i, arr) => followUpRow(f, i, arr)),
+      followUpCount: openFollowUps.length, hasFollowUps: openFollowUps.length > 0,
+      showPrep: !!prep, prep, closePrep: () => this.setState({ prepEventId: null }),
+      calPrev: () => this.setState(st => ({ monthOffset: st.monthOffset - 1 })),
+      calNext: () => this.setState(st => ({ monthOffset: st.monthOffset + 1 })),
+      calToday: () => this.setState({ monthOffset: 0 }),
+      dueSoonCount: overdueCount + soon,
+      unscheduled, unscheduledCount: unscheduled.length, hasUnscheduled: unscheduled.length > 0,
       summary, tabs, sections, hasRows: visible.length > 0, showEmpty: visible.length === 0,
       catFilter: s.cat, catOpts, setCat: ev => this.setState({ cat: ev.target.value }),
       detailName, detailType, detailSub, detailInitials, threads, relOpts, conOpts,
@@ -609,8 +1225,33 @@ class Component extends DCLogic {
         ['notifyFlagged', 'Items flagged as urgent'],
         ['notifyUnread', 'Every new unread message']
       ].map(([k, label]) => ({ label, on: s.prefs[k], sel: () => this.savePrefs({ [k]: !s.prefs[k] }) })),
+      priorityFirst: s.prefs.priorityFirst,
+      togglePriorityFirst: () => this.savePrefs({ priorityFirst: !s.prefs.priorityFirst }),
+      priorityHint: (s.prefs.priority || []).length
+        ? (s.prefs.priority || []).length + ' sender' + ((s.prefs.priority || []).length === 1 ? '' : 's') + ' flagged — their messages sort to the top of the inbox.'
+        : 'No priority senders yet. Flag anyone whose messages should always surface first.',
+      priorityRows: s.contacts.map(c => ({
+        name: c.name, meta: c.type + ' · ' + c.connection,
+        on: (s.prefs.priority || []).includes(c.id),
+        toggle: () => this.togglePriority(c.id)
+      })),
       showDemoBadge: this.props.showDemoBadge ?? true,
       toast: s.toast,
+      // simulate (demo tool)
+      showSimulate: s.showSimulate,
+      openSimulate: () => this.setState({ showSimulate: true }),
+      closeSimulate: () => this.setState({ showSimulate: false }),
+      simContact: s.sim.contactId, simPlatform: s.sim.platform, simContent: s.sim.content, simTs: s.sim.ts,
+      simImpOpts: [['low', 'Low'], ['normal', 'Normal'], ['high', 'High']].map(([v, label]) => ({
+        label, on: s.sim.importance === v,
+        sel: () => this.setState(st => ({ sim: Object.assign({}, st.sim, { importance: v }) }))
+      })),
+      setSimContact: ev => this.setState({ sim: Object.assign({}, s.sim, { contactId: ev.target.value }) }),
+      setSimPlatform: ev => this.setState({ sim: Object.assign({}, s.sim, { platform: ev.target.value }) }),
+      setSimContent: ev => this.setState({ sim: Object.assign({}, s.sim, { content: ev.target.value }) }),
+      toggleSimTs: () => this.setState({ sim: Object.assign({}, s.sim, { ts: !s.sim.ts }) }),
+      deliverSim: () => this.deliverSim(),
+
       // compose
       showCompose: s.showCompose,
       openCompose: () => this.setState({ showCompose: true }),
@@ -630,6 +1271,40 @@ class Component extends DCLogic {
     };
   }
 
+  togglePriority(contactId) {
+    const list = this.state.prefs.priority || [];
+    const on = !list.includes(contactId);
+    this.savePrefs({ priority: on ? [...list, contactId] : list.filter(id => id !== contactId) });
+    const c = this.state.contacts.find(x => x.id === contactId);
+    this.toast(c.name.split(' (')[0] + (on ? ' added to priority senders' : ' removed from priority'));
+  }
+
+  dueLabel(ts) {
+    const days = Math.round((ts - Date.now()) / 864e5);
+    if (days === 0) return 'today';
+    if (days === 1) return 'tomorrow';
+    if (days > 1 && days < 7) return 'in ' + days + ' days';
+    return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
+  addFollowUp(eventId) {
+    const { text, date } = this.state.followDraft;
+    if (!text.trim()) return;
+    let dueTs = Date.now() + 864e5;
+    if (date) {
+      const [y, m, d] = date.split('-').map(Number);
+      dueTs = new Date(y, m - 1, d, 9, 0).getTime();
+    }
+    this.setState(s => ({
+      followUps: [...s.followUps, { id: 'f' + Date.now(), eventId, text: text.trim(), dueTs, done: false }],
+      followDraft: { text: '', date: '' }
+    }));
+    this.toast('Follow-up set for ' + this.dueLabel(dueTs));
+  }
+  completeFollowUp(id) {
+    this.setState(s => ({ followUps: s.followUps.map(f => f.id === id ? Object.assign({}, f, { done: true }) : f) }));
+    this.toast('Follow-up done');
+  }
+
   setDraft(convId, text) {
     this.setState(s => ({ drafts: Object.assign({}, s.drafts, { [convId]: text }) }));
   }
@@ -647,6 +1322,35 @@ class Component extends DCLogic {
       drafts: Object.assign({}, s.drafts, { [convId]: '' })
     }));
     this.toast('Sent — thread marked responded');
+  }
+
+  deliverSim() {
+    const s = this.state, sim = s.sim, now = Date.now();
+    const content = sim.content.trim() || 'Hey — quick question when you have a minute.';
+    const autoTs = /\b(today|tomorrow|tonight|asap|urgent|deadline|by (mon|tue|wed|thu|fri|sat|sun|end)|\d{1,2}\s?(am|pm))\b/i.test(content);
+    const c = s.contacts.find(x => x.id === sim.contactId);
+    const mail = Component.isMail(sim.platform);
+    const msg = { dir: 'in', sender: c.name.split(' (')[0], content, ts: now };
+    if (mail) msg.subject = content.split(/[.!?]/)[0].slice(0, 60);
+    const existing = s.convs.find(v => v.contactId === sim.contactId && v.platform === sim.platform);
+    let convs;
+    if (existing) {
+      convs = s.convs.map(v => v === existing ? Object.assign({}, v, {
+        isRead: false, isResponded: false,
+        importance: sim.importance !== 'normal' ? sim.importance : v.importance,
+        timeSensitive: v.timeSensitive || sim.ts || autoTs,
+        messages: [...v.messages, msg]
+      }) : v);
+    } else {
+      convs = [...s.convs, {
+        id: 'v' + (now % 1e7), contactId: sim.contactId, platform: sim.platform,
+        isRead: false, isResponded: false, importance: sim.importance,
+        timeSensitive: sim.ts || autoTs, messages: [msg]
+      }];
+    }
+    this.setState({ convs, showSimulate: false, screen: 'home',
+      sim: Object.assign({}, sim, { content: '', ts: false, importance: 'normal' }) });
+    this.toast('Message delivered' + ((sim.ts || autoTs) ? ' — flagged time-sensitive' : ''));
   }
 
   sendCompose() {

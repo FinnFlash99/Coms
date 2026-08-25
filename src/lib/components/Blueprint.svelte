@@ -4,12 +4,13 @@
 	interface Props {
 		children: Snippet;
 		class?: string;
+		style?: string;
 	}
 
-	let { children, class: className = '' }: Props = $props();
+	let { children, class: className = '', style = '' }: Props = $props();
 </script>
 
-<div class="blueprint {className}">
+<div class="blueprint {className}" {style}>
 	<i class="corner tl"></i>
 	<i class="corner tr"></i>
 	<i class="corner bl"></i>

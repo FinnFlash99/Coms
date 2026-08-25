@@ -1,52 +1,58 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { Settings, Send } from 'lucide-svelte';
+	import { Settings, Send, Plus, CalendarDays } from 'lucide-svelte';
 	import {
 		welcomed,
 		filteredConversations,
 		conversationCounts,
+		conversations,
 		contacts,
+		preferences,
 		categoryFilter,
 		activeTab,
-		toast
+		openComposeDialog,
+		openSimulateDialog
 	} from '$lib/stores';
-	import { PLATFORMS, type Platform } from '$lib/types';
-	import Blueprint from '$components/Blueprint.svelte';
+	import { PLATFORMS, PLATFORM_FAMILIES, familyOf } from '$lib/types';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import TabBar from '$components/TabBar.svelte';
 	import ConversationRow from '$components/ConversationRow.svelte';
 	import EmptyState from '$components/EmptyState.svelte';
 	import WelcomeDialog from '$components/WelcomeDialog.svelte';
-	import ComposeDialog from '$components/ComposeDialog.svelte';
 	import DemoBadge from '$components/DemoBadge.svelte';
 
-	let showCompose = $state(false);
-
-	function handleSent(conversationId: string, contactId: string, platform: Platform) {
-		showCompose = false;
-		const contact = $contacts.find((c) => c.id === contactId);
-		if (contact) {
-			toast.show(`Sent to ${contact.name.split(' (')[0]} on ${PLATFORMS[platform].label}`);
-		}
-		goto(`/conversation/${contactId}`);
-	}
+	// How many open thread deadlines are overdue or due within 3 days -- shown as
+	// a badge on the Calendar button so it's visible without opening the calendar.
+	const dueSoonCount = $derived.by(() => {
+		const now = Date.now();
+		const threeDays = 3 * 86400000;
+		return $conversations.filter((v) => {
+			if (!v.dueTs || (v.isRead && v.isResponded)) return false;
+			return v.dueTs < now + threeDays;
+		}).length;
+	});
 
 	// Build category filter options
 	const categoryOptions = $derived(() => {
 		const options = [{ id: 'all', label: 'All categories' }];
+		const priority = $preferences.priority || [];
+		if (priority.length) options.push({ id: 'prio:1', label: 'Priority senders only' });
+
+		const livePlatforms = [...new Set($filteredConversations.map((v) => v.platform))];
+		const liveFamilies = PLATFORM_FAMILIES.filter((f) => livePlatforms.some((p) => familyOf(p).id === f.id));
+		liveFamilies.forEach((f) => {
+			const label = f.platforms.filter((p) => livePlatforms.includes(p)).map((p) => PLATFORMS[p].label).join(', ');
+			options.push({ id: `fam:${f.id}`, label: `${f.label} — ${label}` });
+		});
+		livePlatforms.forEach((p) => options.push({ id: `pf:${p}`, label: `${familyOf(p).label} · ${PLATFORMS[p].label}` }));
 
 		// Relationship types
 		const types = [...new Set($contacts.map((c) => c.type))];
-		types.forEach((t) => options.push({ id: `rel:${t}`, label: t }));
+		types.forEach((t) => options.push({ id: `rel:${t}`, label: `Relationship · ${t}` }));
 
 		// Connection strengths
 		const connections = [...new Set($contacts.map((c) => c.connection))];
-		connections.forEach((c) => options.push({ id: `con:${c}`, label: c }));
-
-		// Platforms
-		const platforms = [...new Set($filteredConversations.map((v) => v.platform))];
-		platforms.forEach((p) => options.push({ id: `pf:${p}`, label: PLATFORMS[p].label }));
+		connections.forEach((c) => options.push({ id: `con:${c}`, label: `Connection · ${c}` }));
 
 		return options;
 	});
@@ -67,7 +73,7 @@
 		return text;
 	});
 
-	// Group conversations for "All" tab (Active vs Done sections)
+	// Group conversations for "All" tab (Priority / Active / Done sections)
 	const sections = $derived(() => {
 		const convs = $filteredConversations;
 		const tab = $activeTab;
@@ -75,11 +81,18 @@
 		if (tab === 'all') {
 			const rank = (e: (typeof convs)[0]) =>
 				e.urgent ? 0 : e.status === 'unread' ? 1 : e.status === 'needs' ? 2 : 3;
-			const active = convs.filter((e) => e.status !== 'done').sort((a, b) => rank(a) - rank(b));
+			const byRank = (a: (typeof convs)[0], b: (typeof convs)[0]) => rank(a) - rank(b);
+			const open = convs.filter((e) => e.status !== 'done');
 			const done = convs.filter((e) => e.status === 'done');
 
+			const priorityIds = $preferences.priority || [];
+			const usePriority = $preferences.priorityFirst && priorityIds.length > 0;
+			const priorityRows = usePriority ? open.filter((e) => e.isPriority).sort(byRank) : [];
+			const activeRows = (usePriority ? open.filter((e) => !e.isPriority) : open).sort(byRank);
+
 			const sections = [];
-			if (active.length) sections.push({ label: 'Active', count: active.length, rows: active });
+			if (priorityRows.length) sections.push({ label: 'Priority senders', count: priorityRows.length, rows: priorityRows });
+			if (activeRows.length) sections.push({ label: usePriority ? 'Everything else' : 'Active', count: activeRows.length, rows: activeRows });
 			if (done.length) sections.push({ label: 'Done', count: done.length, rows: done });
 			return sections;
 		}
@@ -95,10 +108,21 @@
 		<span class="logo">COMS</span>
 		<Tag variant="neutral">UNIFIED INBOX</Tag>
 		<span class="spacer"></span>
-		<Button variant="primary" onclick={() => (showCompose = true)}>
+		<Button variant="primary" onclick={() => openComposeDialog()}>
 			<Send size={14} strokeWidth={1.5} />
 			New message
 		</Button>
+		<Button variant="secondary" title="Simulate an incoming message" onclick={openSimulateDialog}>
+			<Plus size={14} strokeWidth={1.5} />
+			Simulate
+		</Button>
+		<a href="/calendar" class="btn btn-secondary" title="Calendar">
+			<CalendarDays size={15} strokeWidth={1.5} />
+			Calendar
+			{#if dueSoonCount > 0}
+				<span class="due-badge">{dueSoonCount}</span>
+			{/if}
+		</a>
 		<a href="/settings" class="btn btn-secondary btn-icon" title="Settings">
 			<Settings size={16} strokeWidth={1.5} />
 		</a>
@@ -130,7 +154,7 @@
 							<span class="section-count text-muted">{section.count}</span>
 						</div>
 					{/if}
-					<Blueprint>
+					<div class="row-card">
 						{#each section.rows as conv, i}
 							{@const contact = $contacts.find((c) => c.id === conv.contactId)}
 							{#if contact}
@@ -141,7 +165,7 @@
 								/>
 							{/if}
 						{/each}
-					</Blueprint>
+					</div>
 				</div>
 			{/each}
 		</div>
@@ -151,7 +175,6 @@
 </div>
 
 <WelcomeDialog visible={!$welcomed} />
-<ComposeDialog open={showCompose} onclose={() => (showCompose = false)} onsent={handleSent} />
 <DemoBadge />
 
 <style>
@@ -176,6 +199,16 @@
 
 	.spacer {
 		flex: 1;
+	}
+
+	.due-badge {
+		font-size: 10.5px;
+		padding: 1px 7px;
+		min-width: 18px;
+		text-align: center;
+		border-radius: 999px;
+		background: var(--color-alert);
+		color: #fff;
 	}
 
 	.summary {
@@ -203,6 +236,14 @@
 		flex-direction: column;
 		gap: 38px;
 		margin-top: 30px;
+	}
+
+	.row-card {
+		background: var(--color-surface);
+		border: 1px solid var(--color-divider);
+		border-radius: 24px;
+		border-bottom-left-radius: 8px;
+		overflow: hidden;
 	}
 
 	.section-header {

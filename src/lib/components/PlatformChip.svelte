@@ -3,9 +3,10 @@
 
 	interface Props {
 		platform: Platform;
+		label?: string;
 	}
 
-	let { platform }: Props = $props();
+	let { platform, label }: Props = $props();
 
 	const info = $derived(PLATFORMS[platform]);
 </script>
@@ -15,7 +16,7 @@
 	style:background="color-mix(in srgb, {info.color} 26%, transparent)"
 	style:color="color-mix(in srgb, {info.color} 88%, var(--color-text))"
 >
-	{info.label}
+	{label ?? info.label}
 </span>
 
 <style>
