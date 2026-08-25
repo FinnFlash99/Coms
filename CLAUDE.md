@@ -28,14 +28,29 @@ Single-developer repo (just Finn) — commit and push directly to `main`. Do not
 
 ## Handling a Claude Design handoff
 
-When given a new Claude Design file/export (a `.dc.html` bundle, a "design handoff" ZIP, etc.), every time, without being asked:
+Finn will upload a new Claude Design export ZIP repeatedly, over and over, indefinitely. It is always shaped the same way. Do NOT re-derive this from scratch each time — follow the mechanical procedure below exactly.
 
-1. Sync it into `design/` (per "Claude Design Integration" above), fixing any references broken by the sync (renamed `_ds/` UUID, etc.).
+### Step 1: Extract and pick the right copy of each file — deterministically
+
+**The zip always contains multiple copies of the same files at different nesting depths.** This is because Claude Design's export bundles the project's own `uploads/` folder too, which accumulates copies of previous exports/handoffs the user re-uploaded as reference material. Observed shapes so far, always the same rule applies:
+
+- A zip may have `Coms.dc.html` at the root, AND/OR nested under `design_handoff_coms/`, AND/OR nested under `uploads/<something>/`.
+- **Rule: for each filename, use the copy with the fewest path segments (least nested / closest to the zip root). Ignore every deeper copy — they are stale leftovers from a previous upload, not the current export.**
+- Do NOT use file timestamps to decide freshness — the zip stamps every file with the export time, not the file's actual history, so timestamps are always identical and useless as a signal.
+- If two copies of the same filename tie at the same minimal depth, diff them. If identical, it doesn't matter which you use. If they differ, stop and ask Finn rather than guess.
+
+Files to extract this way and sync into `design/`: `Coms.dc.html`, `support.js`, `image-slot.js`, `.thumbnail` (if present), and the `_ds/<system-name>-<uuid>/` folder(s) actually `<link>`/`<script>`-referenced from the chosen `Coms.dc.html` (currently just `nocturne-*`; ignore any other `_ds/*` folder present in the zip as an inactive leftover). Also sync the product spec markdown (shallowest copy) into `design/uploads/` if its content actually changed.
+
+**Never sync these, even though they appear in the zip:** `github.md` (stale bookkeeping from Claude Design's own session, not authoritative for this repo — `CLAUDE.md`'s own "Claude Design Integration" section is the source of truth here), `.image-slots.state.json` (Claude Design's internal tool state), and the entire `design_handoff_coms/` or nested `uploads/*/` wrapper directories themselves (only cherry-pick the individual files named above out of them, using the depth rule).
+
+### Step 2: every time, without being asked
+
+1. Sync the files selected in Step 1 into `design/` (per "Claude Design Integration" below), fixing any references broken by the sync (renamed `_ds/` UUID, etc.).
 2. **Propagate the actual content/visual changes into `src/` so the deployed app matches the new design.** `design/Coms.dc.html` is a static reference file — the live app never reads it, it has its own hardcoded copy of every string/style in `src/routes/` and `src/lib/components/`. Diff the new design against the previous one, find the corresponding hardcoded text/markup/styling in `src/`, and update it to match. Syncing `design/` alone is **not sufficient** — if the deployed site doesn't reflect the new design, the job isn't done.
-3. Validate: `npm run lint`, `npm run check`, `npm run build` must all pass clean (0 errors) before committing.
+3. Validate: `npm run lint`, `npm run check`, `npm run build` must all pass clean (0 errors). For any change to visual/interactive behavior (theming, new UI, new flows), also actually run the app (`npm run dev` + a real browser/Playwright check) and confirm it — a clean build has already once shipped a broken theme toggle, so build-clean alone is not sufficient proof it works.
 4. Commit and push to `main`.
 
-This is a standing instruction — don't ask for confirmation or scope check-in on any of these four steps for a design handoff; just do them. (Building *new functionality* beyond what the design actually shows, or expanding scope past matching the design, is still not part of this — that would need an explicit ask.)
+This is a standing instruction — don't ask for confirmation or scope check-in on any of these steps for a design handoff; just do them. (Building *new functionality* beyond what the design actually shows, or expanding scope past matching the design, is still not part of this — that would need an explicit ask.)
 
 ## Development Commands
 
