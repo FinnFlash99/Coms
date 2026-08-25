@@ -4,7 +4,7 @@ This document records significant design decisions and their rationale.
 
 ## Decision Record
 
-### Industry Design System
+### Industry Design System — superseded by Nocturne
 
 **Decision:** Use the Industry design system — a wireframe/blueprint aesthetic.
 
@@ -20,6 +20,8 @@ This document records significant design decisions and their rationale.
 - All UI must follow Industry guidelines (no rounded corners, no decorative colors)
 - Primary buttons are the only solid-filled elements
 - Registration marks (`+`) are required on framed elements
+
+**Superseded:** A later Claude Design retheme replaced Industry with **Nocturne** — a dark blue-grey ground with a blurple accent, Inter typography, and 8px radii (outlined, never filled, primary buttons). See [Design System: Nocturne](../reference/design-system.md). This record is kept as-is for history; it no longer describes the current UI.
 
 ### Grouped by Contact
 

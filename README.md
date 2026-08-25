@@ -53,7 +53,7 @@ The repository contains a complete product specification and interactive design 
 
 ## Design System
 
-Coms uses the **Industry** design system — a wireframe/blueprint aesthetic.
+Coms uses the **Nocturne** design system — a quiet, compact dark interface.
 
 - Steel-blue accent (`#5980a6`)
 - Square corners, hairline borders

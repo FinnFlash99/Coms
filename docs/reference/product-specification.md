@@ -155,20 +155,20 @@ Full emoji support throughout the app:
 | **Open in platform** | Each conversation shows "Open in [Platform]" button (e.g., "Open in Slack", "Open in Email") |
 | **Demo Mode label** | Subtle but persistent — small indicator in a corner |
 
-## 12b. Design System: Industry
+## 12b. Design System: Nocturne
 
-The app uses the **Industry** design system — a wireframe/blueprint aesthetic.
+The app uses the **Nocturne** design system — a quiet, compact dark interface.
 
 | Element | Style |
 |---------|-------|
-| **Accent color** | Steel-blue (#5980a6) |
-| **Background** | Light gray (#f2f2f3), dark mode (#191b1e) |
-| **Typography** | Barlow Condensed (headings), Barlow (body) |
-| **Corners** | Square — no rounded corners |
-| **Cards/frames** | Transparent with hairline borders |
-| **Corner marks** | Blueprint registration marks (+) at corners |
-| **Icons** | Lucide icons, stroke-width 1.5 |
-| **Buttons** | Primary is solid accent fill with square corners |
+| **Accent color** | Blurple (#9184d9) |
+| **Background** | Dark blue-grey (#161826), derived light mode (#f4f5fb) |
+| **Typography** | Inter (headings and body), heading weight capped at 500 |
+| **Corners** | 8px radii — softly rounded |
+| **Cards/frames** | Surface-filled with hairline borders |
+| **Elevation** | Shadow tokens only — no stacked shadows |
+| **Icons** | Phosphor icons |
+| **Buttons** | Primary is an accent outline, never a solid fill |
 
 **Design files location:**
 - Full design: `design/Coms.dc.html` (open in browser)

@@ -21,7 +21,7 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 ### Key Reference
 - [Project Structure](reference/project-structure.md) — Repository layout and file purposes
 - [Data Model](reference/data-model.md) — Contact, Conversation, and Message schemas
-- [Design System](reference/design-system.md) — Industry design system usage
+- [Design System](reference/design-system.md) — Nocturne design system usage
 - [Product Specification](reference/product-specification.md) — Complete feature specification
 
 ### Development

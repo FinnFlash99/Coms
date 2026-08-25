@@ -38,7 +38,7 @@ Coms is a **unified inbox** that aggregates messages from multiple platforms int
 ```
 ┌─────────────────────────────────────────┐
 │              Presentation               │
-│   (SvelteKit + Industry design system)  │
+│   (SvelteKit + Nocturne design system)  │
 ├─────────────────────────────────────────┤
 │             Application Logic           │
 │   (Svelte stores, reactive state)       │
@@ -56,12 +56,12 @@ Coms is a **unified inbox** that aggregates messages from multiple platforms int
 
 ### Presentation Layer
 
-Built with **SvelteKit 5** using the **Industry design system**. Key characteristics:
+Built with **SvelteKit 5** using the **Nocturne design system**. Key characteristics:
 
 - **Svelte 5 runes** — `$state`, `$derived`, `$effect` for reactivity
 - **Component library** — Reusable components in `src/lib/components/`
-- **Steel-blue accent** on light/dark grounds
-- **Square corners**, hairline borders, blueprint registration marks
+- **Blurple accent** on a dark blue-grey ground (with a derived light mode)
+- **8px radii**, hairline borders, outlined (never filled) primary buttons
 - **Lucide icons** at stroke-width 1.5
 
 ### Application Logic
@@ -152,7 +152,7 @@ OAuth tokens are encrypted with AES-256-GCM before storage. The encryption key i
 ```
 src/
 ├── app.html              # HTML template
-├── app.css               # Global styles (imports Industry CSS)
+├── app.css               # Global styles (imports Nocturne via $design/styles.css)
 ├── app.d.ts              # TypeScript declarations
 ├── hooks.server.ts       # Server-side middleware (auth)
 ├── lib/
@@ -162,7 +162,6 @@ src/
 │   │   ├── db.ts         # Database queries
 │   │   ├── crypto.ts     # Token encryption
 │   │   └── oauth.ts      # OAuth helpers
-│   ├── styles/           # CSS (Industry design system)
 │   └── types/            # TypeScript types
 └── routes/
     ├── +layout.svelte    # Root layout

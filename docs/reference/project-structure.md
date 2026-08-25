@@ -16,8 +16,8 @@ Finn-Comms/
 ├── design/                     # Claude Design exports
 │   ├── Coms.dc.html            # Interactive design prototype
 │   ├── README.md               # Design folder documentation
-│   ├── _ds/                    # Design system (Industry)
-│   │   └── industry-*/         # Design system files
+│   ├── _ds/                    # Design system (Nocturne)
+│   │   └── nocturne-*/         # Design system files
 │   │       ├── styles.css      # CSS variables and components
 │   │       ├── readme.md       # Design system guide
 │   │       └── ...
@@ -46,9 +46,9 @@ Contains exports from [Claude Design](https://claude.ai/design). The main design
 
 See: [design/README.md](../../design/README.md)
 
-### `/design/_ds/industry-*/`
+### `/design/_ds/nocturne-*/`
 
-The Industry design system — a wireframe/blueprint aesthetic. Contains CSS variables, component classes, and usage documentation.
+The Nocturne design system — a quiet, compact dark interface. Contains CSS variables, component classes, and usage documentation.
 
 See: [Design System Reference](design-system.md)
 
