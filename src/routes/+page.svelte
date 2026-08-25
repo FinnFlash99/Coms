@@ -82,7 +82,7 @@
 <div class="inbox">
 	<header class="header">
 		<span class="logo">COMS</span>
-		<Tag variant="neutral">Unified inbox</Tag>
+		<Tag variant="neutral">BANANA</Tag>
 		<span class="spacer"></span>
 		<Button variant="secondary" onclick={() => (showSimulate = true)}>
 			<Plus size={14} strokeWidth={1.5} />
