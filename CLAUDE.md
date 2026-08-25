@@ -28,13 +28,14 @@ Single-developer repo (just Finn) — commit and push directly to `main`. Do not
 
 ## Handling a Claude Design handoff
 
-When given a new Claude Design file/export (a `.dc.html` bundle, a "design handoff" ZIP, etc.), the job is narrow:
+When given a new Claude Design file/export (a `.dc.html` bundle, a "design handoff" ZIP, etc.), every time, without being asked:
 
 1. Sync it into `design/` (per "Claude Design Integration" above), fixing any references broken by the sync (renamed `_ds/` UUID, etc.).
-2. Make sure the repo still compiles clean — `npm run lint`, `npm run check`, `npm run build` all pass.
-3. Commit and push to `main`.
+2. **Propagate the actual content/visual changes into `src/` so the deployed app matches the new design.** `design/Coms.dc.html` is a static reference file — the live app never reads it, it has its own hardcoded copy of every string/style in `src/routes/` and `src/lib/components/`. Diff the new design against the previous one, find the corresponding hardcoded text/markup/styling in `src/`, and update it to match. Syncing `design/` alone is **not sufficient** — if the deployed site doesn't reflect the new design, the job isn't done.
+3. Validate: `npm run lint`, `npm run check`, `npm run build` must all pass clean (0 errors) before committing.
+4. Commit and push to `main`.
 
-Do **not** treat a design handoff as a request to implement the design in `src/`, build new functionality, or otherwise expand scope — and do not stop to ask the user about scope/next-steps for that. If they want the design implemented in app code, or anything beyond sync-and-deploy, they'll ask for it explicitly.
+This is a standing instruction — don't ask for confirmation or scope check-in on any of these four steps for a design handoff; just do them. (Building *new functionality* beyond what the design actually shows, or expanding scope past matching the design, is still not part of this — that would need an explicit ask.)
 
 ## Development Commands
 
@@ -74,7 +75,8 @@ Claude Design is connected directly to this GitHub repo (`FinnFlash99/Coms`). De
 **How it works:**
 - Claude Design exports to `design/` folder
 - `design/styles.css` is a stable entry point that imports the design system
-- The app imports `$design/styles.css` directly — no manual copy/sync needed
+- The app imports `$design/styles.css` directly — no manual copy/sync needed for design *tokens* (colors, fonts, radii, spacing): those propagate to the deployed app automatically through this CSS import.
+- **Content, copy, and markup/structure do NOT auto-propagate.** Every string and layout in `design/Coms.dc.html` has a separate, hardcoded counterpart in `src/routes/` and `src/lib/components/`. A new design export requires manually finding and updating those — see "Handling a Claude Design handoff" below, which is a standing instruction to do this every time without being asked.
 
 **If the design system folder changes** (new UUID in `_ds/nocturne-*/`):
 1. Update the import path in `design/styles.css`
