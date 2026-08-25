@@ -1,14 +1,16 @@
 <script lang="ts">
-	import { Settings, Plus } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Settings, Send } from 'lucide-svelte';
 	import {
 		welcomed,
 		filteredConversations,
 		conversationCounts,
 		contacts,
 		categoryFilter,
-		activeTab
+		activeTab,
+		toast
 	} from '$lib/stores';
-	import { PLATFORMS } from '$lib/types';
+	import { PLATFORMS, type Platform } from '$lib/types';
 	import Blueprint from '$components/Blueprint.svelte';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
@@ -16,10 +18,19 @@
 	import ConversationRow from '$components/ConversationRow.svelte';
 	import EmptyState from '$components/EmptyState.svelte';
 	import WelcomeDialog from '$components/WelcomeDialog.svelte';
-	import SimulateDialog from '$components/SimulateDialog.svelte';
+	import ComposeDialog from '$components/ComposeDialog.svelte';
 	import DemoBadge from '$components/DemoBadge.svelte';
 
-	let showSimulate = $state(false);
+	let showCompose = $state(false);
+
+	function handleSent(conversationId: string, contactId: string, platform: Platform) {
+		showCompose = false;
+		const contact = $contacts.find((c) => c.id === contactId);
+		if (contact) {
+			toast.show(`Sent to ${contact.name.split(' (')[0]} on ${PLATFORMS[platform].label}`);
+		}
+		goto(`/conversation/${contactId}`);
+	}
 
 	// Build category filter options
 	const categoryOptions = $derived(() => {
@@ -84,9 +95,9 @@
 		<span class="logo">COMS</span>
 		<Tag variant="neutral">BANANA</Tag>
 		<span class="spacer"></span>
-		<Button variant="secondary" onclick={() => (showSimulate = true)}>
-			<Plus size={14} strokeWidth={1.5} />
-			Simulate message
+		<Button variant="primary" onclick={() => (showCompose = true)}>
+			<Send size={14} strokeWidth={1.5} />
+			New message
 		</Button>
 		<a href="/settings" class="btn btn-secondary btn-icon" title="Settings">
 			<Settings size={16} strokeWidth={1.5} />
@@ -140,7 +151,7 @@
 </div>
 
 <WelcomeDialog visible={!$welcomed} />
-<SimulateDialog open={showSimulate} onclose={() => (showSimulate = false)} />
+<ComposeDialog open={showCompose} onclose={() => (showCompose = false)} onsent={handleSent} />
 <DemoBadge />
 
 <style>

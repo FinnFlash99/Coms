@@ -27,35 +27,51 @@ a {
 }
 
 a:hover {
-	color: var(--color-accent-700);
+	color: var(--color-accent-400);
 }
 
 /* Muted text utility */
 .text-muted {
-	color: color-mix(in srgb, var(--color-text) 72%, transparent);
+	color: color-mix(in srgb, var(--color-text) 62%, transparent);
 }
 
-/* Dark theme overrides */
-html[data-theme="dark"] {
-	--color-bg: #191b1e;
-	--color-surface: #22252a;
-	--color-text: #e6e8eb;
-	--color-divider: color-mix(in srgb, #e6e8eb 18%, transparent);
-	--color-accent: #7fa3c7;
-	--color-accent-100: #22303f;
-	--color-accent-200: #2b3d50;
-	--color-accent-600: #96b7d6;
-	--color-accent-700: #b0cbe4;
-	--color-accent-800: #cbdff2;
-	--color-neutral-100: #26292d;
-	--color-neutral-800: #cfd3d8;
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-	--shadow-md: 0 3px 10px rgba(0, 0, 0, 0.55);
-	--shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+/*
+ * Nocturne is dark-only by default (its :root tokens, imported above, are the
+ * dark values). Light mode is a derived ramp inversion -- there is no
+ * "dark theme override" block; dark IS the base, and this is the only
+ * override needed.
+ */
+html[data-theme="light"] {
+	--color-bg: #f4f5fb;
+	--color-surface: #fbfbfe;
+	--color-text: #22242e;
+	--color-accent: #5d5294;
+	--color-divider: color-mix(in srgb, #22242e 15%, transparent);
+	--color-neutral-100: #292b31;
+	--color-neutral-200: #3f424d;
+	--color-neutral-300: #595d6c;
+	--color-neutral-400: #75798c;
+	--color-neutral-600: #b2b6ca;
+	--color-neutral-700: #cfd3e5;
+	--color-neutral-800: #e4e7f5;
+	--color-neutral-900: #f3f5fe;
+	--color-accent-100: #2b2741;
+	--color-accent-200: #423a6a;
+	--color-accent-300: #5d5294;
+	--color-accent-400: #796cbf;
+	--color-accent-600: #b5abfc;
+	--color-accent-700: #d2cefd;
+	--color-accent-800: #e7e5fe;
+	--color-accent-900: #f5f4ff;
+	--color-accent-2-100: #2b293a;
+	--color-accent-2-800: #e7e5fe;
+	--shadow-sm: 0 0 0 1px color-mix(in srgb, #22242e 12%, transparent);
+	--shadow-md: 0 0 0 1px color-mix(in srgb, #22242e 10%, transparent), 0 6px 18px rgba(30, 32, 45, 0.1);
+	--shadow-lg: 0 0 0 1px color-mix(in srgb, #22242e 10%, transparent), 0 16px 40px rgba(30, 32, 45, 0.16);
 }
 
-html[data-theme="dark"] a:hover {
-	color: var(--color-accent-600);
+html[data-theme="light"] .dialog-backdrop {
+	background: color-mix(in srgb, #22242e 34%, transparent);
 }
 
 /* Animations */

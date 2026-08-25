@@ -8,12 +8,12 @@ export interface PlatformInfo {
 }
 
 export const PLATFORMS: Record<Platform, PlatformInfo> = {
-	email: { label: 'Email', color: '#5980a6' },
-	slack: { label: 'Slack', color: '#a06ca8' },
-	whatsapp: { label: 'WhatsApp', color: '#5b9e6f' },
-	instagram: { label: 'Instagram', color: '#bd6f86' },
-	imessage: { label: 'iMessage', color: '#5a95c8' },
-	teams: { label: 'Teams', color: '#6f74bd' },
+	email: { label: 'Email', color: '#6d92e0' },
+	slack: { label: 'Slack', color: '#b478e8' },
+	whatsapp: { label: 'WhatsApp', color: '#5cc389' },
+	instagram: { label: 'Instagram', color: '#e07ba0' },
+	imessage: { label: 'iMessage', color: '#5cb4ec' },
+	teams: { label: 'Teams', color: '#7d84f0' },
 	discord: { label: 'Discord', color: '#5865f2' }
 };
 

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ChevronLeft, Flag, ExternalLink } from 'lucide-svelte';
+	import { ChevronLeft, Flag, ExternalLink, Send } from 'lucide-svelte';
 	import {
 		contacts,
 		conversations,
+		drafts,
+		setDraft,
+		sendReply,
 		updateContact,
 		markConversationRead,
 		markConversationResponded,
@@ -60,6 +63,19 @@
 
 	function handleConnectionChange(connection: ConnectionStrength) {
 		if (contact) updateContact(contact.id, { connection });
+	}
+
+	function handleSend(conversationId: string) {
+		if (sendReply(conversationId)) {
+			toast.show('Sent — thread marked responded');
+		}
+	}
+
+	function handleReplyKey(e: KeyboardEvent, conversationId: string) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			handleSend(conversationId);
+		}
 	}
 </script>
 
@@ -137,6 +153,25 @@
 								</div>
 							</div>
 						{/each}
+					</div>
+
+					<div class="reply-row">
+						<textarea
+							class="input reply-input"
+							placeholder={`Reply to ${contact.name.split(' (')[0]} on ${PLATFORMS[conv.platform].label}…`}
+							value={$drafts[conv.id] || ''}
+							oninput={(e) => setDraft(conv.id, e.currentTarget.value)}
+							onkeydown={(e) => handleReplyKey(e, conv.id)}
+						></textarea>
+						<Button
+							variant="primary"
+							class="reply-send"
+							disabled={!($drafts[conv.id] || '').trim()}
+							onclick={() => handleSend(conv.id)}
+						>
+							<Send size={14} strokeWidth={1.5} />
+							Send
+						</Button>
 					</div>
 
 					<div class="thread-actions">
@@ -299,11 +334,32 @@
 		font-size: 14px;
 		line-height: 1.5;
 		border: 1px solid var(--color-divider);
-		background: var(--color-surface);
+		background: color-mix(in srgb, var(--color-text) 6%, transparent);
 	}
 
 	.message-bubble.outbound {
-		background: var(--color-accent-100);
+		background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+	}
+
+	.reply-row {
+		display: flex;
+		align-items: flex-end;
+		gap: 10px;
+		padding: 16px 24px;
+		border-top: 1px solid var(--color-divider);
+	}
+
+	.reply-input {
+		flex: 1;
+		min-height: 44px;
+		max-height: 120px;
+		font-size: 14px;
+		padding: 11px 13px;
+		resize: vertical;
+	}
+
+	.reply-row :global(.reply-send) {
+		flex: none;
 	}
 
 	.thread-actions {

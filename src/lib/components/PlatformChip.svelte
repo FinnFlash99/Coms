@@ -12,8 +12,8 @@
 
 <span
 	class="platform-chip"
-	style:background="color-mix(in srgb, {info.color} 18%, transparent)"
-	style:color="color-mix(in srgb, {info.color} 62%, var(--color-text))"
+	style:background="color-mix(in srgb, {info.color} 26%, transparent)"
+	style:color="color-mix(in srgb, {info.color} 88%, var(--color-text))"
 >
 	{info.label}
 </span>

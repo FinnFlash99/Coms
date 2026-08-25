@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import {
 	type Contact,
 	type Conversation,
+	type Message,
 	type UserPreferences,
 	type TabId,
 	type Theme,
@@ -9,7 +10,7 @@ import {
 	DEFAULT_PREFERENCES,
 	getConversationStatus
 } from '$lib/types';
-import { DEMO_CONTACTS, DEMO_CONVERSATIONS, generateDemoMessage } from './demo-data';
+import { DEMO_CONTACTS, DEMO_CONVERSATIONS } from './demo-data';
 
 // Theme store
 function createThemeStore() {
@@ -157,6 +158,13 @@ function createToastStore() {
 
 export const toast = createToastStore();
 
+// Per-thread reply draft text, keyed by conversation id
+export const drafts = writable<Record<string, string>>({});
+
+export function setDraft(conversationId: string, text: string) {
+	drafts.update((d) => ({ ...d, [conversationId]: text }));
+}
+
 // Derived store for filtered conversations
 export const filteredConversations = derived(
 	[conversations, activeTab, categoryFilter, contacts],
@@ -245,58 +253,94 @@ export function updateContact(id: string, updates: Partial<Contact>) {
 	contacts.update((cs) => cs.map((c) => (c.id === id ? { ...c, ...updates } : c)));
 }
 
-export function simulateMessage(
+function outboundMessage(conversationId: string, platform: Platform, content: string, ts: number): Message {
+	return {
+		id: 'm' + (ts % 10000000),
+		conversationId,
+		platform,
+		direction: 'outbound',
+		senderName: 'You',
+		content,
+		timestamp: ts,
+		isRead: true
+	};
+}
+
+// Replying resolves the thread: read, responded, no longer time-sensitive.
+// Returns false if the draft was empty (nothing sent).
+export function sendReply(conversationId: string): boolean {
+	const text = (get(drafts)[conversationId] || '').trim();
+	if (!text) return false;
+
+	const now = Date.now();
+	conversations.update((convs) =>
+		convs.map((v) =>
+			v.id === conversationId
+				? {
+						...v,
+						isRead: true,
+						isResponded: true,
+						timeSensitive: false,
+						lastMessageAt: now,
+						lastMessagePreview: text,
+						messages: [...v.messages, outboundMessage(v.id, v.platform, text, now)]
+					}
+				: v
+		)
+	);
+	drafts.update((d) => ({ ...d, [conversationId]: '' }));
+	return true;
+}
+
+// Sends to a matching contact+platform thread if one exists, else starts a new one.
+// Either way it lands read/responded. Returns null if content was empty.
+export function sendNewMessage(
 	contactId: string,
 	platform: Platform,
-	content: string,
-	importance: 'low' | 'normal' | 'high',
-	timeSensitive: boolean
-) {
-	const contact = get(contacts).find((c) => c.id === contactId);
-	if (!contact) return;
+	content: string
+): { conversationId: string } | null {
+	const trimmed = content.trim();
+	if (!trimmed) return null;
 
-	const message = generateDemoMessage(contact, content);
-	const autoTs =
-		/\b(today|tomorrow|tonight|asap|urgent|deadline|by (mon|tue|wed|thu|fri|sat|sun|end)|\d{1,2}\s?(am|pm))\b/i.test(
-			content
-		);
+	const now = Date.now();
+	let conversationId = '';
 
 	conversations.update((convs) => {
 		const existing = convs.find((v) => v.contactId === contactId && v.platform === platform);
-
 		if (existing) {
+			conversationId = existing.id;
 			return convs.map((v) =>
 				v === existing
 					? {
 							...v,
-							isRead: false,
-							isResponded: false,
-							importance: importance !== 'normal' ? importance : v.importance,
-							timeSensitive: v.timeSensitive || timeSensitive || autoTs,
-							lastMessageAt: message.timestamp,
-							lastMessagePreview: message.content,
-							messages: [...v.messages, message]
+							isRead: true,
+							isResponded: true,
+							timeSensitive: false,
+							lastMessageAt: now,
+							lastMessagePreview: trimmed,
+							messages: [...v.messages, outboundMessage(v.id, platform, trimmed, now)]
 						}
 					: v
 			);
-		} else {
-			return [
-				...convs,
-				{
-					id: 'v' + (Date.now() % 10000000),
-					contactId,
-					platform,
-					isRead: false,
-					isResponded: false,
-					importance,
-					timeSensitive: timeSensitive || autoTs,
-					lastMessageAt: message.timestamp,
-					lastMessagePreview: message.content,
-					messages: [message]
-				}
-			];
 		}
+
+		conversationId = 'v' + (now % 10000000);
+		return [
+			...convs,
+			{
+				id: conversationId,
+				contactId,
+				platform,
+				isRead: true,
+				isResponded: true,
+				importance: 'normal' as const,
+				timeSensitive: false,
+				lastMessageAt: now,
+				lastMessagePreview: trimmed,
+				messages: [outboundMessage(conversationId, platform, trimmed, now)]
+			}
+		];
 	});
 
-	return timeSensitive || autoTs;
+	return { conversationId };
 }
