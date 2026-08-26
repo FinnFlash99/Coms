@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Settings, Send, Plus, CalendarDays, Search, X } from 'lucide-svelte';
+	import { Settings, Send, NotebookPen, CalendarDays, Search, X } from 'lucide-svelte';
 	import {
 		welcomed,
 		filteredConversations,
@@ -11,10 +11,15 @@
 		groupFilter,
 		searchQuery,
 		activeTab,
-		openComposeDialog,
-		openSimulateDialog
+		greetDismissed,
+		notes,
+		notesOpen,
+		notesSplit,
+		toggleNotesPanel,
+		allTypes,
+		openComposeDialog
 	} from '$lib/stores';
-	import { PLATFORMS, TYPES } from '$lib/types';
+	import { PLATFORMS } from '$lib/types';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import TabBar from '$components/TabBar.svelte';
@@ -22,6 +27,7 @@
 	import EmptyState from '$components/EmptyState.svelte';
 	import WelcomeDialog from '$components/WelcomeDialog.svelte';
 	import DemoBadge from '$components/DemoBadge.svelte';
+	import NotesPanel from '$components/NotesPanel.svelte';
 
 	// How many open thread deadlines are overdue or due within 3 days -- shown as
 	// a badge on the Calendar button so it's visible without opening the calendar.
@@ -48,7 +54,7 @@
 	// Build group filter options: all groups + every contact type
 	const groupOptions = $derived(() => [
 		{ id: 'all', label: 'All groups' },
-		...TYPES.map((t) => ({ id: `rel:${t}`, label: t }))
+		...$allTypes.map((t) => ({ id: `rel:${t}`, label: t }))
 	]);
 
 	// Summary text
@@ -95,27 +101,46 @@
 	});
 
 	const hasRows = $derived($filteredConversations.length > 0);
+	const openTaskCount = $derived($notes.filter((n) => n.kind === 'task' && !n.done).length);
+	const todayFullDate = new Date().toLocaleDateString([], {
+		weekday: 'long',
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric'
+	});
 	const emptyTitle = $derived($searchQuery.trim() ? 'No matches' : 'All clear');
 	const emptyBody = $derived(
 		$searchQuery.trim()
-			? `Nothing matches "${$searchQuery.trim()}". Try a name, a platform, or a word from a message.`
+			? `Nothing matches "${$searchQuery.trim()}". Try a name, a platform, a word from a message, or a time like "yesterday" or "Aug 24".`
 			: "You're all caught up. Nothing needs your attention."
 	);
 </script>
 
+<div class="home-shell" class:split={$notesOpen && $notesSplit}>
 <div class="inbox">
+	{#if !$greetDismissed}
+		<div class="greet-bar">
+			<span class="greet-text">Welcome back to Coms, Maya</span>
+			<span class="spacer"></span>
+			<span class="greet-date">{todayFullDate}</span>
+		</div>
+	{/if}
+
 	<header class="header">
-		<span class="logo">COMS</span>
+		<span class="logo"><span class="logo-c">C</span>oms</span>
 		<Tag variant="neutral">Full Connect</Tag>
 		<span class="spacer"></span>
 		<Button variant="primary" onclick={() => openComposeDialog()}>
 			<Send size={14} strokeWidth={1.5} />
 			New message
 		</Button>
-		<Button variant="secondary" title="Simulate an incoming message" onclick={openSimulateDialog}>
-			<Plus size={14} strokeWidth={1.5} />
-			Simulate
-		</Button>
+		<button class="btn btn-secondary" title="Notes and tasks" onclick={toggleNotesPanel}>
+			<NotebookPen size={14} strokeWidth={1.5} />
+			Notes
+			{#if openTaskCount > 0}
+				<span class="notes-badge">{openTaskCount}</span>
+			{/if}
+		</button>
 		<a href="/calendar" class="btn btn-secondary" title="Calendar">
 			<CalendarDays size={15} strokeWidth={1.5} />
 			Calendar
@@ -135,7 +160,7 @@
 		<input
 			class="input search-input"
 			type="search"
-			placeholder="Search messages or people"
+			placeholder="Search messages, people or dates"
 			bind:value={$searchQuery}
 		/>
 		{#if $searchQuery}
@@ -199,14 +224,60 @@
 	{/if}
 </div>
 
+{#if $notesOpen}
+	<NotesPanel />
+{/if}
+</div>
+
 <WelcomeDialog visible={!$welcomed} />
 <DemoBadge />
 
 <style>
+	.home-shell.split {
+		display: flex;
+		align-items: flex-start;
+		gap: 0;
+		min-height: 100vh;
+	}
+
 	.inbox {
 		max-width: 960px;
 		margin: 0 auto;
 		padding: 38px 32px 100px;
+	}
+
+	.home-shell.split .inbox {
+		max-width: none;
+		margin: 0;
+		flex: 1;
+		min-width: 0;
+		padding: 38px 28px 100px;
+	}
+
+	.greet-bar {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		column-gap: 14px;
+		row-gap: 4px;
+		padding: 0 0 16px;
+		margin-bottom: 22px;
+		border-bottom: 1px solid var(--color-divider);
+		animation: coms-in 0.3s ease;
+	}
+
+	.greet-text {
+		font-family: var(--font-heading);
+		font-weight: 700;
+		font-size: 24px;
+		letter-spacing: -0.015em;
+	}
+
+	.greet-date {
+		font-family: var(--font-heading);
+		font-weight: 700;
+		font-size: 13px;
+		letter-spacing: -0.01em;
 	}
 
 	.header {
@@ -216,10 +287,14 @@
 	}
 
 	.logo {
-		font-family: var(--font-heading);
-		font-weight: 600;
-		font-size: 24px;
-		letter-spacing: 0.02em;
+		font-family: 'DM Serif Display', Georgia, serif;
+		font-weight: 400;
+		font-size: 25px;
+		letter-spacing: -0.01em;
+	}
+
+	.logo-c {
+		font-size: 1.4em;
 	}
 
 	.spacer {
@@ -236,6 +311,16 @@
 		color: #fff;
 	}
 
+	.notes-badge {
+		font-size: 10.5px;
+		padding: 1px 7px;
+		min-width: 18px;
+		text-align: center;
+		border-radius: 999px;
+		background: var(--color-neutral-800);
+		color: var(--color-neutral-100);
+	}
+
 	.summary {
 		font-size: 13px;
 		margin: 8px 0 18px;
@@ -245,7 +330,7 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		width: 288px;
+		width: 312px;
 		margin: 0 0 12px auto;
 	}
 

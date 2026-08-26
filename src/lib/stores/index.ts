@@ -11,13 +11,17 @@ import {
 	type Importance,
 	type CalendarEvent,
 	type FollowUp,
+	type Note,
+	type NoteKind,
 	DEFAULT_PREFERENCES,
 	PLATFORMS,
+	TYPES,
 	getConversationStatus,
 	isMailPlatform,
-	dueLabel
+	dueLabel,
+	timeText
 } from '$lib/types';
-import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
+import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS, DEMO_NOTES } from './demo-data';
 
 // Theme store
 function createThemeStore() {
@@ -114,6 +118,13 @@ export const conversations = writable<Conversation[]>(DEMO_CONVERSATIONS);
 export const events = writable<CalendarEvent[]>(DEMO_EVENTS);
 export const followUps = writable<FollowUp[]>(DEMO_FOLLOWUPS);
 
+// Notes & tasks -- a lightweight scratchpad, separate from conversations/events.
+export const notes = writable<Note[]>(DEMO_NOTES);
+
+// Notes panel UI state -- shared so the header button and the panel itself can both drive it.
+export const notesOpen = writable(false);
+export const notesSplit = writable(true);
+
 // Current tab store
 export const activeTab = writable<TabId>('all');
 
@@ -153,6 +164,10 @@ function createWelcomedStore() {
 }
 
 export const welcomed = createWelcomedStore();
+
+// "Welcome back" greeting bar on the home page — shown once per app load,
+// auto-dismissed after 11s. Not persisted: a fresh load shows it again.
+export const greetDismissed = writable(false);
 
 // Toast notification store
 function createToastStore() {
@@ -206,15 +221,21 @@ export const filteredConversations = derived(
 			};
 		});
 
-		// Apply search — matches contact name, platform, or a message's content/subject
+		// Apply search — matches contact name, platform, a message's content/subject, a
+		// date/time on the thread's due date or any of its messages, or the thread's last activity.
 		const q = $searchQuery.trim().toLowerCase();
 		if (q) {
 			entries = entries.filter(
 				(e) =>
 					(e.contact?.name.toLowerCase().includes(q) ?? false) ||
 					PLATFORMS[e.platform].label.toLowerCase().includes(q) ||
+					timeText(e.lastMessageAt).includes(q) ||
+					(e.dueTs != null && timeText(e.dueTs).includes(q)) ||
 					e.messages.some(
-						(m) => m.content.toLowerCase().includes(q) || (m.subject || '').toLowerCase().includes(q)
+						(m) =>
+							m.content.toLowerCase().includes(q) ||
+							(m.subject || '').toLowerCase().includes(q) ||
+							timeText(m.timestamp).includes(q)
 					)
 			);
 		}
@@ -329,6 +350,57 @@ export function addFollowUp(eventId: string, text: string, dateValue: string) {
 export function completeFollowUp(id: string) {
 	followUps.update((list) => list.map((f) => (f.id === id ? { ...f, done: true } : f)));
 	toast.show('Follow-up done');
+}
+
+export function addNote(text: string, kind: NoteKind) {
+	const trimmed = text.trim();
+	if (!trimmed) return;
+	notes.update((list) => [{ id: 'n' + Date.now(), text: trimmed, kind, done: false, ts: Date.now() }, ...list]);
+}
+
+export function toggleNote(id: string) {
+	notes.update((list) => list.map((n) => (n.id === id ? { ...n, done: !n.done } : n)));
+}
+
+export function removeNote(id: string) {
+	notes.update((list) => list.filter((n) => n.id !== id));
+}
+
+export function toggleNotesPanel() {
+	notesOpen.update((v) => !v);
+}
+
+export function closeNotesPanel() {
+	notesOpen.set(false);
+}
+
+export function toggleNotesSplit() {
+	notesSplit.update((v) => !v);
+}
+
+// All contact groups: built-in types, the user's custom ones, and any ad hoc type
+// already on a contact (keeps old data selectable even if its custom group was since removed).
+export const allTypes = derived([contacts, preferences], ([$contacts, $preferences]) => {
+	const custom = $preferences.customTypes || [];
+	return [...new Set([...TYPES, ...custom, ...$contacts.map((c) => c.type)])];
+});
+
+export function addGroup(name: string) {
+	const trimmed = name.trim();
+	if (!trimmed) return;
+	if (get(allTypes).some((t) => t.toLowerCase() === trimmed.toLowerCase())) {
+		toast.show(`"${trimmed}" already exists`);
+		return;
+	}
+	preferences.update((p) => ({ ...p, customTypes: [...(p.customTypes || []), trimmed] }));
+	toast.show(`Group "${trimmed}" added`);
+}
+
+export function removeGroup(name: string) {
+	preferences.update((p) => ({ ...p, customTypes: (p.customTypes || []).filter((t) => t !== name) }));
+	contacts.update((cs) => cs.map((c) => (c.type === name ? { ...c, type: 'Client' } : c)));
+	groupFilter.update((g) => (g === `rel:${name}` ? 'all' : g));
+	toast.show(`Group "${name}" removed`);
 }
 
 function outboundMessage(conversationId: string, platform: Platform, content: string, ts: number): Message {
@@ -454,95 +526,3 @@ export function sendComposeAndNavigate() {
 	goto(`/conversation/${cmp.contactId}`);
 }
 
-// Simulate an incoming message -- a demo-only tool, distinct from composing an
-// outbound message. Marks the thread unread/needs-response, matching a real
-// inbound message arriving.
-export interface SimulateState {
-	contactId: string;
-	platform: Platform;
-	content: string;
-	importance: Importance;
-	ts: boolean;
-}
-
-export const showSimulate = writable(false);
-export const simulateState = writable<SimulateState>({
-	contactId: 'c1',
-	platform: 'slack',
-	content: '',
-	importance: 'normal',
-	ts: false
-});
-
-export function openSimulateDialog() {
-	showSimulate.set(true);
-}
-
-export function closeSimulateDialog() {
-	showSimulate.set(false);
-}
-
-const AUTO_TIME_SENSITIVE_RE =
-	/\b(today|tomorrow|tonight|asap|urgent|deadline|by (mon|tue|wed|thu|fri|sat|sun|end)|\d{1,2}\s?(am|pm))\b/i;
-
-export function simulateMessage() {
-	const sim = get(simulateState);
-	const content = sim.content.trim() || 'Hey — quick question when you have a minute.';
-	const autoTs = AUTO_TIME_SENSITIVE_RE.test(content);
-	const contact = get(contacts).find((c) => c.id === sim.contactId);
-	if (!contact) return;
-
-	const now = Date.now();
-	const mail = isMailPlatform(sim.platform);
-	const msg: Message = {
-		id: 'm' + (now % 10000000),
-		conversationId: '',
-		platform: sim.platform,
-		direction: 'inbound',
-		senderName: contact.name.split(' (')[0],
-		content,
-		subject: mail ? content.split(/[.!?]/)[0].slice(0, 60) : undefined,
-		timestamp: now,
-		isRead: false
-	};
-
-	conversations.update((convs) => {
-		const existing = convs.find((v) => v.contactId === sim.contactId && v.platform === sim.platform);
-		if (existing) {
-			return convs.map((v) =>
-				v === existing
-					? {
-							...v,
-							isRead: false,
-							isResponded: false,
-							importance: sim.importance !== 'normal' ? sim.importance : v.importance,
-							timeSensitive: v.timeSensitive || sim.ts || autoTs,
-							lastMessageAt: now,
-							lastMessagePreview: mail ? msg.subject || content : content,
-							messages: [...v.messages, { ...msg, conversationId: v.id }]
-						}
-					: v
-			);
-		}
-		const conversationId = 'v' + (now % 10000000);
-		return [
-			...convs,
-			{
-				id: conversationId,
-				contactId: sim.contactId,
-				platform: sim.platform,
-				isRead: false,
-				isResponded: false,
-				importance: sim.importance,
-				timeSensitive: sim.ts || autoTs,
-				lastMessageAt: now,
-				lastMessagePreview: mail ? msg.subject || content : content,
-				messages: [{ ...msg, conversationId }]
-			}
-		];
-	});
-
-	showSimulate.set(false);
-	simulateState.update((s) => ({ ...s, content: '', ts: false, importance: 'normal' }));
-	toast.show('Message delivered' + (sim.ts || autoTs ? ' — flagged time-sensitive' : ''));
-}

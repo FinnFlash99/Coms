@@ -70,6 +70,16 @@ export interface FollowUp {
 	done: boolean;
 }
 
+export type NoteKind = 'task' | 'note';
+
+export interface Note {
+	id: string;
+	text: string;
+	kind: NoteKind;
+	done: boolean;
+	ts: number;
+}
+
 export type ContactType = 'Client' | 'Prospect' | 'Subcontractor' | 'Collaborator' | 'Vendor' | 'Personal';
 export const TYPES: ContactType[] = ['Client', 'Prospect', 'Subcontractor', 'Collaborator', 'Vendor', 'Personal'];
 export type ConnectionStrength = 'Close' | 'Regular' | 'Occasional' | 'New';
@@ -81,7 +91,8 @@ export type Theme = 'light' | 'dark' | 'system';
 export interface Contact {
 	id: string;
 	name: string;
-	type: ContactType;
+	// A built-in ContactType, or a user-defined custom group name (see UserPreferences.customTypes).
+	type: string;
 	connection: ConnectionStrength;
 }
 
@@ -128,15 +139,19 @@ export interface PlatformConnection {
 	lastSyncAt?: number;
 }
 
+// Either a status tab, or "pf:<platform>" to open filtered to a single platform.
+export type DefaultTabId = TabId | `pf:${Platform}`;
+
 export interface UserPreferences {
 	theme: Theme;
-	defaultTab: TabId;
+	defaultTab: DefaultTabId;
 	notify: boolean;
 	notifyDeadlines: boolean;
 	notifyFlagged: boolean;
 	notifyUnread: boolean;
 	priorityFirst: boolean;
 	priority: string[];
+	customTypes: string[];
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -147,7 +162,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 	notifyFlagged: true,
 	notifyUnread: false,
 	priorityFirst: true,
-	priority: ['c1']
+	priority: ['c1'],
+	customTypes: []
 };
 
 export const TABS: Array<[TabId, string]> = [
@@ -211,4 +227,19 @@ export function dateKey(ts: number): string {
 
 export function hhmm(ts: number): string {
 	return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
+// All the ways a timestamp might be typed into search -- relative ("yesterday"),
+// short absolute ("Aug 24"), full weekday/date, or a bare time.
+export function timeText(ts: number): string {
+	const d = new Date(ts);
+	return [
+		relativeTime(ts),
+		formatTime(ts),
+		d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+		d.toLocaleDateString([], { month: 'short', day: 'numeric' }),
+		d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+	]
+		.join(' ')
+		.toLowerCase();
 }

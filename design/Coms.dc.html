@@ -12,7 +12,7 @@
 <script src="_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/_ds_bundle.js"></script>
 <script src="./image-slot.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=DM+Serif+Display&amp;display=swap">
 <style>
 html{height:100%}
 body{margin:0;min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);transition:background .25s ease,color .25s ease}
@@ -43,7 +43,7 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
   <div style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--color-bg);padding:24px">
     <div style="max-width:540px;padding:46px 50px;animation:coms-pop .35s ease;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
             <div class="card-kicker" style="margin-bottom:10px">Unified inbox</div>
-      <h1 style="font-size:54px;margin:0 0 6px">Coms</h1>
+      <h1 style="font-size:44px;margin:0 0 6px;line-height:1.1">Hi {{ userName }}, welcome to Coms</h1>
       <p style="font-size:17px;margin:0 0 24px">One place to see the status of all your conversations.</p>
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
         <div style="display:flex;gap:12px;align-items:center">
@@ -66,20 +66,28 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
 </sc-if>
 
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
-  <div style="max-width:960px;margin:0 auto;padding:38px 32px 100px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span style="font-family:var(--font-heading);font-weight:500;font-size:26px;letter-spacing:-.02em">Coms</span>
+  <div style="{{ homeShellStyle }}">
+  <div style="{{ homeMainStyle }}">
+    <sc-if value="{{ showGreetBar }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;column-gap:14px;row-gap:4px;padding:0 0 16px;margin-bottom:22px;border-bottom:1px solid var(--color-divider);animation:coms-in .3s ease">
+        <span style="font-family:var(--font-heading);font-weight:700;font-size:24px;letter-spacing:-.015em">Welcome back to Coms, {{ userName }}</span>
+        <span style="flex:1"></span>
+        <span style="font-family:var(--font-heading);font-weight:700;font-size:13px;letter-spacing:-.01em">{{ todayFullDate }}</span>
+      </div>
+    </sc-if>
+    <div style="display:flex;align-items:center;flex-wrap:wrap;column-gap:10px;row-gap:8px">
+      <span style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:25px;letter-spacing:-.01em"><span style="font-size:1.4em">C</span>oms</span>
       
       <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px"><strong data-start="507" data-end="523">Full Connect</strong></span><span style="flex:1"></span>
       <button class="btn btn-primary" onClick="{{ openCompose }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>New message</button>
-      <button class="btn btn-secondary" title="Simulate an incoming message" onClick="{{ openSimulate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Simulate</button>
+      <button class="btn btn-secondary" title="Notes and tasks" onClick="{{ toggleNotes }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 3.5h13v17h-13z"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="12" x2="15.5" y2="12"></line><line x1="8.5" y1="16" x2="13" y2="16"></line></svg>Notes<sc-if value="{{ openTaskCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-neutral-800);color:var(--color-neutral-100)">{{ openTaskCount }}</span></sc-if></button>
       <button class="btn btn-secondary" title="Calendar" onClick="{{ openCalendar }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="5" width="17" height="15" rx="1.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3" x2="8" y2="6"></line><line x1="16" y1="3" x2="16" y2="6"></line></svg>Calendar<sc-if value="{{ dueSoonCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-alert);color:#fff">{{ dueSoonCount }}</span></sc-if></button>
       <button class="btn btn-secondary btn-icon" title="Settings" onClick="{{ openSettings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="15" cy="7" r="2.2" fill="var(--color-bg)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="9" cy="17" r="2.2" fill="var(--color-bg)"></circle></svg></button>
     </div>
     <p class="text-muted" style="font-size:13px;margin:8px 0 18px">{{ summary }}</p>
-    <span style="position:relative;display:flex;align-items:center;width:288px;margin:0 0 12px auto">
+    <span style="position:relative;display:flex;align-items:center;width:312px;margin:0 0 12px auto">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position:absolute;left:11px;opacity:.55;pointer-events:none"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.5" y1="15.5" x2="20" y2="20"></line></svg>
-      <input class="input" type="search" placeholder="Search messages or people" style="width:100%;min-height:36px;font-size:13.5px;padding:5px 30px 5px 32px" value="{{ query }}" onChange="{{ setQuery }}">
+      <input class="input" type="search" placeholder="Search messages, people or dates" style="width:100%;min-height:36px;font-size:13.5px;padding:5px 30px 5px 32px" value="{{ query }}" onChange="{{ setQuery }}">
       <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
         <button class="btn btn-ghost btn-icon" style="position:absolute;right:3px;padding:3px" title="Clear search" onClick="{{ clearQuery }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
       </sc-if>
@@ -153,6 +161,50 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         <p class="text-muted" style="font-size:14px;margin:0">{{ emptyBody }}</p>
       </div>
     </sc-if>
+  </div>
+
+  <sc-if value="{{ notesOpen }}" hint-placeholder-val="{{ false }}">
+    <aside style="{{ notesPanelStyle }}">
+      <div style="display:flex;align-items:center;gap:8px;padding:20px 20px 14px">
+        <span style="font-family:var(--font-heading);font-weight:500;font-size:17px;letter-spacing:-.01em">Notes &amp; tasks</span>
+        <span class="text-muted" style="font-size:11.5px">{{ notesCountLabel }}</span>
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost btn-icon" style="padding:4px" title="{{ notesSplitTitle }}" onClick="{{ toggleNotesSplit }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"></rect><line x1="12" y1="4.5" x2="12" y2="19.5"></line></svg></button>
+        <button class="btn btn-ghost btn-icon" style="padding:4px" title="Close notes" onClick="{{ closeNotes }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
+      </div>
+      <div style="padding:0 20px 16px;border-bottom:1px solid var(--color-divider)">
+        <span class="seg" style="margin-bottom:9px">
+          <sc-for list="{{ noteModeOpts }}" as="o" hint-placeholder-count="2"><label class="seg-opt"><input type="radio" name="coms-notemode" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
+        </span>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <textarea class="input" style="flex:1;min-height:40px;max-height:110px;font-size:13.5px;padding:9px 11px;resize:vertical" placeholder="{{ notePlaceholder }}" value="{{ noteDraft }}" onChange="{{ setNoteDraft }}" onKeyDown="{{ noteDraftKey }}"></textarea>
+          <button class="btn btn-primary" style="flex:none;font-size:12.5px;padding:6px 12px" disabled="{{ noteDraftEmpty }}" onClick="{{ addNote }}">Add</button>
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;overflow:auto">
+        <sc-if value="{{ hasNotes }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ noteRows }}" as="n" hint-placeholder-count="2">
+            <div style="{{ n.rowStyle }}">
+              <sc-if value="{{ n.isTask }}" hint-placeholder-val="{{ true }}">
+                <input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;flex:none;margin-top:2px;accent-color:var(--color-accent)" checked="{{ n.done }}" onChange="{{ n.toggle }}">
+              </sc-if>
+              <sc-if value="{{ n.isNote }}" hint-placeholder-val="{{ false }}">
+                <span style="width:5px;height:5px;flex:none;margin-top:7px;border-radius:50%;background:var(--color-accent)"></span>
+              </sc-if>
+              <div style="flex:1;min-width:0">
+                <p style="{{ n.textStyle }}">{{ n.text }}</p>
+                <p class="text-muted" style="font-size:11px;margin:4px 0 0">{{ n.time }}</p>
+              </div>
+              <button class="btn btn-ghost btn-icon" style="flex:none;padding:3px;opacity:.6" title="Delete" onClick="{{ n.remove }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}">
+          <p class="text-muted" style="font-size:13px;margin:0;padding:26px 20px;text-align:center">Nothing written down yet.</p>
+        </sc-if>
+      </div>
+    </aside>
+  </sc-if>
   </div>
 </sc-if>
 
@@ -374,44 +426,6 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
   </div>
 </sc-if>
 
-<sc-if value="{{ showSimulate }}" hint-placeholder-val="{{ false }}">
-  <div class="dialog-backdrop" style="z-index:70" onClick="{{ closeSimulate }}">
-    <div class="dialog" style="animation:coms-pop .25s ease" onClick="{{ swallow }}">
-      <div class="dialog-title">Simulate incoming message</div>
-      <div class="dialog-body" style="display:flex;flex-direction:column;gap:14px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="field"><label>From</label>
-            <select class="input" value="{{ simContact }}" onChange="{{ setSimContact }}">
-              <sc-for list="{{ contactOpts }}" as="c" hint-placeholder-count="6"><option value="{{ c.id }}">{{ c.name }}</option></sc-for>
-            </select>
-          </div>
-          <div class="field"><label>Platform</label>
-            <select class="input" value="{{ simPlatform }}" onChange="{{ setSimPlatform }}">
-              <sc-for list="{{ platformOpts }}" as="p" hint-placeholder-count="6"><option value="{{ p.id }}">{{ p.label }}</option></sc-for>
-            </select>
-          </div>
-        </div>
-        <div class="field"><label>Message</label>
-          <textarea class="input" style="min-height:80px" placeholder="e.g. Can you send the files by tomorrow 3pm?" value="{{ simContent }}" onChange="{{ setSimContent }}"></textarea>
-        </div>
-        <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end">
-          <div class="field" style="margin:0"><label>Importance</label>
-            <span class="seg">
-              <sc-for list="{{ simImpOpts }}" as="o" hint-placeholder-count="3"><label class="seg-opt"><input type="radio" name="coms-sim-imp" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
-            </span>
-          </div>
-          <label class="radio" style="font-size:13px;padding-bottom:8px"><input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;accent-color:var(--color-accent)" checked="{{ simTs }}" onChange="{{ toggleSimTs }}">Time-sensitive</label>
-        </div>
-        <p class="text-muted" style="font-size:12px;margin:0">Deadlines like "tomorrow at 3pm" are auto-detected as time-sensitive.</p>
-      </div>
-      <div class="dialog-actions">
-        <button class="btn btn-secondary" onClick="{{ closeSimulate }}">Cancel</button>
-        <button class="btn btn-primary" onClick="{{ deliverSim }}">Deliver message</button>
-      </div>
-    </div>
-  </div>
-</sc-if>
-
 <sc-if value="{{ showPrep }}" hint-placeholder-val="{{ false }}">
   <div class="dialog-backdrop" style="z-index:70" onClick="{{ closePrep }}">
     <div class="dialog" style="animation:coms-pop .25s ease;max-width:620px;width:min(620px,92vw)" onClick="{{ swallow }}">
@@ -505,10 +519,27 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
       </div>
       <div class="field">
         <label>Default tab</label>
-        <span class="seg">
-          <sc-for list="{{ tabOpts }}" as="o" hint-placeholder-count="5"><label class="seg-opt"><input type="radio" name="coms-dtab" checked="{{ o.on }}" onChange="{{ o.sel }}">{{ o.label }}</label></sc-for>
-        </span>
-        <p class="text-muted" style="font-size:12px;margin:6px 0 0">The tab Coms opens on.</p>
+        <select class="input" style="max-width:240px" value="{{ defaultTab }}" onChange="{{ setDefaultTab }}">
+          <sc-for list="{{ defaultTabOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.id }}">{{ o.label }}</option></sc-for>
+        </select>
+        <p class="text-muted" style="font-size:12px;margin:6px 0 0">{{ defaultTabHint }}</p>
+      </div>
+      <div class="field">
+        <label>Groups</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input class="input" style="flex:1;min-width:170px" placeholder="e.g. Parents, School, Landlord" value="{{ groupDraft }}" onChange="{{ setGroupDraft }}" onKeyDown="{{ groupDraftKey }}">
+          <button class="btn btn-secondary" disabled="{{ groupDraftEmpty }}" onClick="{{ addGroup }}">Add group</button>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px">
+          <sc-for list="{{ groupChips }}" as="g" hint-placeholder-count="6">
+            <span class="tag {{ g.cls }}" style="display:inline-flex;align-items:center;gap:6px">{{ g.label }}
+              <sc-if value="{{ g.custom }}" hint-placeholder-val="{{ false }}">
+                <button class="btn btn-ghost btn-icon" style="padding:0;width:14px;height:14px" title="Remove group" onClick="{{ g.remove }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
+              </sc-if>
+            </span>
+          </sc-for>
+        </div>
+        <p class="text-muted" style="font-size:12px;margin:10px 0 0">Built-in groups can't be removed. Assign a group to anyone from their conversation.</p>
       </div>
       <div class="field">
         <label>Notifications</label>
@@ -601,7 +632,7 @@ class Component extends DCLogic {
     const now = Date.now(), M = 6e4, H = 36e5, D = 864e5;
     let prefs = { theme: 'system', defaultTab: 'all', grouping: 'person', notify: true,
       notifyDeadlines: true, notifyFlagged: true, notifyUnread: false,
-      priorityFirst: true, priority: ['c1'] };
+      priorityFirst: true, priority: ['c1'], customTypes: [] };
     let welcomed = false;
     try {
       const p = JSON.parse(localStorage.getItem('coms.prefs') || 'null');
@@ -609,9 +640,17 @@ class Component extends DCLogic {
       welcomed = localStorage.getItem('coms.welcomed') === '1';
     } catch (e) {}
     return {
-      screen: 'home', tab: prefs.defaultTab, cat: 'all', group: 'all', query: '', prefs, welcomed,
-      detail: null, showCompose: false, showSimulate: false, toast: '', monthOffset: 0,
-      sim: { contactId: 'c1', platform: 'slack', content: '', importance: 'normal', ts: false },
+      screen: 'home',
+      tab: prefs.defaultTab.startsWith('pf:') ? 'all' : prefs.defaultTab,
+      cat: prefs.defaultTab.startsWith('pf:') ? prefs.defaultTab : 'all',
+      group: 'all', query: '', groupDraft: '', prefs, welcomed,
+      greetDismissed: false,
+      notesOpen: false, notesSplit: true, noteDraft: '', noteMode: 'task',
+      notes: [
+        { id: 'n1', text: 'Send Sarah the revised homepage mocks', kind: 'task', done: false, ts: Date.now() - 36e5 },
+        { id: 'n2', text: 'TechCo wants weekly updates, not daily — keep the Friday cadence', kind: 'note', done: false, ts: Date.now() - 864e5 }
+      ],
+      detail: null, showCompose: false, toast: '', monthOffset: 0,
       calView: 'month', prepEventId: null,
       followDraft: { text: '', date: '' },
       followUps: [
@@ -661,6 +700,44 @@ class Component extends DCLogic {
     { id: 'c6', name: 'Brand Co.', type: 'Vendor', connection: 'Occasional' }
   ];
   static TYPES = ['Client', 'Prospect', 'Subcontractor', 'Collaborator', 'Vendor', 'Personal'];
+  allTypes() {
+    return [...new Set([...Component.TYPES, ...(this.state.prefs.customTypes || []),
+      ...this.state.contacts.map(c => c.type)])];
+  }
+  addGroup() {
+    const name = this.state.groupDraft.trim();
+    if (!name) return;
+    if (this.allTypes().some(t => t.toLowerCase() === name.toLowerCase())) {
+      this.setState({ groupDraft: '' });
+      this.toast('“' + name + '” already exists');
+      return;
+    }
+    this.savePrefs({ customTypes: [...(this.state.prefs.customTypes || []), name] });
+    this.setState({ groupDraft: '' });
+    this.toast('Group “' + name + '” added');
+  }
+  removeGroup(name) {
+    this.savePrefs({ customTypes: (this.state.prefs.customTypes || []).filter(t => t !== name) });
+    this.setState(st => ({
+      contacts: st.contacts.map(c => c.type === name ? Object.assign({}, c, { type: 'Client' }) : c),
+      group: st.group === 'rel:' + name ? 'all' : st.group
+    }));
+    this.toast('Group “' + name + '” removed');
+  }
+  addNote() {
+    const text = this.state.noteDraft.trim();
+    if (!text) return;
+    this.setState(st => ({
+      notes: [{ id: 'n' + Date.now(), text, kind: st.noteMode, done: false, ts: Date.now() }, ...st.notes],
+      noteDraft: ''
+    }));
+  }
+  toggleNote(id) {
+    this.setState(st => ({ notes: st.notes.map(n => n.id === id ? Object.assign({}, n, { done: !n.done }) : n) }));
+  }
+  removeNote(id) {
+    this.setState(st => ({ notes: st.notes.filter(n => n.id !== id) }));
+  }
   static PLATFORMS = {
     email: { label: 'Email', color: '#6d92e0' },
     slack: { label: 'Slack', color: '#b478e8' },
@@ -719,6 +796,7 @@ class Component extends DCLogic {
   static TABS = [['all', 'All'], ['unread', 'Unread'], ['needs', 'Needs Response'], ['done', 'Done'], ['urgent', 'Urgent']];
 
   componentDidMount() {
+    this._greetTimer = setTimeout(() => this.setState({ greetDismissed: true }), 11000);
     this.applyTheme();
     this._mq = matchMedia('(prefers-color-scheme: dark)');
     this._mqFn = () => this.applyTheme();
@@ -728,6 +806,7 @@ class Component extends DCLogic {
   componentDidUpdate() { this.applyTheme(); }
   componentWillUnmount() {
     clearInterval(this._tick);
+    clearTimeout(this._greetTimer);
     if (this._mq) this._mq.removeEventListener('change', this._mqFn);
     clearTimeout(this._toastT);
   }
@@ -886,13 +965,25 @@ class Component extends DCLogic {
     entries.sort((a, b) => b.lastTs - a.lastTs);
     const q = s.query.trim().toLowerCase();
     if (q) {
+      // Time terms match relative phrasing ("yesterday", "2 days ago") and absolute
+      // date/time formats ("aug 24", "monday", "3:15 pm", "2026").
+      const timeText = ts => {
+        const d = new Date(ts);
+        return [this.rel(ts), this.full(ts),
+          d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+          d.toLocaleDateString([], { month: 'short', day: 'numeric' }),
+          d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+        ].join(' ').toLowerCase();
+      };
       entries = entries.filter(e =>
         e.contact.name.toLowerCase().includes(q) ||
         e.platforms.some(p => C.PLATFORMS[p].label.toLowerCase().includes(q)) ||
+        timeText(e.lastTs).includes(q) ||
         e.convIds.some(id => {
           const v = s.convs.find(x => x.id === id);
-          return v && v.messages.some(m =>
-            m.content.toLowerCase().includes(q) || (m.subject || '').toLowerCase().includes(q));
+          return v && ((v.dueTs && timeText(v.dueTs).includes(q)) || v.messages.some(m =>
+            m.content.toLowerCase().includes(q) || (m.subject || '').toLowerCase().includes(q) ||
+            timeText(m.ts).includes(q)));
         }));
     }
     if (s.group !== 'all') {
@@ -983,7 +1074,7 @@ class Component extends DCLogic {
       ...(prioritySet.length ? [{ id: 'prio:1', label: 'Priority' }] : []),
       ...Object.keys(C.PLATFORMS).map(p => ({ id: 'pf:' + p, label: C.PLATFORMS[p].label }))];
     const groupOpts = [{ id: 'all', label: 'All groups' },
-      ...C.TYPES.map(t => ({ id: 'rel:' + t, label: t }))];
+      ...this.allTypes().map(t => ({ id: 'rel:' + t, label: t }))];
 
     const tabs = C.TABS.map(([id, label]) => {
       const active = s.tab === id;
@@ -1011,7 +1102,7 @@ class Component extends DCLogic {
     if (s.screen === 'detail' && s.detail) {
       const c = contactById(s.detail.contactId);
       const mkSeg = (list, cur, set) => list.map(l => ({ label: l, on: cur === l, sel: () => set(l) }));
-      relOpts = mkSeg(Component.TYPES, c.type, v => this.patchContact(c.id, { type: v }));
+      relOpts = mkSeg(this.allTypes(), c.type, v => this.patchContact(c.id, { type: v }));
       conOpts = mkSeg(['Close', 'Regular', 'Occasional', 'New'], c.connection, v => this.patchContact(c.id, { connection: v }));
       const cs = s.convs.filter(v => s.detail.convIds.includes(v.id));
       detailName = c.name; detailType = c.type;
@@ -1071,7 +1162,8 @@ class Component extends DCLogic {
     // settings option rows
     const segOpts = (list, cur, sel) => list.map(([id, label]) => ({ label, on: cur === id, sel: () => sel(id) }));
     const themeOpts = segOpts([['light', 'Light'], ['dark', 'Dark'], ['system', 'System']], s.prefs.theme, v => this.savePrefs({ theme: v }));
-    const tabOpts = segOpts(C.TABS, s.prefs.defaultTab, v => this.savePrefs({ defaultTab: v }));
+    const defaultTabOpts = [...C.TABS.map(([id, label]) => ({ id, label })),
+      ...Object.keys(C.PLATFORMS).map(p => ({ id: 'pf:' + p, label: C.PLATFORMS[p].label }))];
 
     // calendar
     const cal = this.buildCalendar();
@@ -1232,13 +1324,73 @@ class Component extends DCLogic {
       catFilter: s.cat, catOpts, setCat: ev => this.setState({ cat: ev.target.value }),
       groupFilter: s.group, groupOpts, setGroup: ev => this.setState({ group: ev.target.value }),
       emptyTitle: q ? 'No matches' : 'All clear',
-      emptyBody: q ? 'Nothing matches “' + s.query.trim() + '”. Try a name, a platform, or a word from a message.'
+      emptyBody: q ? 'Nothing matches “' + s.query.trim() + '”. Try a name, a platform, a word from a message, or a time like “yesterday” or “Aug 24”.'
         : "You're all caught up. Nothing needs your attention.",
       query: s.query, hasQuery: !!s.query,
       setQuery: ev => this.setState({ query: ev.target.value }),
       clearQuery: () => this.setState({ query: '' }),
       detailName, detailType, detailSub, detailInitials, threads, relOpts, conOpts,
-      themeOpts, tabOpts,
+      // notes & tasks — the one feature that can split the screen
+      notesOpen: s.notesOpen,
+      toggleNotes: () => this.setState({ notesOpen: !s.notesOpen }),
+      closeNotes: () => this.setState({ notesOpen: false }),
+      toggleNotesSplit: () => this.setState({ notesSplit: !s.notesSplit }),
+      notesSplitTitle: s.notesSplit ? 'Float over the inbox' : 'Split the screen',
+      homeShellStyle: s.notesOpen && s.notesSplit
+        ? 'display:flex;align-items:flex-start;gap:0;min-height:100vh'
+        : 'display:block',
+      homeMainStyle: s.notesOpen && s.notesSplit
+        ? 'flex:1;min-width:0;padding:38px 28px 100px'
+        : 'max-width:960px;margin:0 auto;padding:38px 32px 100px',
+      notesPanelStyle: (s.notesSplit
+        ? 'position:sticky;top:0;flex:none;width:340px;height:100vh;border-left:1px solid var(--color-divider)'
+        : 'position:fixed;top:18px;right:18px;bottom:18px;width:340px;z-index:60;border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)') +
+        ';display:flex;flex-direction:column;background:var(--color-surface);animation:coms-in .22s ease',
+      noteDraft: s.noteDraft, noteDraftEmpty: !s.noteDraft.trim(),
+      setNoteDraft: ev => this.setState({ noteDraft: ev.target.value }),
+      noteDraftKey: ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); this.addNote(); } },
+      addNote: () => this.addNote(),
+      notePlaceholder: s.noteMode === 'task' ? 'What needs doing?' : 'Write it down…',
+      noteModeOpts: [['task', 'Task'], ['note', 'Note']].map(([id, label]) => ({
+        label, on: s.noteMode === id, sel: () => this.setState({ noteMode: id })
+      })),
+      openTaskCount: s.notes.filter(n => n.kind === 'task' && !n.done).length,
+      notesCountLabel: (() => {
+        const open = s.notes.filter(n => n.kind === 'task' && !n.done).length;
+        const notes = s.notes.filter(n => n.kind === 'note').length;
+        return [open ? open + ' open' : null, notes ? notes + ' note' + (notes === 1 ? '' : 's') : null]
+          .filter(Boolean).join(' · ') || 'empty';
+      })(),
+      hasNotes: s.notes.length > 0, noNotes: s.notes.length === 0,
+      noteRows: s.notes.map((n, i, arr) => ({
+        text: n.text, done: n.done, isTask: n.kind === 'task', isNote: n.kind === 'note',
+        time: this.rel(n.ts),
+        rowStyle: 'display:flex;gap:11px;align-items:flex-start;padding:13px 18px' +
+          (i < arr.length - 1 ? ';border-bottom:1px solid var(--color-divider)' : ''),
+        textStyle: 'font-size:13.5px;line-height:1.5;margin:0' +
+          (n.done ? ';text-decoration:line-through;color:color-mix(in srgb, var(--color-text) 55%, transparent)' : ''),
+        toggle: () => this.toggleNote(n.id),
+        remove: () => this.removeNote(n.id)
+      })),
+
+      showGreetBar: !s.greetDismissed,
+      userName: 'Maya',
+      todayFullDate: new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+
+      themeOpts, defaultTabOpts,
+      defaultTab: s.prefs.defaultTab,
+      setDefaultTab: ev => this.savePrefs({ defaultTab: ev.target.value }),
+      defaultTabHint: s.prefs.defaultTab.startsWith('pf:')
+        ? 'Coms opens filtered to ' + C.PLATFORMS[s.prefs.defaultTab.slice(3)].label + '.'
+        : 'The tab Coms opens on.',
+      groupDraft: s.groupDraft, groupDraftEmpty: !s.groupDraft.trim(),
+      setGroupDraft: ev => this.setState({ groupDraft: ev.target.value }),
+      groupDraftKey: ev => { if (ev.key === 'Enter') { ev.preventDefault(); this.addGroup(); } },
+      addGroup: () => this.addGroup(),
+      groupChips: this.allTypes().map(t => {
+        const custom = (s.prefs.customTypes || []).includes(t);
+        return { label: t, custom, cls: custom ? 'tag-accent' : 'tag-neutral', remove: () => this.removeGroup(t) };
+      }),
       logOut: () => {
         try { localStorage.removeItem('coms.welcomed'); } catch (e) {}
         this.setState({ welcomed: false, screen: 'home', detail: null });
@@ -1265,21 +1417,6 @@ class Component extends DCLogic {
       })),
       showDemoBadge: this.props.showDemoBadge ?? true,
       toast: s.toast,
-      // simulate (demo tool)
-      showSimulate: s.showSimulate,
-      openSimulate: () => this.setState({ showSimulate: true }),
-      closeSimulate: () => this.setState({ showSimulate: false }),
-      simContact: s.sim.contactId, simPlatform: s.sim.platform, simContent: s.sim.content, simTs: s.sim.ts,
-      simImpOpts: [['low', 'Low'], ['normal', 'Normal'], ['high', 'High']].map(([v, label]) => ({
-        label, on: s.sim.importance === v,
-        sel: () => this.setState(st => ({ sim: Object.assign({}, st.sim, { importance: v }) }))
-      })),
-      setSimContact: ev => this.setState({ sim: Object.assign({}, s.sim, { contactId: ev.target.value }) }),
-      setSimPlatform: ev => this.setState({ sim: Object.assign({}, s.sim, { platform: ev.target.value }) }),
-      setSimContent: ev => this.setState({ sim: Object.assign({}, s.sim, { content: ev.target.value }) }),
-      toggleSimTs: () => this.setState({ sim: Object.assign({}, s.sim, { ts: !s.sim.ts }) }),
-      deliverSim: () => this.deliverSim(),
-
       // compose
       showCompose: s.showCompose,
       openCompose: () => this.setState({ showCompose: true }),
@@ -1352,34 +1489,6 @@ class Component extends DCLogic {
     this.toast('Sent — thread marked responded');
   }
 
-  deliverSim() {
-    const s = this.state, sim = s.sim, now = Date.now();
-    const content = sim.content.trim() || 'Hey — quick question when you have a minute.';
-    const autoTs = /\b(today|tomorrow|tonight|asap|urgent|deadline|by (mon|tue|wed|thu|fri|sat|sun|end)|\d{1,2}\s?(am|pm))\b/i.test(content);
-    const c = s.contacts.find(x => x.id === sim.contactId);
-    const mail = Component.isMail(sim.platform);
-    const msg = { dir: 'in', sender: c.name.split(' (')[0], content, ts: now };
-    if (mail) msg.subject = content.split(/[.!?]/)[0].slice(0, 60);
-    const existing = s.convs.find(v => v.contactId === sim.contactId && v.platform === sim.platform);
-    let convs;
-    if (existing) {
-      convs = s.convs.map(v => v === existing ? Object.assign({}, v, {
-        isRead: false, isResponded: false,
-        importance: sim.importance !== 'normal' ? sim.importance : v.importance,
-        timeSensitive: v.timeSensitive || sim.ts || autoTs,
-        messages: [...v.messages, msg]
-      }) : v);
-    } else {
-      convs = [...s.convs, {
-        id: 'v' + (now % 1e7), contactId: sim.contactId, platform: sim.platform,
-        isRead: false, isResponded: false, importance: sim.importance,
-        timeSensitive: sim.ts || autoTs, messages: [msg]
-      }];
-    }
-    this.setState({ convs, showSimulate: false, screen: 'home',
-      sim: Object.assign({}, sim, { content: '', ts: false, importance: 'normal' }) });
-    this.toast('Message delivered' + ((sim.ts || autoTs) ? ' — flagged time-sensitive' : ''));
-  }
 
   sendCompose() {
     const s = this.state, cmp = s.compose, now = Date.now();

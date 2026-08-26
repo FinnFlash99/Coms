@@ -1,4 +1,4 @@
-import type { Contact, Conversation, Message, Platform, CalendarEvent, FollowUp } from '$lib/types';
+import type { Contact, Conversation, Message, Platform, CalendarEvent, FollowUp, Note } from '$lib/types';
 
 const now = Date.now();
 const M = 60000; // minute
@@ -198,6 +198,17 @@ export const DEMO_EVENTS: CalendarEvent[] = [
 
 export const DEMO_FOLLOWUPS: FollowUp[] = [
 	{ id: 'f1', eventId: 'e2', text: 'Send James the revised scope', dueTs: now + D, done: false }
+];
+
+export const DEMO_NOTES: Note[] = [
+	{ id: 'n1', text: 'Send Sarah the revised homepage mocks', kind: 'task', done: false, ts: now - H },
+	{
+		id: 'n2',
+		text: 'TechCo wants weekly updates, not daily — keep the Friday cadence',
+		kind: 'note',
+		done: false,
+		ts: now - D
+	}
 ];
 
 export function generateDemoMessage(contact: Contact, content: string): Message {

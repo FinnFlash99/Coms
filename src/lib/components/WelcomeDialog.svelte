@@ -15,7 +15,7 @@
 	<div class="welcome-backdrop">
 		<Blueprint class="welcome-card animate-pop">
 			<div class="card-kicker">Unified inbox</div>
-			<h1>Coms</h1>
+			<h1>Hi Maya, welcome to Coms</h1>
 			<p class="tagline">One place to see the status of all your conversations.</p>
 
 			<div class="features">
@@ -64,7 +64,8 @@
 	}
 
 	h1 {
-		font-size: 54px;
+		font-size: 44px;
+		line-height: 1.1;
 		margin: 0 0 6px;
 	}
 

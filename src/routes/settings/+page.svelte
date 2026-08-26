@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { ChevronLeft, LogOut } from 'lucide-svelte';
-	import { preferences, welcomed, toast, contacts, togglePriority } from '$lib/stores';
-	import { TABS, type Theme, type TabId } from '$lib/types';
+	import { ChevronLeft, LogOut, X } from 'lucide-svelte';
+	import { preferences, welcomed, toast, contacts, togglePriority, allTypes, addGroup, removeGroup } from '$lib/stores';
+	import { TABS, PLATFORMS, type Theme, type DefaultTabId } from '$lib/types';
 	import Avatar from '$components/Avatar.svelte';
 	import Button from '$components/Button.svelte';
+	import Tag from '$components/Tag.svelte';
 	import SegmentedControl from '$components/SegmentedControl.svelte';
 	import DemoBadge from '$components/DemoBadge.svelte';
+
+	let groupDraft = $state('');
 
 	const themeOptions: Array<{ value: Theme; label: string }> = [
 		{ value: 'light', label: 'Light' },
@@ -13,14 +16,39 @@
 		{ value: 'system', label: 'System' }
 	];
 
-	const tabOptions = TABS.map(([value, label]) => ({ value, label }));
+	const defaultTabOptions: Array<{ id: DefaultTabId; label: string }> = [
+		...TABS.map(([id, label]) => ({ id: id as DefaultTabId, label })),
+		...(Object.keys(PLATFORMS) as Array<keyof typeof PLATFORMS>).map((p) => ({
+			id: `pf:${p}` as DefaultTabId,
+			label: PLATFORMS[p].label
+		}))
+	];
+
+	const defaultTabHint = $derived(
+		$preferences.defaultTab.startsWith('pf:')
+			? `Coms opens filtered to ${PLATFORMS[$preferences.defaultTab.slice(3) as keyof typeof PLATFORMS].label}.`
+			: 'The tab Coms opens on.'
+	);
 
 	function handleThemeChange(theme: Theme) {
 		preferences.update((p) => ({ ...p, theme }));
 	}
 
-	function handleDefaultTabChange(defaultTab: TabId) {
+	function handleDefaultTabChange(ev: Event) {
+		const defaultTab = (ev.target as HTMLSelectElement).value as DefaultTabId;
 		preferences.update((p) => ({ ...p, defaultTab }));
+	}
+
+	function handleAddGroup() {
+		addGroup(groupDraft);
+		groupDraft = '';
+	}
+
+	function handleGroupDraftKey(ev: KeyboardEvent) {
+		if (ev.key === 'Enter') {
+			ev.preventDefault();
+			handleAddGroup();
+		}
 	}
 
 	function toggleNotify() {
@@ -69,13 +97,41 @@
 
 		<div class="field">
 			<span class="field-label">Default tab</span>
-			<SegmentedControl
-				options={tabOptions}
-				value={$preferences.defaultTab}
-				name="coms-dtab"
-				onchange={handleDefaultTabChange}
-			/>
-			<p class="hint text-muted">The tab Coms opens on.</p>
+			<select class="input default-tab-select" value={$preferences.defaultTab} onchange={handleDefaultTabChange}>
+				{#each defaultTabOptions as o}
+					<option value={o.id}>{o.label}</option>
+				{/each}
+			</select>
+			<p class="hint text-muted">{defaultTabHint}</p>
+		</div>
+
+		<div class="field">
+			<span class="field-label">Groups</span>
+			<div class="group-add-row">
+				<input
+					class="input group-input"
+					placeholder="e.g. Parents, School, Landlord"
+					bind:value={groupDraft}
+					onkeydown={handleGroupDraftKey}
+				/>
+				<Button variant="secondary" disabled={!groupDraft.trim()} onclick={handleAddGroup}>Add group</Button>
+			</div>
+			<div class="group-chips">
+				{#each $allTypes as t}
+					{@const custom = ($preferences.customTypes || []).includes(t)}
+					<Tag variant={custom ? 'accent' : 'neutral'}>
+						<span class="group-chip-label">
+							{t}
+							{#if custom}
+								<button class="btn btn-ghost btn-icon group-remove" title="Remove group" onclick={() => removeGroup(t)}>
+									<X size={10} strokeWidth={2} />
+								</button>
+							{/if}
+						</span>
+					</Tag>
+				{/each}
+			</div>
+			<p class="hint text-muted">Built-in groups can't be removed. Assign a group to anyone from their conversation.</p>
 		</div>
 
 		<div class="field">
@@ -192,6 +248,41 @@
 	.hint {
 		font-size: 12px;
 		margin: 6px 0 0;
+	}
+
+	.default-tab-select {
+		width: auto;
+		max-width: 240px;
+	}
+
+	.group-add-row {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.group-input {
+		flex: 1;
+		min-width: 170px;
+	}
+
+	.group-chips {
+		display: flex;
+		gap: 7px;
+		flex-wrap: wrap;
+		margin-top: 12px;
+	}
+
+	.group-chip-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.group-remove {
+		padding: 0;
+		width: 14px;
+		height: 14px;
 	}
 
 	.checkbox-row {

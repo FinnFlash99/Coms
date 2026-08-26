@@ -13,13 +13,12 @@
 		markConversationResponded,
 		toggleTimeSensitive,
 		updateConversationImportance,
+		allTypes,
 		toast
 	} from '$lib/stores';
 	import {
-		type ContactType,
 		type ConnectionStrength,
 		type Importance,
-		TYPES,
 		getConversationStatus,
 		relativeTime,
 		formatTime,
@@ -47,10 +46,7 @@
 		[...new Set(contactConversations.map((c) => PLATFORMS[c.platform].label))].join(', ')
 	);
 
-	const relationshipOptions: Array<{ value: ContactType; label: string }> = TYPES.map((t) => ({
-		value: t,
-		label: t
-	}));
+	const relationshipOptions = $derived($allTypes.map((t) => ({ value: t, label: t })));
 
 	const connectionOptions: Array<{ value: ConnectionStrength; label: string }> = [
 		{ value: 'Close', label: 'Close' },
@@ -59,7 +55,7 @@
 		{ value: 'New', label: 'New' }
 	];
 
-	function handleRelationshipChange(type: ContactType) {
+	function handleRelationshipChange(type: string) {
 		if (contact) updateContact(contact.id, { type });
 	}
 
