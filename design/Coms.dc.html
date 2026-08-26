@@ -69,22 +69,33 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
   <div style="max-width:960px;margin:0 auto;padding:38px 32px 100px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-family:var(--font-heading);font-weight:500;font-size:26px;letter-spacing:-.02em">Coms</span>
-      <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px">UNIFIED INBOX</span>
-      <span style="flex:1"></span>
+      
+      <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px"><strong data-start="507" data-end="523">Full Connect</strong></span><span style="flex:1"></span>
       <button class="btn btn-primary" onClick="{{ openCompose }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>New message</button>
       <button class="btn btn-secondary" title="Simulate an incoming message" onClick="{{ openSimulate }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Simulate</button>
       <button class="btn btn-secondary" title="Calendar" onClick="{{ openCalendar }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="5" width="17" height="15" rx="1.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3" x2="8" y2="6"></line><line x1="16" y1="3" x2="16" y2="6"></line></svg>Calendar<sc-if value="{{ dueSoonCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-alert);color:#fff">{{ dueSoonCount }}</span></sc-if></button>
       <button class="btn btn-secondary btn-icon" title="Settings" onClick="{{ openSettings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="15" cy="7" r="2.2" fill="var(--color-bg)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="9" cy="17" r="2.2" fill="var(--color-bg)"></circle></svg></button>
     </div>
-    <p class="text-muted" style="font-size:13px;margin:8px 0 30px">{{ summary }}</p>
-    <div style="display:flex;gap:26px;border-bottom:1px solid var(--color-divider)">
+    <p class="text-muted" style="font-size:13px;margin:8px 0 18px">{{ summary }}</p>
+    <span style="position:relative;display:flex;align-items:center;width:288px;margin:0 0 12px auto">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position:absolute;left:11px;opacity:.55;pointer-events:none"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.5" y1="15.5" x2="20" y2="20"></line></svg>
+      <input class="input" type="search" placeholder="Search messages or people" style="width:100%;min-height:36px;font-size:13.5px;padding:5px 30px 5px 32px" value="{{ query }}" onChange="{{ setQuery }}">
+      <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+        <button class="btn btn-ghost btn-icon" style="position:absolute;right:3px;padding:3px" title="Clear search" onClick="{{ clearQuery }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
+      </sc-if>
+    </span>
+    <div style="display:flex;flex-wrap:wrap;column-gap:26px;row-gap:8px;border-bottom:1px solid var(--color-divider)">
       <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
         <button style="{{ t.style }}" onClick="{{ t.sel }}">{{ t.label }}<span style="{{ t.countStyle }}">{{ t.count }}</span></button>
       </sc-for>
-      <span style="flex:1"></span>
-      <select class="input" style="width:auto;min-height:32px;font-size:13px;padding:4px 8px;align-self:center;margin-bottom:6px" title="Category" value="{{ catFilter }}" onChange="{{ setCat }}">
-        <sc-for list="{{ catOpts }}" as="c" hint-placeholder-count="3"><option value="{{ c.id }}">{{ c.label }}</option></sc-for>
-      </select>
+      <div style="display:flex;gap:8px;align-items:center;margin-left:auto;margin-bottom:6px">
+        <select class="input" style="width:auto;min-width:0;max-width:140px;min-height:32px;font-size:13px;padding:4px 6px 4px 8px;background-position:right 4px center" title="Category" value="{{ catFilter }}" onChange="{{ setCat }}">
+          <sc-for list="{{ catOpts }}" as="c" hint-placeholder-count="3"><option value="{{ c.id }}">{{ c.label }}</option></sc-for>
+        </select>
+        <select class="input" style="width:auto;min-width:0;max-width:140px;min-height:32px;font-size:13px;padding:4px 6px 4px 8px;background-position:right 4px center" title="Group" value="{{ groupFilter }}" onChange="{{ setGroup }}">
+          <sc-for list="{{ groupOpts }}" as="g" hint-placeholder-count="3"><option value="{{ g.id }}">{{ g.label }}</option></sc-for>
+        </select>
+      </div>
     </div>
     <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:38px;margin-top:30px">
@@ -99,8 +110,8 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:24px;border-bottom-left-radius:8px;overflow:hidden">
                 <sc-for list="{{ sec.rows }}" as="g" hint-placeholder-count="5">
           <div style="{{ g.rowStyle }}" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)" onClick="{{ g.open }}">
-            <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:16px;color:var(--color-accent)">{{ g.initials }}</div>
-            <div style="flex:1;min-width:0">
+            <div style="width:42px;height:42px;flex:none;align-self:flex-start;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:16px;color:var(--color-accent)">{{ g.initials }}</div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
               <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                 <sc-if value="{{ g.unread }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;flex:none;background:var(--color-accent);border-radius:50%"></span></sc-if>
                 <span style="font-family:var(--font-heading);font-weight:500;font-size:17px;line-height:1.2;letter-spacing:-.01em">{{ g.name }}</span>
@@ -114,7 +125,7 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
               <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
                 <sc-for list="{{ g.chips }}" as="c" hint-placeholder-count="1"><span class="tag {{ c.cls }}">{{ c.label }}</span></sc-for>
               </div>
-              <div style="display:flex;margin-top:10px;margin-left:-6px">
+              <div style="display:flex;margin-top:auto;padding-top:10px;margin-left:-64px">
                 <button class="btn btn-ghost" style="font-size:12px;padding:4px 6px" onClick="{{ g.openIn }}">Open in {{ g.openLabel }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 5h5v5"></path><path d="M19 5 10 14"></path><path d="M18 13v6H5V6h6"></path></svg></button>
               </div>
             </div>
@@ -138,8 +149,8 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         <div style="width:320px;height:220px;margin-bottom:22px;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;background:var(--color-surface)">
                     <image-slot id="otter-allclear" shape="rect" placeholder="otter floating on an inflatable tube in a river" style="width:100%;height:100%"></image-slot>
         </div>
-        <h3 style="margin:0 0 4px">All clear</h3>
-        <p class="text-muted" style="font-size:14px;margin:0">You're all caught up. Nothing needs your attention.</p>
+        <h3 style="margin:0 0 4px">{{ emptyTitle }}</h3>
+        <p class="text-muted" style="font-size:14px;margin:0">{{ emptyBody }}</p>
       </div>
     </sc-if>
   </div>
@@ -598,7 +609,7 @@ class Component extends DCLogic {
       welcomed = localStorage.getItem('coms.welcomed') === '1';
     } catch (e) {}
     return {
-      screen: 'home', tab: prefs.defaultTab, cat: 'all', prefs, welcomed,
+      screen: 'home', tab: prefs.defaultTab, cat: 'all', group: 'all', query: '', prefs, welcomed,
       detail: null, showCompose: false, showSimulate: false, toast: '', monthOffset: 0,
       sim: { contactId: 'c1', platform: 'slack', content: '', importance: 'normal', ts: false },
       calView: 'month', prepEventId: null,
@@ -645,16 +656,17 @@ class Component extends DCLogic {
     { id: 'c1', name: 'Sarah Chen', type: 'Client', connection: 'Close' },
     { id: 'c2', name: 'James (TechCo)', type: 'Client', connection: 'Regular' },
     { id: 'c3', name: 'Ravi Sharma', type: 'Subcontractor', connection: 'Close' },
-    { id: 'c4', name: 'Studio Collective', type: 'Client', connection: 'Occasional' },
-    { id: 'c5', name: 'Anna K.', type: 'Client', connection: 'New' },
-    { id: 'c6', name: 'Brand Co.', type: 'Client', connection: 'Occasional' }
+    { id: 'c4', name: 'Studio Collective', type: 'Collaborator', connection: 'Occasional' },
+    { id: 'c5', name: 'Anna K.', type: 'Prospect', connection: 'New' },
+    { id: 'c6', name: 'Brand Co.', type: 'Vendor', connection: 'Occasional' }
   ];
+  static TYPES = ['Client', 'Prospect', 'Subcontractor', 'Collaborator', 'Vendor', 'Personal'];
   static PLATFORMS = {
     email: { label: 'Email', color: '#6d92e0' },
     slack: { label: 'Slack', color: '#b478e8' },
     whatsapp: { label: 'WhatsApp', color: '#5cc389' },
     instagram: { label: 'Instagram', color: '#e07ba0' },
-    imessage: { label: 'iMessage', color: '#5cb4ec' },
+    telegram: { label: 'Telegram', color: '#5cb4ec' },
     teams: { label: 'Teams', color: '#7d84f0' }
   };
   // Mail-style platforms read as subject lines, not chat bubbles.
@@ -665,7 +677,7 @@ class Component extends DCLogic {
   static FAMILIES = [
     ['mail', 'Mail', ['email', 'gmail', 'mail', 'outlook', 'dropbox']],
     ['work', 'Work chat', ['slack', 'teams']],
-    ['personal', 'Messaging', ['whatsapp', 'imessage']],
+    ['personal', 'Messaging', ['whatsapp', 'telegram']],
     ['social', 'Social', ['instagram']]
   ];
   static familyOf(p) {
@@ -872,7 +884,22 @@ class Component extends DCLogic {
       };
     });
     entries.sort((a, b) => b.lastTs - a.lastTs);
-    // category filter: relationship, connection strength, or platform
+    const q = s.query.trim().toLowerCase();
+    if (q) {
+      entries = entries.filter(e =>
+        e.contact.name.toLowerCase().includes(q) ||
+        e.platforms.some(p => C.PLATFORMS[p].label.toLowerCase().includes(q)) ||
+        e.convIds.some(id => {
+          const v = s.convs.find(x => x.id === id);
+          return v && v.messages.some(m =>
+            m.content.toLowerCase().includes(q) || (m.subject || '').toLowerCase().includes(q));
+        }));
+    }
+    if (s.group !== 'all') {
+      const val = s.group.split(':')[1];
+      entries = entries.filter(e => e.contact.type === val);
+    }
+    // category filter: platform family, platform, or priority
     if (s.cat !== 'all') {
       const [kind, val] = s.cat.split(':');
       entries = entries.filter(e =>
@@ -900,7 +927,7 @@ class Component extends DCLogic {
       initials: e.contact.name.split(/[\s(]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(),
       name: e.contact.name,
       unread: e.status === 'unread',
-      platforms: e.platforms.map(p => ({ label: C.familyOf(p).label + ' · ' + C.PLATFORMS[p].label, chipStyle: pchip(p) })),
+      platforms: e.platforms.map(p => ({ label: C.PLATFORMS[p].label, chipStyle: pchip(p) })),
       time: this.rel(e.lastTs),
       preview: e.preview,
       previewStyle: (C.isMail(e.lastPlatform)
@@ -908,10 +935,10 @@ class Component extends DCLogic {
         : 'display:inline-block;max-width:100%;margin:8px 0 10px;padding:7px 13px;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;' +
           'border:1px solid var(--color-divider);border-radius:16px;border-bottom-left-radius:5px;background:color-mix(in srgb, var(--color-text) 6%, transparent);') +
         (e.status === 'unread' ? 'font-weight:500' : 'opacity:.92'),
-      rowStyle: 'display:flex;align-items:flex-start;gap:16px;padding:19px 22px;cursor:pointer;border-bottom:1px solid var(--color-divider)',
+      rowStyle: 'display:flex;align-items:stretch;gap:16px;padding:19px 22px;cursor:pointer;border-bottom:1px solid var(--color-divider)',
       chips: [...this.entryChips(e.status, e.urgent, e.imp),
         ...(isPriority(e) ? [{ cls: 'tag-outline', label: 'Priority sender' }] : []),
-        { cls: 'tag-neutral', label: e.contact.type }, { cls: 'tag-neutral', label: e.contact.connection }],
+        { cls: 'tag-neutral', label: e.contact.type }],
       canRead: e.status === 'unread',
       canRespond: e.status !== 'done',
       done: e.status === 'done',
@@ -942,7 +969,7 @@ class Component extends DCLogic {
       const doneList = visible.filter(e => e.status === 'done');
       sections = [];
       if (prio.length) sections.push({ label: 'Priority senders', count: prio.length, rows: prio.map(mkRow) });
-      if (active.length) sections.push({ label: usePriority ? 'Everything else' : 'Active', count: active.length, rows: active.map(mkRow) });
+      if (active.length) sections.push({ label: prio.length ? 'Everything else' : 'Active', count: active.length, rows: active.map(mkRow) });
       if (doneList.length) sections.push({ label: 'Done', count: doneList.length, rows: doneList.map(mkRow) });
     } else {
       sections = [{ label: '', count: 0, rows: visible.map(mkRow) }];
@@ -952,24 +979,18 @@ class Component extends DCLogic {
       const lr = sec.rows[sec.rows.length - 1];
       lr.rowStyle = lr.rowStyle.replace('border-bottom:1px solid var(--color-divider)', 'border-bottom:none');
     });
-    const livePlatforms = [...new Set(s.convs.map(v => v.platform))];
-    const liveFamilies = C.FAMILIES.filter(([id]) => livePlatforms.some(p => C.familyOf(p).id === id));
     const catOpts = [{ id: 'all', label: 'All categories' },
-      ...(prioritySet.length ? [{ id: 'prio:1', label: 'Priority senders only' }] : []),
-      ...liveFamilies.map(([id, label, list]) => ({
-        id: 'fam:' + id,
-        label: label + ' — ' + list.filter(p => livePlatforms.includes(p)).map(p => C.PLATFORMS[p].label).join(', ')
-      })),
-      ...livePlatforms.map(p => ({ id: 'pf:' + p, label: C.familyOf(p).label + ' · ' + C.PLATFORMS[p].label })),
-      ...[...new Set(s.contacts.map(c => c.type))].map(t => ({ id: 'rel:' + t, label: 'Relationship · ' + t })),
-      ...[...new Set(s.contacts.map(c => c.connection))].map(t => ({ id: 'con:' + t, label: 'Connection · ' + t }))];
+      ...(prioritySet.length ? [{ id: 'prio:1', label: 'Priority' }] : []),
+      ...Object.keys(C.PLATFORMS).map(p => ({ id: 'pf:' + p, label: C.PLATFORMS[p].label }))];
+    const groupOpts = [{ id: 'all', label: 'All groups' },
+      ...C.TYPES.map(t => ({ id: 'rel:' + t, label: t }))];
 
     const tabs = C.TABS.map(([id, label]) => {
       const active = s.tab === id;
       const alert = id === 'urgent' && counts.urgent > 0;
       return {
         label, count: counts[id],
-        style: 'background:none;border:none;border-bottom:2px solid ' + (active ? (alert ? 'var(--color-alert)' : 'var(--color-accent)') : 'transparent') +
+        style: 'flex:none;white-space:nowrap;background:none;border:none;border-bottom:2px solid ' + (active ? (alert ? 'var(--color-alert)' : 'var(--color-accent)') : 'transparent') +
           ';cursor:pointer;font-family:var(--font-heading);font-weight:500;font-size:14.5px;letter-spacing:-.01em;padding:9px 2px;margin-bottom:-1px;display:inline-flex;gap:7px;align-items:center;color:' +
           (active ? (alert ? 'var(--color-alert)' : 'var(--color-accent)') : alert ? 'var(--color-alert-text)' : 'inherit'),
         countStyle: 'font-size:10.5px;font-family:var(--font-body);padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;' +
@@ -990,7 +1011,7 @@ class Component extends DCLogic {
     if (s.screen === 'detail' && s.detail) {
       const c = contactById(s.detail.contactId);
       const mkSeg = (list, cur, set) => list.map(l => ({ label: l, on: cur === l, sel: () => set(l) }));
-      relOpts = mkSeg(['Client', 'Subcontractor', 'Vendor', 'Personal'], c.type, v => this.patchContact(c.id, { type: v }));
+      relOpts = mkSeg(Component.TYPES, c.type, v => this.patchContact(c.id, { type: v }));
       conOpts = mkSeg(['Close', 'Regular', 'Occasional', 'New'], c.connection, v => this.patchContact(c.id, { connection: v }));
       const cs = s.convs.filter(v => s.detail.convIds.includes(v.id));
       detailName = c.name; detailType = c.type;
@@ -1209,6 +1230,13 @@ class Component extends DCLogic {
       unscheduled, unscheduledCount: unscheduled.length, hasUnscheduled: unscheduled.length > 0,
       summary, tabs, sections, hasRows: visible.length > 0, showEmpty: visible.length === 0,
       catFilter: s.cat, catOpts, setCat: ev => this.setState({ cat: ev.target.value }),
+      groupFilter: s.group, groupOpts, setGroup: ev => this.setState({ group: ev.target.value }),
+      emptyTitle: q ? 'No matches' : 'All clear',
+      emptyBody: q ? 'Nothing matches “' + s.query.trim() + '”. Try a name, a platform, or a word from a message.'
+        : "You're all caught up. Nothing needs your attention.",
+      query: s.query, hasQuery: !!s.query,
+      setQuery: ev => this.setState({ query: ev.target.value }),
+      clearQuery: () => this.setState({ query: '' }),
       detailName, detailType, detailSub, detailInitials, threads, relOpts, conOpts,
       themeOpts, tabOpts,
       logOut: () => {

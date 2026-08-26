@@ -1,5 +1,12 @@
 <script lang="ts">
 	import Blueprint from './Blueprint.svelte';
+
+	interface Props {
+		title?: string;
+		body?: string;
+	}
+
+	let { title = 'All clear', body = "You're all caught up. Nothing needs your attention." }: Props = $props();
 </script>
 
 <div class="empty-state animate-pop">
@@ -9,8 +16,8 @@
 			<span class="otter-text">All clear!</span>
 		</div>
 	</Blueprint>
-	<h3>All clear</h3>
-	<p class="text-muted">You're all caught up. Nothing needs your attention.</p>
+	<h3>{title}</h3>
+	<p class="text-muted">{body}</p>
 </div>
 
 <style>

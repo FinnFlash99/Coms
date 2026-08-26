@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Settings, Send, Plus, CalendarDays } from 'lucide-svelte';
+	import { Settings, Send, Plus, CalendarDays, Search, X } from 'lucide-svelte';
 	import {
 		welcomed,
 		filteredConversations,
@@ -8,11 +8,13 @@
 		contacts,
 		preferences,
 		categoryFilter,
+		groupFilter,
+		searchQuery,
 		activeTab,
 		openComposeDialog,
 		openSimulateDialog
 	} from '$lib/stores';
-	import { PLATFORMS, PLATFORM_FAMILIES, familyOf } from '$lib/types';
+	import { PLATFORMS, TYPES } from '$lib/types';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import TabBar from '$components/TabBar.svelte';
@@ -32,30 +34,22 @@
 		}).length;
 	});
 
-	// Build category filter options
+	// Build category filter options: all + priority + a flat platform list
 	const categoryOptions = $derived(() => {
-		const options = [{ id: 'all', label: 'All categories' }];
+		const options: Array<{ id: string; label: string }> = [{ id: 'all', label: 'All categories' }];
 		const priority = $preferences.priority || [];
-		if (priority.length) options.push({ id: 'prio:1', label: 'Priority senders only' });
+		if (priority.length) options.push({ id: 'prio:1', label: 'Priority' });
 
-		const livePlatforms = [...new Set($filteredConversations.map((v) => v.platform))];
-		const liveFamilies = PLATFORM_FAMILIES.filter((f) => livePlatforms.some((p) => familyOf(p).id === f.id));
-		liveFamilies.forEach((f) => {
-			const label = f.platforms.filter((p) => livePlatforms.includes(p)).map((p) => PLATFORMS[p].label).join(', ');
-			options.push({ id: `fam:${f.id}`, label: `${f.label} — ${label}` });
-		});
-		livePlatforms.forEach((p) => options.push({ id: `pf:${p}`, label: `${familyOf(p).label} · ${PLATFORMS[p].label}` }));
-
-		// Relationship types
-		const types = [...new Set($contacts.map((c) => c.type))];
-		types.forEach((t) => options.push({ id: `rel:${t}`, label: `Relationship · ${t}` }));
-
-		// Connection strengths
-		const connections = [...new Set($contacts.map((c) => c.connection))];
-		connections.forEach((c) => options.push({ id: `con:${c}`, label: `Connection · ${c}` }));
+		Object.keys(PLATFORMS).forEach((p) => options.push({ id: `pf:${p}`, label: PLATFORMS[p as keyof typeof PLATFORMS].label }));
 
 		return options;
 	});
+
+	// Build group filter options: all groups + every contact type
+	const groupOptions = $derived(() => [
+		{ id: 'all', label: 'All groups' },
+		...TYPES.map((t) => ({ id: `rel:${t}`, label: t }))
+	]);
 
 	// Summary text
 	const summary = $derived(() => {
@@ -101,12 +95,18 @@
 	});
 
 	const hasRows = $derived($filteredConversations.length > 0);
+	const emptyTitle = $derived($searchQuery.trim() ? 'No matches' : 'All clear');
+	const emptyBody = $derived(
+		$searchQuery.trim()
+			? `Nothing matches "${$searchQuery.trim()}". Try a name, a platform, or a word from a message.`
+			: "You're all caught up. Nothing needs your attention."
+	);
 </script>
 
 <div class="inbox">
 	<header class="header">
 		<span class="logo">COMS</span>
-		<Tag variant="neutral">UNIFIED INBOX</Tag>
+		<Tag variant="neutral">Full Connect</Tag>
 		<span class="spacer"></span>
 		<Button variant="primary" onclick={() => openComposeDialog()}>
 			<Send size={14} strokeWidth={1.5} />
@@ -130,18 +130,43 @@
 
 	<p class="summary text-muted">{summary()}</p>
 
+	<span class="search-bar">
+		<Search size={14} strokeWidth={1.5} class="search-icon" />
+		<input
+			class="input search-input"
+			type="search"
+			placeholder="Search messages or people"
+			bind:value={$searchQuery}
+		/>
+		{#if $searchQuery}
+			<button class="btn btn-ghost btn-icon search-clear" title="Clear search" onclick={() => ($searchQuery = '')}>
+				<X size={13} strokeWidth={1.5} />
+			</button>
+		{/if}
+	</span>
+
 	<div class="tabs-row">
 		<TabBar />
-		<span class="spacer"></span>
-		<select
-			class="input category-select"
-			title="Category"
-			bind:value={$categoryFilter}
-		>
-			{#each categoryOptions() as cat}
-				<option value={cat.id}>{cat.label}</option>
-			{/each}
-		</select>
+		<div class="filters">
+			<select
+				class="input category-select"
+				title="Category"
+				bind:value={$categoryFilter}
+			>
+				{#each categoryOptions() as cat}
+					<option value={cat.id}>{cat.label}</option>
+				{/each}
+			</select>
+			<select
+				class="input category-select"
+				title="Group"
+				bind:value={$groupFilter}
+			>
+				{#each groupOptions() as g}
+					<option value={g.id}>{g.label}</option>
+				{/each}
+			</select>
+		</div>
 	</div>
 
 	{#if hasRows}
@@ -170,7 +195,7 @@
 			{/each}
 		</div>
 	{:else}
-		<EmptyState />
+		<EmptyState title={emptyTitle} body={emptyBody} />
 	{/if}
 </div>
 
@@ -213,22 +238,61 @@
 
 	.summary {
 		font-size: 13px;
-		margin: 8px 0 30px;
+		margin: 8px 0 18px;
+	}
+
+	.search-bar {
+		position: relative;
+		display: flex;
+		align-items: center;
+		width: 288px;
+		margin: 0 0 12px auto;
+	}
+
+	.search-bar :global(.search-icon) {
+		position: absolute;
+		left: 11px;
+		opacity: 0.55;
+		pointer-events: none;
+	}
+
+	.search-input {
+		width: 100%;
+		min-height: 36px;
+		font-size: 13.5px;
+		padding: 5px 30px 5px 32px;
+	}
+
+	.search-clear {
+		position: absolute;
+		right: 3px;
+		padding: 3px;
 	}
 
 	.tabs-row {
 		display: flex;
-		gap: 26px;
+		flex-wrap: wrap;
+		column-gap: 26px;
+		row-gap: 8px;
 		border-bottom: 1px solid var(--color-divider);
+	}
+
+	.filters {
+		display: flex;
+		gap: 8px;
+		align-items: center;
+		margin-left: auto;
+		margin-bottom: 6px;
 	}
 
 	.category-select {
 		width: auto;
+		min-width: 0;
+		max-width: 140px;
 		min-height: 32px;
 		font-size: 13px;
-		padding: 4px 8px;
-		align-self: center;
-		margin-bottom: 6px;
+		padding: 4px 6px 4px 8px;
+		background-position: right 4px center;
 	}
 
 	.sections {

@@ -14,7 +14,6 @@
 		getConversationStatus,
 		relativeTime,
 		isMailPlatform,
-		familyOf,
 		PLATFORMS
 	} from '$lib/types';
 	import Avatar from './Avatar.svelte';
@@ -41,7 +40,7 @@
 	const previewText = $derived(
 		isMail ? lastMessage?.subject || lastMessage?.content || '' : lastMessage?.content || conversation.lastMessagePreview
 	);
-	const platformLabel = $derived(`${familyOf(conversation.platform).label} · ${PLATFORMS[conversation.platform].label}`);
+	const platformLabel = $derived(PLATFORMS[conversation.platform].label);
 	const isPriority = $derived(($preferences.priority || []).includes(contact.id));
 
 	function handleClick() {
@@ -115,7 +114,6 @@
 			{/if}
 
 			<Tag variant="neutral">{contact.type}</Tag>
-			<Tag variant="neutral">{contact.connection}</Tag>
 		</div>
 
 		<div class="open-in-row">
@@ -177,7 +175,7 @@
 <style>
 	.row {
 		display: flex;
-		align-items: flex-start;
+		align-items: stretch;
 		gap: 16px;
 		padding: 19px 22px;
 		cursor: pointer;
@@ -192,9 +190,15 @@
 		border-bottom: none;
 	}
 
+	.row :global(.avatar) {
+		align-self: flex-start;
+	}
+
 	.content {
 		flex: 1;
 		min-width: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.header {
@@ -263,7 +267,9 @@
 
 	.open-in-row {
 		display: flex;
-		margin: 10px 0 0 -6px;
+		margin-top: auto;
+		padding-top: 10px;
+		margin-left: -64px;
 	}
 
 	.actions {

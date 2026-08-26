@@ -19,6 +19,7 @@
 		type ContactType,
 		type ConnectionStrength,
 		type Importance,
+		TYPES,
 		getConversationStatus,
 		relativeTime,
 		formatTime,
@@ -46,12 +47,10 @@
 		[...new Set(contactConversations.map((c) => PLATFORMS[c.platform].label))].join(', ')
 	);
 
-	const relationshipOptions: Array<{ value: ContactType; label: string }> = [
-		{ value: 'Client', label: 'Client' },
-		{ value: 'Subcontractor', label: 'Subcontractor' },
-		{ value: 'Vendor', label: 'Vendor' },
-		{ value: 'Personal', label: 'Personal' }
-	];
+	const relationshipOptions: Array<{ value: ContactType; label: string }> = TYPES.map((t) => ({
+		value: t,
+		label: t
+	}));
 
 	const connectionOptions: Array<{ value: ConnectionStrength; label: string }> = [
 		{ value: 'Close', label: 'Close' },

@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { updateContact } from '$lib/server/db';
+import { TYPES } from '$lib/types';
 
 // PATCH /api/contacts/[id] - Update contact
 export const PATCH: RequestHandler = async ({ params, request, locals, platform }) => {
@@ -29,7 +30,7 @@ export const PATCH: RequestHandler = async ({ params, request, locals, platform 
 		if (body.name && typeof body.name === 'string') {
 			updates.name = body.name;
 		}
-		if (body.type && ['Client', 'Subcontractor', 'Vendor', 'Personal', 'other'].includes(body.type)) {
+		if (body.type && (TYPES as string[]).includes(body.type)) {
 			updates.contact_type = body.type;
 		}
 		if (body.connection && ['Close', 'Regular', 'Occasional', 'New'].includes(body.connection)) {

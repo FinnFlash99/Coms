@@ -15,7 +15,6 @@ import {
 	PLATFORMS,
 	getConversationStatus,
 	isMailPlatform,
-	familyOf,
 	dueLabel
 } from '$lib/types';
 import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
@@ -121,6 +120,12 @@ export const activeTab = writable<TabId>('all');
 // Category filter store
 export const categoryFilter = writable<string>('all');
 
+// Group filter store (by contact type)
+export const groupFilter = writable<string>('all');
+
+// Free-text search across contact name, platform, and message content/subject
+export const searchQuery = writable<string>('');
+
 // Welcome screen dismissed
 function createWelcomedStore() {
 	let initial = false;
@@ -179,8 +184,8 @@ export function setDraft(conversationId: string, text: string) {
 
 // Derived store for filtered conversations
 export const filteredConversations = derived(
-	[conversations, activeTab, categoryFilter, contacts, preferences],
-	([$conversations, $activeTab, $categoryFilter, $contacts, $preferences]) => {
+	[conversations, activeTab, categoryFilter, groupFilter, searchQuery, contacts, preferences],
+	([$conversations, $activeTab, $categoryFilter, $groupFilter, $searchQuery, $contacts, $preferences]) => {
 		const contactById = (id: string) => $contacts.find((c) => c.id === id);
 		const priority = $preferences.priority || [];
 
@@ -201,15 +206,30 @@ export const filteredConversations = derived(
 			};
 		});
 
-		// Apply category filter
+		// Apply search — matches contact name, platform, or a message's content/subject
+		const q = $searchQuery.trim().toLowerCase();
+		if (q) {
+			entries = entries.filter(
+				(e) =>
+					(e.contact?.name.toLowerCase().includes(q) ?? false) ||
+					PLATFORMS[e.platform].label.toLowerCase().includes(q) ||
+					e.messages.some(
+						(m) => m.content.toLowerCase().includes(q) || (m.subject || '').toLowerCase().includes(q)
+					)
+			);
+		}
+
+		// Apply group filter (contact type)
+		if ($groupFilter !== 'all') {
+			const val = $groupFilter.split(':')[1];
+			entries = entries.filter((e) => e.contact?.type === val);
+		}
+
+		// Apply category filter (priority senders, or a specific platform)
 		if ($categoryFilter !== 'all') {
 			const [kind, val] = $categoryFilter.split(':');
 			entries = entries.filter((e) => {
-				if (!e.contact) return false;
-				if (kind === 'rel') return e.contact.type === val;
-				if (kind === 'con') return e.contact.connection === val;
-				if (kind === 'prio') return priority.includes(e.contact.id);
-				if (kind === 'fam') return familyOf(e.platform).id === val;
+				if (kind === 'prio') return e.contact ? priority.includes(e.contact.id) : false;
 				return e.platform === val;
 			});
 		}

@@ -1,6 +1,6 @@
 // Core application types for Coms
 
-export type Platform = 'email' | 'slack' | 'whatsapp' | 'instagram' | 'imessage' | 'teams' | 'discord';
+export type Platform = 'email' | 'slack' | 'whatsapp' | 'instagram' | 'telegram' | 'teams' | 'discord';
 
 export interface PlatformInfo {
 	label: string;
@@ -12,7 +12,7 @@ export const PLATFORMS: Record<Platform, PlatformInfo> = {
 	slack: { label: 'Slack', color: '#b478e8' },
 	whatsapp: { label: 'WhatsApp', color: '#5cc389' },
 	instagram: { label: 'Instagram', color: '#e07ba0' },
-	imessage: { label: 'iMessage', color: '#5cb4ec' },
+	telegram: { label: 'Telegram', color: '#5cb4ec' },
 	teams: { label: 'Teams', color: '#7d84f0' },
 	discord: { label: 'Discord', color: '#5865f2' }
 };
@@ -33,7 +33,7 @@ export interface PlatformFamily {
 export const PLATFORM_FAMILIES: PlatformFamily[] = [
 	{ id: 'mail', label: 'Mail', platforms: ['email'] },
 	{ id: 'work', label: 'Work chat', platforms: ['slack', 'teams'] },
-	{ id: 'personal', label: 'Messaging', platforms: ['whatsapp', 'imessage'] },
+	{ id: 'personal', label: 'Messaging', platforms: ['whatsapp', 'telegram'] },
 	{ id: 'social', label: 'Social', platforms: ['instagram'] }
 ];
 
@@ -70,7 +70,8 @@ export interface FollowUp {
 	done: boolean;
 }
 
-export type ContactType = 'Client' | 'Subcontractor' | 'Vendor' | 'Personal';
+export type ContactType = 'Client' | 'Prospect' | 'Subcontractor' | 'Collaborator' | 'Vendor' | 'Personal';
+export const TYPES: ContactType[] = ['Client', 'Prospect', 'Subcontractor', 'Collaborator', 'Vendor', 'Personal'];
 export type ConnectionStrength = 'Close' | 'Regular' | 'Occasional' | 'New';
 export type Importance = 'low' | 'normal' | 'high';
 export type MessageDirection = 'inbound' | 'outbound';

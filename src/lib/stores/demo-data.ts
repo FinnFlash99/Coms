@@ -9,9 +9,9 @@ export const DEMO_CONTACTS: Contact[] = [
 	{ id: 'c1', name: 'Sarah Chen', type: 'Client', connection: 'Close' },
 	{ id: 'c2', name: 'James (TechCo)', type: 'Client', connection: 'Regular' },
 	{ id: 'c3', name: 'Ravi Sharma', type: 'Subcontractor', connection: 'Close' },
-	{ id: 'c4', name: 'Studio Collective', type: 'Client', connection: 'Occasional' },
-	{ id: 'c5', name: 'Anna K.', type: 'Client', connection: 'New' },
-	{ id: 'c6', name: 'Brand Co.', type: 'Client', connection: 'Occasional' }
+	{ id: 'c4', name: 'Studio Collective', type: 'Collaborator', connection: 'Occasional' },
+	{ id: 'c5', name: 'Anna K.', type: 'Prospect', connection: 'New' },
+	{ id: 'c6', name: 'Brand Co.', type: 'Vendor', connection: 'Occasional' }
 ];
 
 function createMessage(

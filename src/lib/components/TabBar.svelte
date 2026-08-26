@@ -29,6 +29,8 @@
 	}
 
 	.tab {
+		flex: none;
+		white-space: nowrap;
 		background: none;
 		border: none;
 		border-bottom: 2px solid transparent;
