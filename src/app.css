@@ -125,6 +125,12 @@ html[data-theme="light"] {
 	}
 }
 
+@keyframes coms-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 /* Animation utilities */
 .animate-in {
 	animation: coms-in 0.25s ease;

@@ -1,23 +1,38 @@
 <script lang="ts">
 	import Blueprint from './Blueprint.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		title?: string;
 		body?: string;
+		emoji?: string;
+		badge?: string;
+		actions?: Snippet;
 	}
 
-	let { title = 'All clear', body = "You're all caught up. Nothing needs your attention." }: Props = $props();
+	let {
+		title = 'All clear',
+		body = "You're all caught up. Nothing needs your attention.",
+		emoji = '🦦',
+		badge = 'All clear!',
+		actions
+	}: Props = $props();
 </script>
 
 <div class="empty-state animate-pop">
 	<Blueprint class="otter-frame">
 		<div class="otter-placeholder">
-			<span class="otter-emoji">🦦</span>
-			<span class="otter-text">All clear!</span>
+			<span class="otter-emoji">{emoji}</span>
+			<span class="otter-text">{badge}</span>
 		</div>
 	</Blueprint>
 	<h3>{title}</h3>
 	<p class="text-muted">{body}</p>
+	{#if actions}
+		<div class="empty-actions">
+			{@render actions()}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -65,5 +80,13 @@
 	p {
 		font-size: 14px;
 		margin: 0;
+	}
+
+	.empty-actions {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		margin-top: 20px;
 	}
 </style>

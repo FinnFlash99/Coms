@@ -12,6 +12,9 @@ export { default as Toast } from './Toast.svelte';
 // Application components
 export { default as DemoBadge } from './DemoBadge.svelte';
 export { default as WelcomeDialog } from './WelcomeDialog.svelte';
+export { default as SignInScreen } from './SignInScreen.svelte';
+export { default as OnboardingScreen } from './OnboardingScreen.svelte';
+export { default as LegalPage } from './LegalPage.svelte';
 export { default as ComposeDialog } from './ComposeDialog.svelte';
 export { default as EventPrepDialog } from './EventPrepDialog.svelte';
 export { default as ConversationRow } from './ConversationRow.svelte';

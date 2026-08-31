@@ -7,7 +7,7 @@
 	let { visible = false }: { visible?: boolean } = $props();
 
 	function enter() {
-		welcomed.dismiss();
+		welcomed.enable();
 	}
 </script>
 
@@ -41,7 +41,7 @@
 
 			<Button variant="primary" onclick={enter}>Enter Coms</Button>
 			<p class="demo-note text-muted">
-				Demo mode — messages are simulated. The full product syncs your platforms automatically.
+				Demo mode with sample conversations. The full product syncs your platforms automatically.
 			</p>
 		</Blueprint>
 	</div>

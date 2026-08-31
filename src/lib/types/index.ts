@@ -139,6 +139,26 @@ export interface PlatformConnection {
 	lastSyncAt?: number;
 }
 
+// Demo-mode account connections (onboarding + Settings), distinct from PlatformConnection
+// above -- these are simulated toggles, not backed by a real OAuth session yet.
+export type ConnectionId = 'gmail' | 'slack' | 'whatsapp';
+
+export interface ConnectionInfo {
+	id: ConnectionId;
+	name: string;
+	icon: 'mail' | 'hash' | 'chat';
+	blurb: string;
+	handle: string;
+}
+
+export const CONNECTIONS: ConnectionInfo[] = [
+	{ id: 'gmail', name: 'Gmail', icon: 'mail', blurb: 'Sync your email conversations', handle: 'maya@freelance.co' },
+	{ id: 'slack', name: 'Slack', icon: 'hash', blurb: 'See messages from your workspaces', handle: 'Freelance Co workspace' },
+	{ id: 'whatsapp', name: 'WhatsApp', icon: 'chat', blurb: 'Connect via WhatsApp Business', handle: 'Business account' }
+];
+
+export type Connections = Record<ConnectionId, boolean>;
+
 // Either a status tab, or "pf:<platform>" to open filtered to a single platform.
 export type DefaultTabId = TabId | `pf:${Platform}`;
 
@@ -200,6 +220,15 @@ export function relativeTime(timestamp: number): string {
 	if (d < 86400000) return Math.round(d / 3600000) + ' hr ago';
 	const days = Math.round(d / 86400000);
 	return days === 1 ? 'yesterday' : days + ' days ago';
+}
+
+// Short-horizon relative time for the sync indicator -- always recent within a session,
+// so it only ever needs "just synced" / minutes / hours, not days.
+export function syncAgo(ts: number): string {
+	const mins = Math.floor((Date.now() - ts) / 60000);
+	if (mins < 1) return 'Just synced';
+	if (mins < 60) return mins + ' min ago';
+	return Math.floor(mins / 60) + ' hr ago';
 }
 
 export function formatTime(timestamp: number): string {

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ChevronLeft, Flag, ExternalLink, Send } from 'lucide-svelte';
+	import { ChevronLeft, Flag, ExternalLink, Send, LoaderCircle } from 'lucide-svelte';
 	import {
 		contacts,
 		conversations,
 		drafts,
 		setDraft,
 		sendReply,
+		sendStates,
 		setDue,
 		updateContact,
 		markConversationRead,
@@ -64,9 +65,7 @@
 	}
 
 	function handleSend(conversationId: string) {
-		if (sendReply(conversationId)) {
-			toast.show('Sent — thread marked responded');
-		}
+		sendReply(conversationId);
 	}
 
 	function handleReplyKey(e: KeyboardEvent, conversationId: string) {
@@ -161,23 +160,33 @@
 						{/each}
 					</div>
 
+					{@const sending = $sendStates[conv.id] === 'sending'}
 					<div class="reply-row">
 						<textarea
 							class="input reply-input"
+							class:sending
 							placeholder={`Reply to ${contact.name.split(' (')[0]} on ${PLATFORMS[conv.platform].label}…`}
 							value={$drafts[conv.id] || ''}
+							disabled={sending}
 							oninput={(e) => setDraft(conv.id, e.currentTarget.value)}
 							onkeydown={(e) => handleReplyKey(e, conv.id)}
 						></textarea>
-						<Button
-							variant="primary"
-							class="reply-send"
-							disabled={!($drafts[conv.id] || '').trim()}
-							onclick={() => handleSend(conv.id)}
-						>
-							<Send size={14} strokeWidth={1.5} />
-							Send
-						</Button>
+						{#if sending}
+							<Button variant="primary" class="reply-send" disabled>
+								<LoaderCircle size={14} strokeWidth={2} class="spin-icon" />
+								Sending…
+							</Button>
+						{:else}
+							<Button
+								variant="primary"
+								class="reply-send"
+								disabled={!($drafts[conv.id] || '').trim()}
+								onclick={() => handleSend(conv.id)}
+							>
+								<Send size={14} strokeWidth={1.5} />
+								Send
+							</Button>
+						{/if}
 					</div>
 
 					<div class="thread-actions">
@@ -401,8 +410,17 @@
 		resize: vertical;
 	}
 
+	.reply-input.sending {
+		opacity: 0.55;
+		pointer-events: none;
+	}
+
 	.reply-row :global(.reply-send) {
 		flex: none;
+	}
+
+	.reply-row :global(.spin-icon) {
+		animation: coms-spin 0.8s linear infinite;
 	}
 
 	.thread-actions {

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/styles.css">
+<script src="./image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap">
+<style>
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-400)}
+.text-muted{color:color-mix(in srgb, var(--color-text) 62%, transparent)}
+@keyframes otter-dive{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-18px) rotate(-3deg)}}
+@keyframes bubble-up{0%{transform:translateY(0) scale(.7);opacity:0}20%{opacity:.7}100%{transform:translateY(-120px) scale(1.1);opacity:0}}
+@keyframes coms-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="max-width:760px;margin:0 auto;padding:44px 32px 110px;animation:coms-in .3s ease">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:38px">
+    <a href="Coms.dc.html" style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:25px;letter-spacing:-.01em;text-decoration:none;color:var(--color-text)"><span style="font-size:1.4em">C</span>oms</a>
+    <span class="tag tag-neutral" style="letter-spacing:.1em;text-transform:uppercase;font-size:9px">Placeholder</span>
+    <span style="flex:1"></span>
+    <a class="btn btn-secondary" style="text-decoration:none" href="Coms.dc.html">Back to Coms</a>
+  </div>
+
+  <h1 style="font-size:42px;margin:0 0 10px;line-height:1.1;letter-spacing:-.02em">Privacy Policy</h1>
+  <p class="text-muted" style="font-size:15.5px;line-height:1.6;margin:0 0 34px;max-width:560px">Also not real. Also not legal advice. The otter has been moved to this page and is now underwater, which it insists is a metaphor for data minimisation.</p>
+
+  <div style="position:relative;height:230px;margin:0 0 40px;border:1px solid var(--color-divider);border-radius:var(--radius-lg);overflow:hidden;background:linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-accent) 13%, transparent))">
+    <span style="position:absolute;left:26%;bottom:20px;width:9px;height:9px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 55%, transparent);animation:bubble-up 5s ease-in infinite"></span>
+    <span style="position:absolute;left:38%;bottom:20px;width:6px;height:6px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 45%, transparent);animation:bubble-up 6.4s ease-in .9s infinite"></span>
+    <span style="position:absolute;left:66%;bottom:20px;width:11px;height:11px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 40%, transparent);animation:bubble-up 7.2s ease-in 1.8s infinite"></span>
+    <span style="position:absolute;left:76%;bottom:20px;width:5px;height:5px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 50%, transparent);animation:bubble-up 5.8s ease-in 2.6s infinite"></span>
+    <div style="position:absolute;inset:0;display:grid;place-items:center">
+      <div style="width:210px;height:150px;animation:otter-dive 6.5s ease-in-out infinite">
+        <image-slot id="otter-privacy" shape="rounded" radius="14" placeholder="otter swimming underwater, seen from the side" style="width:100%;height:100%"></image-slot>
+      </div>
+    </div>
+  </div>
+
+  <sc-for list="{{ clauses }}" as="c" hint-placeholder-count="6">
+    <div style="padding:22px 0;border-bottom:1px solid var(--color-divider)">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:7px">
+        <span class="text-muted" style="flex:none;font-family:var(--font-heading);font-size:12px;letter-spacing:.1em">{{ c.num }}</span>
+        <h2 style="margin:0;font-size:19px;font-weight:500;letter-spacing:-.01em">{{ c.title }}</h2>
+      </div>
+      <p class="text-muted" style="font-size:14.5px;line-height:1.65;margin:0 0 0 33px;max-width:600px">{{ c.body }}</p>
+    </div>
+  </sc-for>
+
+  <div style="margin-top:34px;padding:20px 22px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface)">
+    <p style="font-size:14px;line-height:1.6;margin:0">Short version: your messages are yours, the otter cannot read, and nobody here wants your group chat.</p>
+    <p class="text-muted" style="font-size:12.5px;margin:12px 0 0">Last updated: whenever you last loaded this page. See also the <a href="Terms.dc.html">Terms of Service</a>.</p>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      clauses: [
+        { num: '01', title: 'What we collect',
+          body: 'The messages you asked us to gather, and which of them you have dealt with. That second part is the entire product, and also the part you would most like us to forget. We cannot. It is the point.' },
+        { num: '02', title: 'What we do not collect',
+          body: 'Your location, your contacts list for its own sake, your browsing history, or the seven drafts you typed and deleted before sending "sounds good!". Those are gone. They were never here. Let them go.' },
+        { num: '03', title: 'Who we share it with',
+          body: 'Nobody. There is no advertising business hiding behind this page. If a company ever offers to buy your unread count, it will be a very strange day and you will be told about it.' },
+        { num: '04', title: 'Otter data policy',
+          body: 'The otter cannot read. It has no access to your messages, your calendar, or your notes. It has access to water. This has been independently verified by looking at it.' },
+        { num: '05', title: 'Cookies',
+          body: 'A small amount of information is kept in your browser so the app remembers your theme, your priority senders, and that you have already seen the welcome screen. Clearing it resets the app and nothing else.' },
+        { num: '06', title: 'Your rights',
+          body: 'You may leave at any time and take your data with you. You may also stay and ignore everything in your inbox indefinitely. Both are protected rights under this placeholder.' },
+        { num: '07', title: 'Contact',
+          body: 'There is no contact address yet, because this page is a placeholder written to fill a link that would otherwise go nowhere. When there is a real policy, there will be a real address.' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

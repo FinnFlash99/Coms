@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-91aaaa64-e109-471d-96ce-af374af8888d/styles.css">
+<script src="./image-slot.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap">
+<style>
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}
+a{color:var(--color-accent)}a:hover{color:var(--color-accent-400)}
+.text-muted{color:color-mix(in srgb, var(--color-text) 62%, transparent)}
+@keyframes otter-float{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-14px) rotate(1.2deg)}}
+@keyframes otter-drift{0%{transform:translateX(-3%)}100%{transform:translateX(3%)}}
+@keyframes ripple{0%{transform:scaleX(1);opacity:.5}50%{transform:scaleX(1.15);opacity:.25}100%{transform:scaleX(1);opacity:.5}}
+@keyframes coms-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="max-width:760px;margin:0 auto;padding:44px 32px 110px;animation:coms-in .3s ease">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:38px">
+    <a href="Coms.dc.html" style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:25px;letter-spacing:-.01em;text-decoration:none;color:var(--color-text)"><span style="font-size:1.4em">C</span>oms</a>
+    <span class="tag tag-neutral" style="letter-spacing:.1em;text-transform:uppercase;font-size:9px">Placeholder</span>
+    <span style="flex:1"></span>
+    <a class="btn btn-secondary" style="text-decoration:none" href="Coms.dc.html">Back to Coms</a>
+  </div>
+
+  <h1 style="font-size:42px;margin:0 0 10px;line-height:1.1;letter-spacing:-.02em">Terms of Service</h1>
+  <p class="text-muted" style="font-size:15.5px;line-height:1.6;margin:0 0 34px;max-width:560px">These are not real terms. A lawyer has not seen this page. An otter has. Below is what the otter agreed to on your behalf.</p>
+
+  <div style="position:relative;height:230px;margin:0 0 40px;border:1px solid var(--color-divider);border-radius:var(--radius-lg);overflow:hidden;background:linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 62%)">
+    <div style="position:absolute;left:0;right:0;bottom:0;height:74px;background:color-mix(in srgb, var(--color-accent) 14%, transparent)"></div>
+    <div style="position:absolute;left:8%;right:8%;bottom:52px;height:2px;border-radius:2px;background:color-mix(in srgb, var(--color-accent) 45%, transparent);animation:ripple 4.5s ease-in-out infinite"></div>
+    <div style="position:absolute;left:14%;right:14%;bottom:34px;height:2px;border-radius:2px;background:color-mix(in srgb, var(--color-accent) 28%, transparent);animation:ripple 6s ease-in-out infinite reverse"></div>
+    <div style="position:absolute;inset:0;display:grid;place-items:center;animation:otter-drift 11s ease-in-out infinite alternate">
+      <div style="width:210px;height:150px;animation:otter-float 5.5s ease-in-out infinite">
+        <image-slot id="otter-terms" shape="rounded" radius="14" placeholder="otter floating on its back on an inflatable tube" style="width:100%;height:100%"></image-slot>
+      </div>
+    </div>
+  </div>
+
+  <sc-for list="{{ clauses }}" as="c" hint-placeholder-count="6">
+    <div style="padding:22px 0;border-bottom:1px solid var(--color-divider)">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:7px">
+        <span class="text-muted" style="flex:none;font-family:var(--font-heading);font-size:12px;letter-spacing:.1em">{{ c.num }}</span>
+        <h2 style="margin:0;font-size:19px;font-weight:500;letter-spacing:-.01em">{{ c.title }}</h2>
+      </div>
+      <p class="text-muted" style="font-size:14.5px;line-height:1.65;margin:0 0 0 33px;max-width:600px">{{ c.body }}</p>
+    </div>
+  </sc-for>
+
+  <div style="margin-top:34px;padding:20px 22px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface)">
+    <p style="font-size:14px;line-height:1.6;margin:0">When real terms exist, this page gets replaced and the otter is reassigned to the privacy policy. It already knows.</p>
+    <p class="text-muted" style="font-size:12.5px;margin:12px 0 0">Last updated: whenever you last loaded this page. See also the <a href="Privacy.dc.html">Privacy Policy</a>.</p>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      clauses: [
+        { num: '01', title: 'Acceptance of terms',
+          body: 'By reading this sentence you have accepted these terms. By reading the next one you accept them again, slightly harder. There is no way out except closing the tab, which we also count as acceptance.' },
+        { num: '02', title: 'What Coms does',
+          body: 'Coms gathers your messages from several places and shows you which ones are still waiting on a reply. It does not write the replies for you. That part is famously still your job.' },
+        { num: '03', title: 'Your responsibilities',
+          body: 'Answer your people. Flag the things that actually matter, not everything. Do not mark a thread "responded" when you have only thought about responding — the app cannot tell, but you can, and that is worse.' },
+        { num: '04', title: 'Acceptable use',
+          body: 'Do not use Coms to organise a large-scale scheme of any kind. Do not use it to ignore your mother more efficiently. Small-scale schemes and ordinary procrastination are permitted and, frankly, expected.' },
+        { num: '05', title: 'The otter clause',
+          body: 'The otter floating above is a placeholder and holds no legal authority, no equity, and no opinion on your inbox. It is present because an empty legal page is sad and it was available. It floats. That is the whole role.' },
+        { num: '06', title: 'Limitation of liability',
+          body: 'If you miss a deadline, that is between you and the deadline. Coms will show you it was coming, in red, more than once. What happens after that is a matter of personal character.' },
+        { num: '07', title: 'Changes to these terms',
+          body: 'These terms will be replaced entirely by real ones written by a real lawyer. You will not be notified, because you are reading a placeholder and we both know it.' }
+      ]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

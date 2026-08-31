@@ -13,6 +13,8 @@ import {
 	type FollowUp,
 	type Note,
 	type NoteKind,
+	type ConnectionId,
+	type Connections,
 	DEFAULT_PREFERENCES,
 	PLATFORMS,
 	TYPES,
@@ -137,37 +139,123 @@ export const groupFilter = writable<string>('all');
 // Free-text search across contact name, platform, and message content/subject
 export const searchQuery = writable<string>('');
 
-// Welcome screen dismissed
-function createWelcomedStore() {
+// A boolean flag persisted to localStorage under `key` -- backs the welcome/sign-in/
+// onboarding gates, each of which is just "has the user gotten past this screen once".
+function createLocalFlagStore(key: string) {
 	let initial = false;
 	if (typeof window !== 'undefined') {
-		initial = localStorage.getItem('coms.welcomed') === '1';
+		initial = localStorage.getItem(key) === '1';
 	}
 
 	const { subscribe, set } = writable<boolean>(initial);
 
 	return {
 		subscribe,
-		dismiss: () => {
+		enable: () => {
 			set(true);
 			if (typeof window !== 'undefined') {
-				localStorage.setItem('coms.welcomed', '1');
+				localStorage.setItem(key, '1');
 			}
 		},
 		reset: () => {
 			set(false);
 			if (typeof window !== 'undefined') {
-				localStorage.removeItem('coms.welcomed');
+				localStorage.removeItem(key);
 			}
 		}
 	};
 }
 
-export const welcomed = createWelcomedStore();
+export const welcomed = createLocalFlagStore('coms.welcomed');
+
+// Demo-mode sign-in and onboarding gates -- simulated (no real OAuth), but persisted
+// the same way `welcomed` is so returning visitors don't see them again.
+export const authed = createLocalFlagStore('coms.authed');
+export const onboarded = createLocalFlagStore('coms.onboarded');
 
 // "Welcome back" greeting bar on the home page — shown once per app load,
 // auto-dismissed after 11s. Not persisted: a fresh load shows it again.
 export const greetDismissed = writable(false);
+
+// Demo account connections (Gmail/Slack/WhatsApp). Persisted like preferences so a
+// reload can't spuriously "reconnect" something the user disconnected -- the first
+// time there's nothing stored yet, it seeds from whether onboarding was completed.
+function persistConnections(c: Connections) {
+	if (typeof window !== 'undefined') {
+		try {
+			localStorage.setItem('coms.connections', JSON.stringify(c));
+		} catch {
+			// Ignore localStorage errors
+		}
+	}
+}
+
+function initialConnections(): Connections {
+	if (typeof window !== 'undefined') {
+		try {
+			const stored = localStorage.getItem('coms.connections');
+			if (stored) return JSON.parse(stored);
+		} catch {
+			// Ignore localStorage errors
+		}
+	}
+	const wasOnboarded = typeof window !== 'undefined' && localStorage.getItem('coms.onboarded') === '1';
+	const seed: Connections = { gmail: wasOnboarded, slack: wasOnboarded, whatsapp: false };
+	persistConnections(seed);
+	return seed;
+}
+
+export const connections = writable<Connections>(initialConnections());
+
+export function togglePlatform(id: ConnectionId, name: string) {
+	let nowOn = false;
+	connections.update((c) => {
+		nowOn = !c[id];
+		const next = { ...c, [id]: nowOn };
+		persistConnections(next);
+		return next;
+	});
+	toast.show(`${name} ${nowOn ? 'connected' : 'disconnected'}`);
+}
+
+export function signIn() {
+	authed.enable();
+}
+
+export function finishOnboarding() {
+	onboarded.enable();
+}
+
+export function signOut() {
+	welcomed.reset();
+	authed.reset();
+	onboarded.reset();
+	const cleared: Connections = { gmail: false, slack: false, whatsapp: false };
+	connections.set(cleared);
+	if (typeof window !== 'undefined') {
+		try {
+			localStorage.removeItem('coms.connections');
+		} catch {
+			// Ignore localStorage errors
+		}
+	}
+	toast.show('Logged out');
+}
+
+// Manual "refresh now" sync indicator. There's no real backend to sync with yet, so
+// this always succeeds -- it exists to show the interaction, not to model failure.
+export const syncState = writable<'idle' | 'syncing'>('idle');
+export const lastSync = writable<number>(Date.now());
+const SYNC_DELAY_MS = 1300;
+
+export function runSync() {
+	if (get(syncState) === 'syncing') return;
+	syncState.set('syncing');
+	setTimeout(() => {
+		syncState.set('idle');
+		lastSync.set(Date.now());
+	}, SYNC_DELAY_MS);
+}
 
 // Toast notification store
 function createToastStore() {
@@ -416,29 +504,40 @@ function outboundMessage(conversationId: string, platform: Platform, content: st
 	};
 }
 
+// Per-conversation reply send state -- 'sending' briefly disables the reply box
+// and shows a spinner, matching a real (if instant) network round trip.
+export const sendStates = writable<Record<string, 'idle' | 'sending'>>({});
+const SEND_DELAY_MS = 1100;
+
 // Replying resolves the thread: read, responded, no longer time-sensitive.
-// Returns false if the draft was empty (nothing sent).
+// Returns false if there was nothing to send, or a send is already in flight.
 export function sendReply(conversationId: string): boolean {
 	const text = (get(drafts)[conversationId] || '').trim();
-	if (!text) return false;
+	if (!text || get(sendStates)[conversationId] === 'sending') return false;
 
-	const now = Date.now();
-	conversations.update((convs) =>
-		convs.map((v) =>
-			v.id === conversationId
-				? {
-						...v,
-						isRead: true,
-						isResponded: true,
-						timeSensitive: false,
-						lastMessageAt: now,
-						lastMessagePreview: text,
-						messages: [...v.messages, outboundMessage(v.id, v.platform, text, now)]
-					}
-				: v
-		)
-	);
-	drafts.update((d) => ({ ...d, [conversationId]: '' }));
+	sendStates.update((s) => ({ ...s, [conversationId]: 'sending' }));
+	setTimeout(() => {
+		const now = Date.now();
+		conversations.update((convs) =>
+			convs.map((v) =>
+				v.id === conversationId
+					? {
+							...v,
+							isRead: true,
+							isResponded: true,
+							timeSensitive: false,
+							lastMessageAt: now,
+							lastMessagePreview: text,
+							messages: [...v.messages, outboundMessage(v.id, v.platform, text, now)]
+						}
+					: v
+			)
+		);
+		drafts.update((d) => ({ ...d, [conversationId]: '' }));
+		sendStates.update((s) => ({ ...s, [conversationId]: 'idle' }));
+		toast.show('Sent — thread marked responded');
+	}, SEND_DELAY_MS);
+
 	return true;
 }
 

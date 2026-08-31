@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Settings, Send, NotebookPen, CalendarDays, Search, X } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Settings, Send, NotebookPen, CalendarDays, Search, X, RefreshCw } from 'lucide-svelte';
 	import {
 		welcomed,
 		filteredConversations,
@@ -17,9 +18,13 @@
 		notesSplit,
 		toggleNotesPanel,
 		allTypes,
+		connections,
+		syncState,
+		lastSync,
+		runSync,
 		openComposeDialog
 	} from '$lib/stores';
-	import { PLATFORMS } from '$lib/types';
+	import { PLATFORMS, syncAgo } from '$lib/types';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import TabBar from '$components/TabBar.svelte';
@@ -57,8 +62,11 @@
 		...$allTypes.map((t) => ({ id: `rel:${t}`, label: t }))
 	]);
 
+	const hasConnections = $derived(Object.values($connections).some(Boolean));
+
 	// Summary text
 	const summary = $derived(() => {
+		if (!hasConnections) return "You're one step away — connect a platform to start seeing messages.";
 		const counts = $conversationCounts;
 		const attn = counts.unread + counts.needs;
 		let text = `${counts.all} threads · `;
@@ -72,6 +80,11 @@
 		}
 		return text;
 	});
+
+	// Manual sync indicator — "Refresh now" until clicked, then "Syncing…", then how
+	// long ago it last succeeded.
+	const syncLabel = $derived($syncState === 'syncing' ? 'Syncing…' : syncAgo($lastSync));
+	const syncTitle = $derived($syncState === 'syncing' ? 'Syncing your platforms' : 'Refresh now');
 
 	// Group conversations for "All" tab (Priority / Active / Done sections)
 	const sections = $derived(() => {
@@ -134,6 +147,10 @@
 			<Send size={14} strokeWidth={1.5} />
 			New message
 		</Button>
+		<button class="btn btn-ghost sync-btn" title={syncTitle} disabled={$syncState === 'syncing'} onclick={runSync}>
+			<RefreshCw size={13} strokeWidth={1.6} class={$syncState === 'syncing' ? 'sync-spin' : ''} />
+			{syncLabel}
+		</button>
 		<button class="btn btn-secondary" title="Notes and tasks" onclick={toggleNotesPanel}>
 			<NotebookPen size={14} strokeWidth={1.5} />
 			Notes
@@ -155,72 +172,86 @@
 
 	<p class="summary text-muted">{summary()}</p>
 
-	<span class="search-bar">
-		<Search size={14} strokeWidth={1.5} class="search-icon" />
-		<input
-			class="input search-input"
-			type="search"
-			placeholder="Search messages, people or dates"
-			bind:value={$searchQuery}
-		/>
-		{#if $searchQuery}
-			<button class="btn btn-ghost btn-icon search-clear" title="Clear search" onclick={() => ($searchQuery = '')}>
-				<X size={13} strokeWidth={1.5} />
-			</button>
-		{/if}
-	</span>
+	{#if hasConnections}
+		<span class="search-bar">
+			<Search size={14} strokeWidth={1.5} class="search-icon" />
+			<input
+				class="input search-input"
+				type="search"
+				placeholder="Search messages, people or dates"
+				bind:value={$searchQuery}
+			/>
+			{#if $searchQuery}
+				<button class="btn btn-ghost btn-icon search-clear" title="Clear search" onclick={() => ($searchQuery = '')}>
+					<X size={13} strokeWidth={1.5} />
+				</button>
+			{/if}
+		</span>
 
-	<div class="tabs-row">
-		<TabBar />
-		<div class="filters">
-			<select
-				class="input category-select"
-				title="Category"
-				bind:value={$categoryFilter}
-			>
-				{#each categoryOptions() as cat}
-					<option value={cat.id}>{cat.label}</option>
-				{/each}
-			</select>
-			<select
-				class="input category-select"
-				title="Group"
-				bind:value={$groupFilter}
-			>
-				{#each groupOptions() as g}
-					<option value={g.id}>{g.label}</option>
-				{/each}
-			</select>
+		<div class="tabs-row">
+			<TabBar />
+			<div class="filters">
+				<select
+					class="input category-select"
+					title="Category"
+					bind:value={$categoryFilter}
+				>
+					{#each categoryOptions() as cat}
+						<option value={cat.id}>{cat.label}</option>
+					{/each}
+				</select>
+				<select
+					class="input category-select"
+					title="Group"
+					bind:value={$groupFilter}
+				>
+					{#each groupOptions() as g}
+						<option value={g.id}>{g.label}</option>
+					{/each}
+				</select>
+			</div>
 		</div>
-	</div>
 
-	{#if hasRows}
-		<div class="sections">
-			{#each sections() as section}
-				<div class="section">
-					{#if section.label}
-						<div class="section-header">
-							<span class="section-label">{section.label}</span>
-							<span class="section-count text-muted">{section.count}</span>
+		{#if hasRows}
+			<div class="sections">
+				{#each sections() as section}
+					<div class="section">
+						{#if section.label}
+							<div class="section-header">
+								<span class="section-label">{section.label}</span>
+								<span class="section-count text-muted">{section.count}</span>
+							</div>
+						{/if}
+						<div class="row-card">
+							{#each section.rows as conv, i}
+								{@const contact = $contacts.find((c) => c.id === conv.contactId)}
+								{#if contact}
+									<ConversationRow
+										conversation={conv}
+										{contact}
+										isLast={i === section.rows.length - 1}
+									/>
+								{/if}
+							{/each}
 						</div>
-					{/if}
-					<div class="row-card">
-						{#each section.rows as conv, i}
-							{@const contact = $contacts.find((c) => c.id === conv.contactId)}
-							{#if contact}
-								<ConversationRow
-									conversation={conv}
-									{contact}
-									isLast={i === section.rows.length - 1}
-								/>
-							{/if}
-						{/each}
 					</div>
-				</div>
-			{/each}
-		</div>
+				{/each}
+			</div>
+		{:else}
+			<EmptyState title={emptyTitle} body={emptyBody} />
+		{/if}
 	{:else}
-		<EmptyState title={emptyTitle} body={emptyBody} />
+		<EmptyState
+			title="No platforms connected"
+			body="Connect Gmail, Slack, or WhatsApp to see your messages here."
+			emoji="🧩"
+			badge="Connect a platform"
+		>
+			{#snippet actions()}
+				<Button variant="primary" onclick={() => goto('/settings')}>Connect a platform</Button>
+				<button class="btn btn-ghost learn-more" onclick={() => goto('/settings')}>Learn more about connections</button>
+			{/snippet}
+		</EmptyState>
 	{/if}
 </div>
 
@@ -319,6 +350,32 @@
 		border-radius: 999px;
 		background: var(--color-neutral-800);
 		color: var(--color-neutral-100);
+	}
+
+	.sync-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+		font-size: 11.5px;
+		padding: 4px 2px;
+		opacity: 0.72;
+	}
+
+	.sync-btn:hover:not(:disabled) {
+		opacity: 1;
+	}
+
+	.sync-btn:disabled {
+		cursor: default;
+	}
+
+	:global(.sync-spin) {
+		animation: coms-spin 0.9s linear infinite;
+	}
+
+	.learn-more {
+		font-size: 12.5px;
 	}
 
 	.summary {

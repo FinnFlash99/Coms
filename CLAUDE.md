@@ -41,6 +41,8 @@ Finn will upload a new Claude Design export ZIP repeatedly, over and over, indef
 
 Files to extract this way and sync into `design/`: `Coms.dc.html`, `support.js`, `image-slot.js`, `.thumbnail` (if present), and the `_ds/<system-name>-<uuid>/` folder(s) actually `<link>`/`<script>`-referenced from the chosen `Coms.dc.html` (currently just `nocturne-*`; ignore any other `_ds/*` folder present in the zip as an inactive leftover). Also sync the product spec markdown (shallowest copy) into `design/uploads/` if its content actually changed.
 
+**Any other top-level `*.dc.html` file** the design links to (e.g. `Terms.dc.html`, `Privacy.dc.html`, linked from the sign-in screen) is a real design page, not a stale leftover — sync it the same way (shallowest copy) and give it a real route under `src/routes/` porting its actual copy, the same as every other page. `design/_ds/nocturne-*/readme.md`-style "Placeholder" tags on the page itself just mean the *content* is intentionally not-real (e.g. joke legal text) — it still needs a real, reachable route; it does not mean skip syncing it. Route(s) added so far: `/terms`, `/privacy` (component: `src/lib/components/LegalPage.svelte`). Routes linked from the sign-in screen must be exempted from the auth gate in `+layout.svelte` (see `PUBLIC_ROUTES`) since they need to be readable before signing in.
+
 **Never sync these, even though they appear in the zip:** `github.md` (stale bookkeeping from Claude Design's own session, not authoritative for this repo — `CLAUDE.md`'s own "Claude Design Integration" section is the source of truth here), `.image-slots.state.json` (Claude Design's internal tool state), and the entire `design_handoff_coms/` or nested `uploads/*/` wrapper directories themselves (only cherry-pick the individual files named above out of them, using the depth rule).
 
 ### Step 2: every time, without being asked
@@ -125,6 +127,8 @@ Finn-Comms/
 │       ├── +page.svelte      # Home (inbox)
 │       ├── conversation/     # Conversation detail
 │       ├── settings/         # Settings page
+│       ├── terms/            # Terms of Service (public, no auth gate)
+│       ├── privacy/          # Privacy Policy (public, no auth gate)
 │       └── api/              # API endpoints
 ├── static/                   # Static assets
 ├── .github/workflows/        # CI/CD pipelines
@@ -188,3 +192,7 @@ See: [`.claude/rules/documentation.md`](.claude/rules/documentation.md) for deta
 - Demo mode with simulated data for development
 - Desktop-first responsive design
 - Theme support (light/dark/system)
+
+## Demo Auth & Onboarding Flow
+
+There's no real OAuth yet. `+layout.svelte` gates every route (except `/terms` and `/privacy`) behind two simulated, localStorage-persisted steps, in order: sign-in (`authed`, `coms.authed`) → connect-platforms onboarding (`onboarded`, `coms.onboarded`) → the app itself, with the existing first-run welcome dialog (`welcomed`, `coms.welcomed`) still gating the home page after that. "Continue with Google" and "Connect"/"Disconnect" just flip local state (`src/lib/stores/index.ts`: `signIn`, `finishOnboarding`, `togglePlatform`, `signOut`) — no real account is ever contacted. If no platform is connected, the home page shows a distinct "No platforms connected" empty state instead of the inbox. `signOut()` (Settings → Log out) resets all three gates and every connection, returning to the sign-in screen.

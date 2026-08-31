@@ -1,7 +1,17 @@
 <script lang="ts">
 	import { ChevronLeft, LogOut, X } from 'lucide-svelte';
-	import { preferences, welcomed, toast, contacts, togglePriority, allTypes, addGroup, removeGroup } from '$lib/stores';
-	import { TABS, PLATFORMS, type Theme, type DefaultTabId } from '$lib/types';
+	import {
+		preferences,
+		contacts,
+		togglePriority,
+		allTypes,
+		addGroup,
+		removeGroup,
+		connections,
+		togglePlatform,
+		signOut
+	} from '$lib/stores';
+	import { TABS, PLATFORMS, CONNECTIONS, type Theme, type DefaultTabId } from '$lib/types';
 	import Avatar from '$components/Avatar.svelte';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
@@ -71,8 +81,7 @@
 	});
 
 	function handleLogout() {
-		welcomed.reset();
-		toast.show('Logged out');
+		signOut();
 	}
 </script>
 
@@ -103,6 +112,44 @@
 				{/each}
 			</select>
 			<p class="hint text-muted">{defaultTabHint}</p>
+		</div>
+
+		<div class="field">
+			<span class="field-label">Connected platforms</span>
+			<div class="platform-list">
+				{#each CONNECTIONS as p (p.id)}
+					{@const on = $connections[p.id]}
+					<div class="platform-row">
+						<span class="platform-icon" style:color={on ? 'var(--color-accent)' : 'color-mix(in srgb, var(--color-text) 45%, transparent)'}>
+							{#if p.icon === 'mail'}
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+									<rect x="3" y="5" width="18" height="14" rx="1.5"></rect>
+									<polyline points="3 8 12 13.5 21 8"></polyline>
+								</svg>
+							{:else if p.icon === 'hash'}
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+									<line x1="9.5" y1="4" x2="7.5" y2="20"></line>
+									<line x1="16.5" y1="4" x2="14.5" y2="20"></line>
+									<line x1="4" y1="9.5" x2="20" y2="9.5"></line>
+									<line x1="4" y1="14.5" x2="20" y2="14.5"></line>
+								</svg>
+							{:else}
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+									<path d="M20.5 11.5a8.5 8.5 0 0 1-12.2 7.7L3.5 20.5l1.3-4.8A8.5 8.5 0 1 1 20.5 11.5z"></path>
+								</svg>
+							{/if}
+						</span>
+						<span class="platform-name">{p.name}</span>
+						<span class="text-muted platform-status">{on ? p.handle : 'Not connected'}</span>
+						{#if on}
+							<button class="btn btn-ghost platform-btn" onclick={() => togglePlatform(p.id, p.name)}>Disconnect</button>
+						{:else}
+							<button class="btn btn-secondary platform-btn" onclick={() => togglePlatform(p.id, p.name)}>Connect</button>
+						{/if}
+					</div>
+				{/each}
+			</div>
+			<p class="hint text-muted">Connect platforms to sync your messages. You can disconnect anytime.</p>
 		</div>
 
 		<div class="field">
@@ -196,6 +243,7 @@
 
 		<div class="field">
 			<span class="field-label">Account</span>
+			<div class="text-muted signed-in-as">Signed in as</div>
 			<div class="account-row">
 				<Avatar name="Maya" size="sm" />
 				<div class="account-info">
@@ -283,6 +331,59 @@
 		padding: 0;
 		width: 14px;
 		height: 14px;
+	}
+
+	.platform-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		background: var(--color-divider);
+		border: 1px solid var(--color-divider);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+	}
+
+	.platform-row {
+		display: flex;
+		align-items: center;
+		gap: 11px;
+		padding: 12px 14px;
+		background: var(--color-surface);
+	}
+
+	.platform-icon {
+		flex: none;
+		display: grid;
+		place-items: center;
+	}
+
+	.platform-name {
+		flex: none;
+		font-family: var(--font-heading);
+		font-weight: 500;
+		font-size: 14px;
+	}
+
+	.platform-status {
+		flex: 1;
+		min-width: 0;
+		font-size: 12.5px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.platform-btn {
+		flex: none;
+		font-size: 12px;
+		padding: 4px 10px;
+	}
+
+	.signed-in-as {
+		font-size: 11px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		margin-bottom: 9px;
 	}
 
 	.checkbox-row {

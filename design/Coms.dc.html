@@ -35,12 +35,77 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
 .tag-alert{background:var(--color-alert-tint);color:var(--color-alert-text);border:1px solid color-mix(in srgb,var(--color-alert) 45%,transparent)}
 @keyframes coms-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 @keyframes coms-pop{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@keyframes coms-spin{to{transform:rotate(360deg)}}
+@keyframes coms-slide-down{from{transform:translateY(-100%)}to{transform:none}}
 @keyframes coms-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 </style>
 </helmet>
 
+<sc-if value="{{ isOffline }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;gap:10px;height:40px;padding:0 18px;background:var(--color-alert-tint);border-bottom:1px solid color-mix(in srgb, var(--color-alert) 40%, transparent);animation:coms-slide-down .28s ease">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-alert-text)" stroke-width="1.6" style="flex:none"><path d="M4.5 9.5a12 12 0 0 1 6-3"></path><path d="M8 13a7.5 7.5 0 0 1 2.6-1.6"></path><circle cx="12" cy="18" r="1" fill="var(--color-alert-text)" stroke="none"></circle><path d="M15.5 11.6A7.5 7.5 0 0 1 16 13"></path><path d="M17 7.3a12 12 0 0 1 2.5 2.2"></path><line x1="4" y1="3.5" x2="20.5" y2="20.5"></line></svg>
+    <span style="flex:1;min-width:0;font-size:13px;color:var(--color-alert-text)">You're offline. Some features may not work.</span>
+    <button class="btn btn-ghost" style="flex:none;font-size:12px;padding:3px 10px;color:var(--color-alert-text)" onClick="{{ retryConnection }}">Retry</button>
+  </div>
+  <div style="height:40px"></div>
+</sc-if>
+
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;left:0;right:0;bottom:0;{{ overlayInset }};z-index:65;display:grid;place-items:center;background:var(--color-bg);padding:24px">
+    <div style="width:min(420px,100%);padding:44px 44px 32px;text-align:center;animation:coms-pop .35s ease;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-weight:400;font-size:30px;letter-spacing:-.01em;margin-bottom:26px"><span style="font-size:1.4em">C</span>oms</div>
+      <h1 style="font-size:27px;margin:0 0 8px;line-height:1.15">Sign in to Coms</h1>
+      <p class="text-muted" style="font-size:14.5px;line-height:1.55;margin:0 auto 28px;max-width:300px">Connect your accounts to see all your messages in one place.</p>
+      <button class="btn btn-primary btn-block" style="justify-content:center;gap:10px" onClick="{{ signIn }}">
+        <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.2-3.8 6.6-9.5 6.6-16.1z"></path><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.6-3.9-12.3-9.1H4.4v5.7C8 41.1 15.4 46 24 46z"></path><path fill="#FBBC05" d="M11.7 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.4A22 22 0 0 0 2 24c0 3.6.9 6.9 2.4 9.8l7.3-5.7z"></path><path fill="#EA4335" d="M24 10.8c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.4 2 8 6.9 4.4 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.3-9.1z"></path></svg>
+        Continue with Google
+      </button>
+      <p class="text-muted" style="font-size:12.5px;margin:14px 0 0">We'll ask you to connect your messaging platforms next.</p>
+      <p class="text-muted" style="font-size:11.5px;line-height:1.6;margin:30px 0 0;padding-top:20px;border-top:1px solid var(--color-divider)">By signing in, you agree to our <a href="Terms.dc.html">Terms</a> and <a href="Privacy.dc.html">Privacy Policy</a></p>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showOnboarding }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:0;right:0;bottom:0;{{ overlayInset }};z-index:62;overflow:auto;background:var(--color-bg)">
+    <div style="max-width:600px;margin:0 auto;padding:76px 32px 64px;animation:coms-in .3s ease">
+      <div class="card-kicker" style="margin-bottom:10px">Almost there</div>
+      <h1 style="font-size:38px;margin:0 0 8px;line-height:1.12;letter-spacing:-.02em">Connect your platforms</h1>
+      <p class="text-muted" style="font-size:15.5px;line-height:1.6;margin:0 0 34px;max-width:440px">Choose which accounts to sync. You can always change this in Settings.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ onboardRows }}" as="p" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;padding:17px 19px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface)">
+            <span style="{{ p.iconStyle }}">
+              <sc-if value="{{ p.isMail }}" hint-placeholder-val="{{ true }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><polyline points="3 8 12 13.5 21 8"></polyline></svg></sc-if>
+              <sc-if value="{{ p.isHash }}" hint-placeholder-val="{{ false }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9.5" y1="4" x2="7.5" y2="20"></line><line x1="16.5" y1="4" x2="14.5" y2="20"></line><line x1="4" y1="9.5" x2="20" y2="9.5"></line><line x1="4" y1="14.5" x2="20" y2="14.5"></line></svg></sc-if>
+              <sc-if value="{{ p.isChat }}" hint-placeholder-val="{{ false }}"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.2 7.7L3.5 20.5l1.3-4.8A8.5 8.5 0 1 1 20.5 11.5z"></path></svg></sc-if>
+            </span>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:var(--font-heading);font-weight:500;font-size:15.5px;letter-spacing:-.01em">{{ p.name }}</div>
+              <div class="text-muted" style="font-size:13px;margin-top:3px">{{ p.blurb }}</div>
+            </div>
+            <sc-if value="{{ p.connected }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex;align-items:center;gap:6px;flex:none;font-size:13px;color:var(--color-accent)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5 12.5 10 17.5 19 7"></polyline></svg>Connected</span>
+            </sc-if>
+            <sc-if value="{{ p.disconnected }}" hint-placeholder-val="{{ true }}">
+              <button class="btn btn-secondary" style="flex:none" onClick="{{ p.connect }}">Connect</button>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:32px">
+        <button class="btn btn-ghost" onClick="{{ skipOnboarding }}">Skip for now</button>
+        <span style="flex:1"></span>
+        <button class="btn btn-primary" disabled="{{ noneConnected }}" onClick="{{ finishOnboarding }}">Continue to Coms</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ showWelcome }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--color-bg);padding:24px">
+  <div style="position:fixed;left:0;right:0;bottom:0;{{ overlayInset }};z-index:60;display:grid;place-items:center;background:var(--color-bg);padding:24px">
     <div style="max-width:540px;padding:46px 50px;animation:coms-pop .35s ease;background:var(--color-surface);border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
             <div class="card-kicker" style="margin-bottom:10px">Unified inbox</div>
       <h1 style="font-size:44px;margin:0 0 6px;line-height:1.1">Hi {{ userName }}, welcome to Coms</h1>
@@ -80,11 +145,21 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
       
       <span class="tag tag-neutral" style="letter-spacing:.08em;text-transform:uppercase;font-size:9px"><strong data-start="507" data-end="523">Full Connect</strong></span><span style="flex:1"></span>
       <button class="btn btn-primary" onClick="{{ openCompose }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>New message</button>
+      <button style="{{ syncStyle }}" style-hover="opacity:1" title="{{ syncTitle }}" disabled="{{ syncing }}" onClick="{{ runSync }}">
+        <sc-if value="{{ syncFailed }}" hint-placeholder-val="{{ false }}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><path d="M12 4.5 21 19.5H3z"></path><line x1="12" y1="10" x2="12" y2="14"></line><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"></circle></svg>
+        </sc-if>
+        <sc-if value="{{ syncOk }}" hint-placeholder-val="{{ true }}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="{{ syncIconStyle }}"><path d="M20 11a8 8 0 1 0-.7 4.4"></path><polyline points="20 5 20 11 14 11"></polyline></svg>
+        </sc-if>
+        {{ syncLabel }}
+      </button>
       <button class="btn btn-secondary" title="Notes and tasks" onClick="{{ toggleNotes }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 3.5h13v17h-13z"></path><line x1="8.5" y1="8" x2="15.5" y2="8"></line><line x1="8.5" y1="12" x2="15.5" y2="12"></line><line x1="8.5" y1="16" x2="13" y2="16"></line></svg>Notes<sc-if value="{{ openTaskCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-neutral-800);color:var(--color-neutral-100)">{{ openTaskCount }}</span></sc-if></button>
       <button class="btn btn-secondary" title="Calendar" onClick="{{ openCalendar }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="5" width="17" height="15" rx="1.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3" x2="8" y2="6"></line><line x1="16" y1="3" x2="16" y2="6"></line></svg>Calendar<sc-if value="{{ dueSoonCount }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;padding:1px 7px;min-width:18px;text-align:center;border-radius:999px;background:var(--color-alert);color:#fff">{{ dueSoonCount }}</span></sc-if></button>
       <button class="btn btn-secondary btn-icon" title="Settings" onClick="{{ openSettings }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="15" cy="7" r="2.2" fill="var(--color-bg)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="9" cy="17" r="2.2" fill="var(--color-bg)"></circle></svg></button>
     </div>
     <p class="text-muted" style="font-size:13px;margin:8px 0 18px">{{ summary }}</p>
+    <sc-if value="{{ hasSources }}" hint-placeholder-val="{{ true }}">
     <span style="position:relative;display:flex;align-items:center;width:312px;margin:0 0 12px auto">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="position:absolute;left:11px;opacity:.55;pointer-events:none"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.5" y1="15.5" x2="20" y2="20"></line></svg>
       <input class="input" type="search" placeholder="Search messages, people or dates" style="width:100%;min-height:36px;font-size:13.5px;padding:5px 30px 5px 32px" value="{{ query }}" onChange="{{ setQuery }}">
@@ -105,6 +180,27 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         </select>
       </div>
     </div>
+    </sc-if>
+    <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:30px">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">
+          <span style="font-family:var(--font-heading);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:color-mix(in srgb, var(--color-text) 60%, transparent)">Loading state</span>
+        </div>
+        <div style="background:var(--color-surface);border:1px solid var(--color-divider);border-radius:24px;border-bottom-left-radius:8px;overflow:hidden">
+          <sc-for list="{{ skeletonRows }}" as="sk" hint-placeholder-count="5">
+            <div style="{{ sk.rowStyle }}">
+              <div style="width:42px;height:42px;flex:none;border-radius:50%;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out infinite"></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px">
+                <div style="{{ sk.nameBar }}"></div>
+                <div style="{{ sk.previewBar }}"></div>
+                <div style="{{ sk.tagBar }}"></div>
+              </div>
+              <div style="{{ sk.timeBar }}"></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
     <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:38px;margin-top:30px">
         <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="1">
@@ -150,6 +246,17 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         </div>
         </div>
         </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ showNoPlatforms }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;align-items:center;padding:52px 0 20px;text-align:center;animation:coms-pop .35s ease">
+        <div style="width:320px;height:220px;margin-bottom:22px;border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden;background:var(--color-surface)">
+          <image-slot id="otter-connect" shape="rect" placeholder="two puzzle pieces linking together" style="width:100%;height:100%"></image-slot>
+        </div>
+        <h3 style="margin:0 0 4px">No platforms connected</h3>
+        <p class="text-muted" style="font-size:14px;margin:0 0 20px;max-width:340px">Connect Gmail, Slack, or WhatsApp to see your messages here.</p>
+        <button class="btn btn-primary" onClick="{{ openConnections }}">Connect a platform</button>
+        <button class="btn btn-ghost" style="font-size:12.5px;margin-top:10px" onClick="{{ openConnections }}">Learn more about connections</button>
       </div>
     </sc-if>
     <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
@@ -246,9 +353,23 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
               </div>
             </sc-for>
           </div>
-          <div style="display:flex;align-items:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--color-divider)">
-            <textarea class="input" style="flex:1;min-height:44px;max-height:120px;font-size:14px;padding:11px 13px;resize:vertical" placeholder="{{ th.replyPlaceholder }}" value="{{ th.draft }}" onChange="{{ th.setDraft }}" onKeyDown="{{ th.replyKey }}"></textarea>
-            <button class="btn btn-primary" style="flex:none" disabled="{{ th.replyEmpty }}" onClick="{{ th.send }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>Send</button>
+          <div style="padding:16px 24px;border-top:1px solid var(--color-divider)">
+            <div style="display:flex;align-items:flex-end;gap:10px">
+              <textarea class="input" style="{{ th.replyBoxStyle }}" placeholder="{{ th.replyPlaceholder }}" disabled="{{ th.sending }}" value="{{ th.draft }}" onChange="{{ th.setDraft }}" onKeyDown="{{ th.replyKey }}"></textarea>
+              <sc-if value="{{ th.sending }}" hint-placeholder-val="{{ false }}">
+                <button class="btn btn-primary" style="flex:none" disabled="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:coms-spin .8s linear infinite"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5" stroke-linecap="round"></path></svg>Sending…</button>
+              </sc-if>
+              <sc-if value="{{ th.idle }}" hint-placeholder-val="{{ true }}">
+                <button class="btn btn-primary" style="flex:none" disabled="{{ th.replyEmpty }}" onClick="{{ th.send }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12.5 20 5l-7 15-2.2-6.2z"></path><path d="M10.8 13.8 20 5"></path></svg>Send</button>
+              </sc-if>
+            </div>
+            <sc-if value="{{ th.failed }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 13px;border:1px solid color-mix(in srgb, var(--color-alert) 45%, transparent);border-radius:var(--radius-md);background:var(--color-alert-tint)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-alert-text)" stroke-width="1.6" style="flex:none"><path d="M12 4.5 21 19.5H3z"></path><line x1="12" y1="10" x2="12" y2="14"></line><circle cx="12" cy="16.8" r=".9" fill="var(--color-alert-text)" stroke="none"></circle></svg>
+                <span style="flex:1;min-width:0;font-size:13px;color:var(--color-alert-text)">Failed to send. Check your connection.</span>
+                <button class="btn btn-secondary" style="flex:none;font-size:12px;padding:4px 11px;border-color:color-mix(in srgb, var(--color-alert) 55%, transparent);color:var(--color-alert-text)" onClick="{{ th.retry }}">Retry</button>
+              </div>
+            </sc-if>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 24px;border-top:1px solid var(--color-divider)">
             <sc-if value="{{ th.canRead }}" hint-placeholder-val="{{ false }}"><button class="btn btn-secondary" style="font-size:12px;padding:5px 11px" onClick="{{ th.markRead }}">Mark read</button></sc-if>
@@ -525,6 +646,43 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
         <p class="text-muted" style="font-size:12px;margin:6px 0 0">{{ defaultTabHint }}</p>
       </div>
       <div class="field">
+        <label>Connected platforms</label>
+        <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:1px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ platformSkeleton }}" as="sk" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 14px;background:var(--color-surface)">
+                <div style="{{ sk.icon }}"></div>
+                <div style="{{ sk.name }}"></div>
+                <div style="{{ sk.meta }}"></div>
+                <div style="{{ sk.button }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notLoading }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:1px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+          <sc-for list="{{ platformRows }}" as="p" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:11px;padding:12px 14px;background:var(--color-surface)" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)">
+              <span style="{{ p.iconStyle }}">
+                <sc-if value="{{ p.isMail }}" hint-placeholder-val="{{ true }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><polyline points="3 8 12 13.5 21 8"></polyline></svg></sc-if>
+                <sc-if value="{{ p.isHash }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="9.5" y1="4" x2="7.5" y2="20"></line><line x1="16.5" y1="4" x2="14.5" y2="20"></line><line x1="4" y1="9.5" x2="20" y2="9.5"></line><line x1="4" y1="14.5" x2="20" y2="14.5"></line></svg></sc-if>
+                <sc-if value="{{ p.isChat }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.2 7.7L3.5 20.5l1.3-4.8A8.5 8.5 0 1 1 20.5 11.5z"></path></svg></sc-if>
+              </span>
+              <span style="flex:none;font-family:var(--font-heading);font-weight:500;font-size:14px">{{ p.name }}</span>
+              <span class="text-muted" style="flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.status }}</span>
+              <sc-if value="{{ p.connected }}" hint-placeholder-val="{{ true }}">
+                <button class="btn btn-ghost" style="flex:none;font-size:12px;padding:4px 8px" onClick="{{ p.toggle }}">Disconnect</button>
+              </sc-if>
+              <sc-if value="{{ p.disconnected }}" hint-placeholder-val="{{ false }}">
+                <button class="btn btn-secondary" style="flex:none;font-size:12px;padding:4px 10px" onClick="{{ p.toggle }}">Connect</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <p class="text-muted" style="font-size:12px;margin:10px 0 0">Connect platforms to sync your messages. You can disconnect anytime.</p>
+      </div>
+      <div class="field">
         <label>Groups</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <input class="input" style="flex:1;min-width:170px" placeholder="e.g. Parents, School, Landlord" value="{{ groupDraft }}" onChange="{{ setGroupDraft }}" onKeyDown="{{ groupDraftKey }}">
@@ -554,6 +712,18 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
       <div class="field">
         <label>Priority senders</label>
         <label class="radio" style="font-size:14px"><input type="checkbox" style="position:static;opacity:1;width:15px;height:15px;accent-color:var(--color-accent)" checked="{{ priorityFirst }}" onChange="{{ togglePriorityFirst }}">Sort priority senders to the top</label>
+        <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:1px;margin-top:12px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
+            <sc-for list="{{ prioritySkeleton }}" as="sk" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--color-surface)">
+                <div style="{{ sk.box }}"></div>
+                <div style="{{ sk.name }}"></div>
+                <div style="{{ sk.meta }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ notLoading }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:1px;margin-top:12px;background:var(--color-divider);border:1px solid var(--color-divider);border-radius:var(--radius-md);overflow:hidden">
           <sc-for list="{{ priorityRows }}" as="p" hint-placeholder-count="6">
             <label style="display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--color-surface);cursor:pointer" style-hover="background:color-mix(in srgb, var(--color-text) 4%, transparent)">
@@ -563,15 +733,17 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
             </label>
           </sc-for>
         </div>
+        </sc-if>
         <p class="text-muted" style="font-size:12px;margin:10px 0 0">{{ priorityHint }}</p>
       </div>
       <div class="field">
         <label>Account</label>
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-          <div style="width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:15px;color:var(--color-accent)">M</div>
+        <div class="text-muted" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px">Signed in as</div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 15px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface)">
+          <div style="width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid var(--color-divider);border-radius:50%;font-family:var(--font-heading);font-weight:500;font-size:15px;color:var(--color-accent)">{{ userInitial }}</div>
           <div style="flex:1;min-width:160px">
-            <div style="font-size:14px;font-weight:500">Maya</div>
-            <div class="text-muted" style="font-size:12px">maya@freelance.co</div>
+            <div style="font-size:14px;font-weight:500">{{ userName }}</div>
+            <div class="text-muted" style="font-size:12px">{{ userEmail }}</div>
           </div>
           <button class="btn btn-secondary" onClick="{{ logOut }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H4V3h5"></path><path d="M14 16l4-4-4-4"></path><line x1="18" y1="12" x2="8" y2="12"></line></svg>Log out</button>
         </div>
@@ -621,9 +793,14 @@ html[data-theme="light"]{--color-alert:#d8401c;--color-alert-tint:color-mix(in s
 </sc-if>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{
-  &quot;theme&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;], &quot;default&quot;: &quot;system&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Appearance&quot;},
+  &quot;theme&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;system&quot;, &quot;light&quot;, &quot;dark&quot;], &quot;default&quot;: &quot;system&quot;, &quot;tsType&quot;: &quot;'system' | 'light' | 'dark'&quot;},
   &quot;showDemoBadge&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;},
-  &quot;forceEmptyState&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}
+  &quot;forceEmptyState&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;},
+  &quot;showLoadingState&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;},
+  &quot;replyState&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;live&quot;, &quot;sending&quot;, &quot;failed&quot;], &quot;default&quot;: &quot;live&quot;, &quot;tsType&quot;: &quot;'live' | 'sending' | 'failed'&quot;, &quot;section&quot;: &quot;Demo&quot;},
+  &quot;simulateSendFailure&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;},
+  &quot;simulateSyncFailure&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;},
+  &quot;simulateOffline&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Demo&quot;}
 }">
 class Component extends DCLogic {
   state = this.initState();
@@ -633,18 +810,24 @@ class Component extends DCLogic {
     let prefs = { theme: 'system', defaultTab: 'all', grouping: 'person', notify: true,
       notifyDeadlines: true, notifyFlagged: true, notifyUnread: false,
       priorityFirst: true, priority: ['c1'], customTypes: [] };
-    let welcomed = false;
+    let welcomed = false, authed = false, onboarded = false;
     try {
       const p = JSON.parse(localStorage.getItem('coms.prefs') || 'null');
       if (p) prefs = Object.assign(prefs, p);
       welcomed = localStorage.getItem('coms.welcomed') === '1';
+      authed = localStorage.getItem('coms.authed') === '1';
+      onboarded = localStorage.getItem('coms.onboarded') === '1';
     } catch (e) {}
     return {
       screen: 'home',
       tab: prefs.defaultTab.startsWith('pf:') ? 'all' : prefs.defaultTab,
       cat: prefs.defaultTab.startsWith('pf:') ? prefs.defaultTab : 'all',
-      group: 'all', query: '', groupDraft: '', prefs, welcomed,
+      group: 'all', query: '', groupDraft: '', prefs, welcomed, authed,
       greetDismissed: false,
+      syncState: 'idle', lastSync: Date.now(), offline: false, offlineDismissed: false,
+      onboarded,
+      // Returning users keep their demo connections; first-run starts empty so onboarding has work to do.
+      connections: onboarded ? { gmail: true, slack: true, whatsapp: false } : { gmail: false, slack: false, whatsapp: false },
       notesOpen: false, notesSplit: true, noteDraft: '', noteMode: 'task',
       notes: [
         { id: 'n1', text: 'Send Sarah the revised homepage mocks', kind: 'task', done: false, ts: Date.now() - 36e5 },
@@ -658,7 +841,7 @@ class Component extends DCLogic {
       ],
       events: Component.seedEvents(now, H, D),
       compose: { contactId: 'c1', platform: 'slack', content: '' },
-      drafts: {},
+      drafts: {}, sendStates: {},
       contacts: Component.CONTACTS.map(c => Object.assign({}, c)),
       convs: [
         { id: 'v1', contactId: 'c1', platform: 'slack', isRead: false, isResponded: false, importance: 'high', timeSensitive: true, dueTs: now + D, messages: [
@@ -723,6 +906,15 @@ class Component extends DCLogic {
       group: st.group === 'rel:' + name ? 'all' : st.group
     }));
     this.toast('Group “' + name + '” removed');
+  }
+  finishOnboarding() {
+    try { localStorage.setItem('coms.onboarded', '1'); } catch (e) {}
+    this.setState({ onboarded: true });
+  }
+  togglePlatform(id, name) {
+    const on = !this.state.connections[id];
+    this.setState(s => ({ connections: Object.assign({}, s.connections, { [id]: on }) }));
+    this.toast(name + (on ? ' connected' : ' disconnected'));
   }
   addNote() {
     const text = this.state.noteDraft.trim();
@@ -795,6 +987,7 @@ class Component extends DCLogic {
   }
   static TABS = [['all', 'All'], ['unread', 'Unread'], ['needs', 'Needs Response'], ['done', 'Done'], ['urgent', 'Urgent']];
 
+  _sendTimers = {};
   componentDidMount() {
     this._greetTimer = setTimeout(() => this.setState({ greetDismissed: true }), 11000);
     this.applyTheme();
@@ -803,10 +996,18 @@ class Component extends DCLogic {
     this._mq.addEventListener('change', this._mqFn);
     this._tick = setInterval(() => this.forceUpdate(), 60000);
   }
-  componentDidUpdate() { this.applyTheme(); }
+  componentDidUpdate(prev) {
+    this.applyTheme();
+    // Flipping the tweak off and on again re-arms the banner.
+    if (prev.simulateOffline && !this.props.simulateOffline && this.state.offlineDismissed) {
+      this.setState({ offlineDismissed: false });
+    }
+  }
   componentWillUnmount() {
     clearInterval(this._tick);
     clearTimeout(this._greetTimer);
+    Object.values(this._sendTimers).forEach(clearTimeout);
+    clearTimeout(this._syncTimer);
     if (this._mq) this._mq.removeEventListener('change', this._mqFn);
     clearTimeout(this._toastT);
   }
@@ -947,6 +1148,9 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state, C = Component;
+    // Retry clears the simulated offline state too, so the banner really dismisses.
+    const offline = ((this.props.simulateOffline ?? false) || s.offline) && !s.offlineDismissed;
+    const noPlatforms = !Object.values(s.connections || {}).some(Boolean);
     const contactById = id => s.contacts.find(c => c.id === id);
     const latest = v => v.messages[v.messages.length - 1];
     const urgentOf = v => v.timeSensitive && !(v.isRead && v.isResponded);
@@ -1110,6 +1314,9 @@ class Component extends DCLogic {
       detailSub = [...new Set(cs.map(v => C.PLATFORMS[v.platform].label))].join(', ');
       threads = cs.slice().sort((a, b) => latest(b).ts - latest(a).ts).map(v => {
         const st = this.convStatus(v);
+        // Tweaks can pin a frame state so all three composer states are reviewable.
+        const forced = this.props.replyState;
+        const sendState = (forced && forced !== 'live') ? forced : (s.sendStates || {})[v.id] || 'idle';
         return {
           platform: C.PLATFORMS[v.platform].label,
           chipStyle: pchip(v.platform),
@@ -1134,6 +1341,10 @@ class Component extends DCLogic {
             if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); this.sendReply(v.id); }
           },
           send: () => this.sendReply(v.id),
+          retry: () => this.sendReply(v.id, true),
+          sending: sendState === 'sending', failed: sendState === 'failed', idle: sendState !== 'sending',
+          replyBoxStyle: 'flex:1;min-height:44px;max-height:120px;font-size:14px;padding:11px 13px;resize:vertical' +
+            (sendState === 'sending' ? ';opacity:.55;pointer-events:none' : ''),
           toggleTs: () => this.patchConv(v.id, { timeSensitive: !v.timeSensitive }),
           openIn: () => this.toast('The full product would open this thread in ' + C.PLATFORMS[v.platform].label + '.'),
           msgs: v.messages.map(m => {
@@ -1295,7 +1506,29 @@ class Component extends DCLogic {
     const cmpExisting = s.convs.find(v => v.contactId === s.compose.contactId && v.platform === s.compose.platform);
 
     return {
-      showWelcome: !s.welcomed,
+      // The fixed full-page overlays sit below the banner rather than under it.
+      overlayInset: offline ? 'top:40px' : 'top:0',
+      showLogin: !s.authed,
+      showOnboarding: s.authed && !s.onboarded,
+      showWelcome: s.authed && s.onboarded && !s.welcomed,
+      onboardRows: [
+        { id: 'gmail', name: 'Gmail', icon: 'mail', blurb: 'Sync your email conversations' },
+        { id: 'slack', name: 'Slack', icon: 'hash', blurb: 'See messages from your workspaces' },
+        { id: 'whatsapp', name: 'WhatsApp', icon: 'chat', blurb: 'Connect via WhatsApp Business' }
+      ].map(p => {
+        const on = (s.connections || {})[p.id];
+        return {
+          name: p.name, blurb: p.blurb, connected: on, disconnected: !on,
+          isMail: p.icon === 'mail', isHash: p.icon === 'hash', isChat: p.icon === 'chat',
+          iconStyle: 'flex:none;display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--color-divider);border-radius:var(--radius-sm);color:' +
+            (on ? 'var(--color-accent)' : 'color-mix(in srgb, var(--color-text) 50%, transparent)'),
+          connect: () => this.togglePlatform(p.id, p.name)
+        };
+      }),
+      noneConnected: !Object.values(s.connections || {}).some(Boolean),
+      skipOnboarding: () => this.finishOnboarding(),
+      finishOnboarding: () => this.finishOnboarding(),
+      signIn: () => { try { localStorage.setItem('coms.authed', '1'); } catch (e) {} this.setState({ authed: true }); },
       enterApp: () => { try { localStorage.setItem('coms.welcomed', '1'); } catch (e) {} this.setState({ welcomed: true }); },
       isHome: s.screen === 'home', isDetail: s.screen === 'detail', isSettings: s.screen === 'settings',
       isCalendar: s.screen === 'calendar',
@@ -1320,7 +1553,13 @@ class Component extends DCLogic {
       calToday: () => this.setState({ monthOffset: 0 }),
       dueSoonCount: overdueCount + soon,
       unscheduled, unscheduledCount: unscheduled.length, hasUnscheduled: unscheduled.length > 0,
-      summary, tabs, sections, hasRows: visible.length > 0, showEmpty: visible.length === 0,
+      hasSources: !noPlatforms,
+      summary: noPlatforms ? "You're one step away — connect a platform to start seeing messages." : summary,
+      tabs, sections,
+      hasRows: !this.props.showLoadingState && !noPlatforms && visible.length > 0,
+      showEmpty: !this.props.showLoadingState && !noPlatforms && visible.length === 0,
+      showNoPlatforms: !this.props.showLoadingState && noPlatforms,
+      openConnections: () => this.setState({ screen: 'settings' }),
       catFilter: s.cat, catOpts, setCat: ev => this.setState({ cat: ev.target.value }),
       groupFilter: s.group, groupOpts, setGroup: ev => this.setState({ group: ev.target.value }),
       emptyTitle: q ? 'No matches' : 'All clear',
@@ -1343,7 +1582,7 @@ class Component extends DCLogic {
         ? 'flex:1;min-width:0;padding:38px 28px 100px'
         : 'max-width:960px;margin:0 auto;padding:38px 32px 100px',
       notesPanelStyle: (s.notesSplit
-        ? 'position:sticky;top:0;flex:none;width:340px;height:100vh;border-left:1px solid var(--color-divider)'
+        ? 'position:sticky;top:' + (offline ? '40px' : '0') + ';flex:none;width:340px;height:100vh;border-left:1px solid var(--color-divider)'
         : 'position:fixed;top:18px;right:18px;bottom:18px;width:340px;z-index:60;border:1px solid var(--color-divider);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)') +
         ';display:flex;flex-direction:column;background:var(--color-surface);animation:coms-in .22s ease',
       noteDraft: s.noteDraft, noteDraftEmpty: !s.noteDraft.trim(),
@@ -1373,8 +1612,59 @@ class Component extends DCLogic {
         remove: () => this.removeNote(n.id)
       })),
 
+      isLoading: !!this.props.showLoadingState,
+      notLoading: !this.props.showLoadingState,
+      platformSkeleton: [0, 1, 2].map(i => {
+        const d = (i * 0.09).toFixed(2);
+        return {
+          icon: 'width:20px;height:20px;flex:none;border-radius:50%;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + d + 's infinite',
+          name: 'width:74px;height:14px;flex:none;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + d + 's infinite',
+          meta: 'flex:1;min-width:0;max-width:180px;height:14px;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + (i * 0.09 + 0.12).toFixed(2) + 's infinite',
+          button: 'width:78px;height:26px;flex:none;margin-left:auto;border-radius:var(--radius-sm);background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + d + 's infinite'
+        };
+      }),
+      prioritySkeleton: [0, 1, 2, 3].map(i => {
+        const d = (i * 0.09).toFixed(2);
+        return {
+          box: 'width:15px;height:15px;flex:none;border-radius:4px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + d + 's infinite',
+          name: 'flex:1;min-width:0;max-width:150px;height:14px;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + d + 's infinite',
+          meta: 'width:96px;height:14px;flex:none;margin-left:auto;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + (i * 0.09 + 0.12).toFixed(2) + 's infinite'
+        };
+      }),
+      skeletonRows: [0, 1, 2, 3, 4].map((n, i, arr) => {
+        const bar = (w, delay) => 'width:' + w + ';height:14px;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + delay + 's infinite';
+        return {
+          rowStyle: 'display:flex;align-items:flex-start;gap:16px;padding:19px 22px' +
+            (i < arr.length - 1 ? ';border-bottom:1px solid var(--color-divider)' : ''),
+          nameBar: bar('40%', (i * 0.08).toFixed(2)),
+          previewBar: bar('80%', (i * 0.08 + 0.12).toFixed(2)),
+          tagBar: bar('20%', (i * 0.08 + 0.24).toFixed(2)),
+          timeBar: 'flex:none;width:64px;height:14px;border-radius:5px;background:var(--color-divider);animation:coms-pulse 1.6s ease-in-out ' + (i * 0.08).toFixed(2) + 's infinite'
+        };
+      }),
+      isOffline: offline,
+      retryConnection: () => {
+        this.setState({ offline: false, offlineDismissed: true });
+        this.toast('Back online');
+      },
+
+      // Sync indicator — utility weight, matching the demo badge.
+      syncing: s.syncState === 'syncing',
+      syncFailed: s.syncState === 'error', syncOk: s.syncState !== 'error',
+      syncLabel: s.syncState === 'syncing' ? 'Syncing…'
+        : s.syncState === 'error' ? 'Sync error'
+        : this.syncAgo(s.lastSync),
+      syncTitle: s.syncState === 'syncing' ? 'Syncing your platforms'
+        : s.syncState === 'error' ? 'Sync failed — click to retry' : 'Refresh now',
+      syncIconStyle: 'flex:none' + (s.syncState === 'syncing' ? ';animation:coms-spin .9s linear infinite' : ''),
+      syncStyle: 'display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap;background:none;border:none;padding:4px 2px;font-family:var(--font-body);font-size:11.5px;' +
+        (s.syncState === 'syncing' ? 'cursor:default;opacity:.7;' : 'cursor:pointer;opacity:.72;') +
+        'color:' + (s.syncState === 'error' ? 'var(--color-alert-text)' : 'color-mix(in srgb, var(--color-text) 70%, transparent)'),
+      runSync: () => this.runSync(),
+
       showGreetBar: !s.greetDismissed,
-      userName: 'Maya',
+      // Display-only placeholders — the real values come from the signed-in account.
+      userName: '{name}', userEmail: '{email}', userInitial: '{}',
       todayFullDate: new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
 
       themeOpts, defaultTabOpts,
@@ -1383,6 +1673,21 @@ class Component extends DCLogic {
       defaultTabHint: s.prefs.defaultTab.startsWith('pf:')
         ? 'Coms opens filtered to ' + C.PLATFORMS[s.prefs.defaultTab.slice(3)].label + '.'
         : 'The tab Coms opens on.',
+      platformRows: [
+        { id: 'gmail', name: 'Gmail', icon: 'mail', handle: '{email}' },
+        { id: 'slack', name: 'Slack', icon: 'hash', handle: '{workspace}' },
+        { id: 'whatsapp', name: 'WhatsApp', icon: 'chat', handle: '{phone}' }
+      ].map(p => {
+        const on = (s.connections || {})[p.id];
+        return {
+          name: p.name, connected: on, disconnected: !on,
+          status: on ? p.handle : 'Not connected',
+          isMail: p.icon === 'mail', isHash: p.icon === 'hash', isChat: p.icon === 'chat',
+          iconStyle: 'flex:none;display:grid;place-items:center;color:' +
+            (on ? 'var(--color-accent)' : 'color-mix(in srgb, var(--color-text) 45%, transparent)'),
+          toggle: () => this.togglePlatform(p.id, p.name)
+        };
+      }),
       groupDraft: s.groupDraft, groupDraftEmpty: !s.groupDraft.trim(),
       setGroupDraft: ev => this.setState({ groupDraft: ev.target.value }),
       groupDraftKey: ev => { if (ev.key === 'Enter') { ev.preventDefault(); this.addGroup(); } },
@@ -1392,8 +1697,9 @@ class Component extends DCLogic {
         return { label: t, custom, cls: custom ? 'tag-accent' : 'tag-neutral', remove: () => this.removeGroup(t) };
       }),
       logOut: () => {
-        try { localStorage.removeItem('coms.welcomed'); } catch (e) {}
-        this.setState({ welcomed: false, screen: 'home', detail: null });
+        try { ['coms.welcomed', 'coms.authed', 'coms.onboarded'].forEach(k => localStorage.removeItem(k)); } catch (e) {}
+        this.setState({ welcomed: false, authed: false, onboarded: false, screen: 'home', detail: null,
+          connections: { gmail: false, slack: false, whatsapp: false } });
         this.toast('Logged out');
       },
       notifyOn: s.prefs.notify,
@@ -1415,7 +1721,7 @@ class Component extends DCLogic {
         on: (s.prefs.priority || []).includes(c.id),
         toggle: () => this.togglePriority(c.id)
       })),
-      showDemoBadge: this.props.showDemoBadge ?? true,
+      showDemoBadge: (this.props.showDemoBadge ?? true) && s.authed && s.onboarded,
       toast: s.toast,
       // compose
       showCompose: s.showCompose,
@@ -1474,19 +1780,46 @@ class Component extends DCLogic {
     this.setState(s => ({ drafts: Object.assign({}, s.drafts, { [convId]: text }) }));
   }
 
+  syncAgo(ts) {
+    const mins = Math.floor((Date.now() - ts) / 6e4);
+    if (mins < 1) return 'Just synced';
+    if (mins < 60) return mins + ' min ago';
+    const hrs = Math.floor(mins / 60);
+    return hrs + ' hr ago';
+  }
+  runSync() {
+    if (this.state.syncState === 'syncing') return;
+    this.setState({ syncState: 'syncing' });
+    clearTimeout(this._syncTimer);
+    this._syncTimer = setTimeout(() => {
+      if (this.props.simulateSyncFailure) { this.setState({ syncState: 'error' }); return; }
+      this.setState({ syncState: 'idle', lastSync: Date.now() });
+    }, 1300);
+  }
+  setSendState(convId, value) {
+    this.setState(s => ({ sendStates: Object.assign({}, s.sendStates, { [convId]: value }) }));
+  }
   // Sending marks the thread handled: read, responded, no longer time-sensitive.
+  // The draft is kept until the send resolves, so a failure never loses the text.
   sendReply(convId) {
     const text = (this.state.drafts[convId] || '').trim();
     if (!text) return;
-    const msg = { dir: 'out', sender: 'You', content: text, ts: Date.now() };
-    this.setState(s => ({
-      convs: s.convs.map(v => v.id === convId ? Object.assign({}, v, {
-        isRead: true, isResponded: true, timeSensitive: false,
-        messages: [...v.messages, msg]
-      }) : v),
-      drafts: Object.assign({}, s.drafts, { [convId]: '' })
-    }));
-    this.toast('Sent — thread marked responded');
+    if ((this.state.sendStates || {})[convId] === 'sending') return;
+    this.setSendState(convId, 'sending');
+    clearTimeout(this._sendTimers[convId]);
+    this._sendTimers[convId] = setTimeout(() => {
+      if (this.props.simulateSendFailure) { this.setSendState(convId, 'failed'); return; }
+      const msg = { dir: 'out', sender: 'You', content: text, ts: Date.now() };
+      this.setState(s => ({
+        convs: s.convs.map(v => v.id === convId ? Object.assign({}, v, {
+          isRead: true, isResponded: true, timeSensitive: false,
+          messages: [...v.messages, msg]
+        }) : v),
+        drafts: Object.assign({}, s.drafts, { [convId]: '' }),
+        sendStates: Object.assign({}, s.sendStates, { [convId]: 'idle' })
+      }));
+      this.toast('✓ Sent');
+    }, 1100);
   }
 
 
