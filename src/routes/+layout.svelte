@@ -10,7 +10,9 @@
 		categoryFilter,
 		authed,
 		onboarded,
-		loadNotes
+		loadNotes,
+		loadConversations,
+		loadContacts
 	} from '$lib/stores';
 	import type { TabId } from '$lib/types';
 	import Toast from '$components/Toast.svelte';
@@ -25,10 +27,12 @@
 	const PUBLIC_ROUTES = ['/terms', '/privacy'];
 	const isPublicRoute = $derived(PUBLIC_ROUTES.includes($page.url.pathname));
 
-	// Load notes from API when user is authenticated and onboarded
+	// Load data from API when user is authenticated and onboarded
 	$effect(() => {
 		if ($authed && $onboarded) {
 			loadNotes();
+			loadConversations();
+			loadContacts();
 		}
 	});
 

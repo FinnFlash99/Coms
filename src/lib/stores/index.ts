@@ -23,7 +23,7 @@ import {
 	dueLabel,
 	timeText
 } from '$lib/types';
-import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
+import { DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
 import * as api from '$lib/api/openchannels';
 
 // Theme store
@@ -111,11 +111,57 @@ function createPreferencesStore() {
 
 export const preferences = createPreferencesStore();
 
-// Contacts store
-export const contacts = writable<Contact[]>(DEMO_CONTACTS);
+// Contacts store - wired to OpenChannels API
+export const contacts = writable<Contact[]>([]);
+export const contactsLoading = writable<boolean>(false);
+export const contactsError = writable<string | null>(null);
 
-// Conversations store
-export const conversations = writable<Conversation[]>(DEMO_CONVERSATIONS);
+// Load contacts from API
+export async function loadContacts(): Promise<void> {
+	if (typeof window === 'undefined') return;
+	contactsLoading.set(true);
+	contactsError.set(null);
+	try {
+		const items = await api.listContacts();
+		contacts.set(items);
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : 'Failed to load contacts';
+		contactsError.set(msg);
+		console.error('Failed to load contacts:', e);
+	} finally {
+		contactsLoading.set(false);
+	}
+}
+
+// Conversations store - wired to OpenChannels API
+export const conversations = writable<Conversation[]>([]);
+export const conversationsLoading = writable<boolean>(false);
+export const conversationsError = writable<string | null>(null);
+
+// Load conversations from API (also populates contacts from embedded contact data)
+export async function loadConversations(): Promise<void> {
+	if (typeof window === 'undefined') return;
+	conversationsLoading.set(true);
+	conversationsError.set(null);
+	try {
+		const result = await api.listConversations({ status: 'all' });
+		conversations.set(result.conversations);
+		// Merge contacts from conversations into contacts store
+		if (result.contacts.size > 0) {
+			contacts.update((existing) => {
+				const byId = new Map(existing.map((c) => [c.id, c]));
+				result.contacts.forEach((c, id) => byId.set(id, c));
+				return Array.from(byId.values());
+			});
+		}
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : 'Failed to load conversations';
+		conversationsError.set(msg);
+		console.error('Failed to load conversations:', e);
+	} finally {
+		conversationsLoading.set(false);
+	}
+}
 
 // Calendar events and follow-up reminders
 export const events = writable<CalendarEvent[]>(DEMO_EVENTS);
@@ -393,45 +439,166 @@ export const conversationCounts = derived([conversations, contacts], ([$conversa
 	return counts;
 });
 
-// Action helpers
-export function markConversationRead(id: string) {
+// Action helpers - all wired to OpenChannels API with optimistic updates
+export async function markConversationRead(id: string): Promise<void> {
+	// Optimistic update
 	conversations.update((convs) =>
 		convs.map((c) => (c.id === id ? { ...c, isRead: true } : c))
 	);
+	try {
+		await api.markConversationRead(id);
+	} catch (e) {
+		// Revert on error
+		conversations.update((convs) =>
+			convs.map((c) => (c.id === id ? { ...c, isRead: false } : c))
+		);
+		const msg = e instanceof Error ? e.message : 'Failed to mark read';
+		toast.show(msg);
+		console.error('Failed to mark conversation read:', e);
+	}
 }
 
-export function markConversationResponded(id: string) {
+export async function markConversationResponded(id: string): Promise<void> {
+	// Get previous state for revert
+	let prevRead = true;
+	let prevResponded = true;
 	conversations.update((convs) =>
-		convs.map((c) => (c.id === id ? { ...c, isRead: true, isResponded: true } : c))
+		convs.map((c) => {
+			if (c.id === id) {
+				prevRead = c.isRead;
+				prevResponded = c.isResponded;
+				return { ...c, isRead: true, isResponded: true };
+			}
+			return c;
+		})
 	);
+	try {
+		await api.markConversationResponded(id);
+	} catch (e) {
+		// Revert on error
+		conversations.update((convs) =>
+			convs.map((c) => (c.id === id ? { ...c, isRead: prevRead, isResponded: prevResponded } : c))
+		);
+		const msg = e instanceof Error ? e.message : 'Failed to mark responded';
+		toast.show(msg);
+		console.error('Failed to mark conversation responded:', e);
+	}
 }
 
-export function toggleTimeSensitive(id: string) {
+export async function toggleTimeSensitive(id: string): Promise<void> {
+	// Get current state and toggle
+	let newValue = false;
 	conversations.update((convs) =>
-		convs.map((c) => (c.id === id ? { ...c, timeSensitive: !c.timeSensitive } : c))
+		convs.map((c) => {
+			if (c.id === id) {
+				newValue = !c.timeSensitive;
+				return { ...c, timeSensitive: newValue };
+			}
+			return c;
+		})
 	);
+	try {
+		await api.setConversationUrgent(id, newValue);
+	} catch (e) {
+		// Revert on error
+		conversations.update((convs) =>
+			convs.map((c) => (c.id === id ? { ...c, timeSensitive: !newValue } : c))
+		);
+		const msg = e instanceof Error ? e.message : 'Failed to update';
+		toast.show(msg);
+		console.error('Failed to toggle time-sensitive:', e);
+	}
 }
 
-export function updateConversationImportance(id: string, importance: Importance) {
+export async function updateConversationImportance(id: string, importance: Importance): Promise<void> {
+	// Get previous value for revert
+	let prevImportance: Importance = 'normal';
 	conversations.update((convs) =>
-		convs.map((c) => (c.id === id ? { ...c, importance } : c))
+		convs.map((c) => {
+			if (c.id === id) {
+				prevImportance = c.importance;
+				return { ...c, importance };
+			}
+			return c;
+		})
 	);
+	try {
+		await api.setConversationImportance(id, importance);
+	} catch (e) {
+		// Revert on error
+		conversations.update((convs) =>
+			convs.map((c) => (c.id === id ? { ...c, importance: prevImportance } : c))
+		);
+		const msg = e instanceof Error ? e.message : 'Failed to update importance';
+		toast.show(msg);
+		console.error('Failed to update importance:', e);
+	}
 }
 
-export function updateContact(id: string, updates: Partial<Contact>) {
-	contacts.update((cs) => cs.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+export async function updateContact(id: string, updates: Partial<Contact>): Promise<void> {
+	// Get previous state for revert
+	let prevContact: Contact | undefined;
+	contacts.update((cs) =>
+		cs.map((c) => {
+			if (c.id === id) {
+				prevContact = { ...c };
+				return { ...c, ...updates };
+			}
+			return c;
+		})
+	);
+	try {
+		await api.updateContact(id, {
+			name: updates.name,
+			contactType: updates.type,
+			connectionStrength: updates.connection
+		});
+	} catch (e) {
+		// Revert on error
+		if (prevContact) {
+			contacts.update((cs) => cs.map((c) => (c.id === id ? prevContact! : c)));
+		}
+		const msg = e instanceof Error ? e.message : 'Failed to update contact';
+		toast.show(msg);
+		console.error('Failed to update contact:', e);
+	}
 }
 
 // <input type="date"> gives a Y-M-D string; anchor it at 9am local so it lands on the intended day.
-export function setDue(conversationId: string, value: string) {
-	if (!value) {
-		conversations.update((convs) => convs.map((c) => (c.id === conversationId ? { ...c, dueTs: null } : c)));
-		return;
+export async function setDue(conversationId: string, value: string): Promise<void> {
+	// Get previous value for revert
+	let prevDueTs: number | null | undefined = null;
+	let newDueTs: number | null = null;
+
+	if (value) {
+		const [y, m, d] = value.split('-').map(Number);
+		newDueTs = new Date(y, m - 1, d, 9, 0).getTime();
 	}
-	const [y, m, d] = value.split('-').map(Number);
-	const dueTs = new Date(y, m - 1, d, 9, 0).getTime();
-	conversations.update((convs) => convs.map((c) => (c.id === conversationId ? { ...c, dueTs } : c)));
-	toast.show('Due ' + new Date(y, m - 1, d).toLocaleDateString([], { month: 'short', day: 'numeric' }));
+
+	conversations.update((convs) =>
+		convs.map((c) => {
+			if (c.id === conversationId) {
+				prevDueTs = c.dueTs;
+				return { ...c, dueTs: newDueTs };
+			}
+			return c;
+		})
+	);
+
+	try {
+		await api.setConversationDue(conversationId, newDueTs);
+		if (newDueTs) {
+			toast.show('Due ' + new Date(newDueTs).toLocaleDateString([], { month: 'short', day: 'numeric' }));
+		}
+	} catch (e) {
+		// Revert on error
+		conversations.update((convs) =>
+			convs.map((c) => (c.id === conversationId ? { ...c, dueTs: prevDueTs } : c))
+		);
+		const msg = e instanceof Error ? e.message : 'Failed to set due date';
+		toast.show(msg);
+		console.error('Failed to set due date:', e);
+	}
 }
 
 export function togglePriority(contactId: string) {
