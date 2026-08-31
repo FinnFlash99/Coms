@@ -82,9 +82,9 @@ async function findOrCreateContact(
 	const contactId = generateId();
 	await execute(
 		db,
-		`INSERT INTO contacts (id, user_id, name, contact_type, connection_strength)
-		 VALUES (?, ?, ?, 'other', 'New')`,
-		[contactId, userId, senderName]
+		`INSERT INTO contacts (id, user_id, name, channel, handle, contact_type, connection_strength, created_at)
+		 VALUES (?, ?, ?, 'gmail', ?, 'other', 'New', datetime('now'))`,
+		[contactId, userId, senderName, senderEmail]
 	);
 
 	// Create contact identity
@@ -133,8 +133,8 @@ async function findOrCreateConversation(
 	const convId = generateId();
 	await execute(
 		db,
-		`INSERT INTO conversations (id, user_id, contact_id, platform, channel, subject, last_message_at, is_read, is_responded, importance, is_time_sensitive)
-		 VALUES (?, ?, ?, 'gmail', 'gmail', ?, ?, 0, 0, 'normal', 0)`,
+		`INSERT INTO conversations (id, user_id, contact_id, platform, channel, subject, last_message_at, created_at, is_read, is_responded, importance, is_time_sensitive)
+		 VALUES (?, ?, ?, 'gmail', 'gmail', ?, ?, datetime('now'), 0, 0, 'normal', 0)`,
 		[convId, userId, contactId, subject, timestamp]
 	);
 
