@@ -166,16 +166,38 @@ See: [`design/_ds/nocturne-*/readme.md`](design/_ds/nocturne-91aaaa64-e109-471d-
 
 ## Environment Setup
 
-1. Copy `.env.example` to `.env` and configure
-2. Set up Cloudflare resources:
+1. Set up Cloudflare resources (configured in `wrangler.toml`):
    - D1 Database: `coms-db`
-   - KV Namespaces: `coms-sessions`, `coms-state`
-3. Configure OAuth credentials for each platform (Gmail, Outlook, Slack, Discord)
-4. Run database migrations: `npm run db:migrate:local`
+   - KV Namespaces: `SESSIONS`, `OAUTH_STATE`
+2. Set secrets via wrangler CLI (see Secrets Management)
+3. Run database migrations: `npm run db:migrate:local` (local) or `npm run db:migrate:remote` (production)
+
+## Secrets Management
+
+This project deploys as a **Cloudflare Worker**. Secrets are set via wrangler CLI:
+
+```bash
+npx wrangler secret put ENCRYPTION_KEY
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+npx wrangler secret put SLACK_CLIENT_ID
+npx wrangler secret put SLACK_CLIENT_SECRET
+npx wrangler secret put SLACK_SIGNING_SECRET
+```
+
+Generate `ENCRYPTION_KEY` once: `openssl rand -hex 32`
+
+**WARNING:** If `ENCRYPTION_KEY` changes, all stored OAuth tokens become unreadable. Users must reconnect.
+
+See: [`docs/reference/secrets-and-credentials.md`](docs/reference/secrets-and-credentials.md) for complete documentation.
 
 ## Deployment
 
-Cloudflare Pages deploys via its own native Git integration (configured in the Cloudflare dashboard, not GitHub Actions) -- it builds and deploys automatically on every push to `main`. `.github/workflows/deploy.yml` (job name `CI`) only runs lint/type-check/build as a merge gate; it does not deploy and needs no Cloudflare secrets. A prior version of this workflow also tried to deploy via `wrangler pages deploy` using `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets -- this was removed because it was redundant with the Git integration and had never once succeeded (wrangler.toml is a Workers config -- `main` + `[assets]` binding -- which `wrangler pages deploy` rejects as invalid; the correct command for this config shape would have been `wrangler deploy`, but since Cloudflare's Git integration already handles deployment, fixing it wasn't necessary).
+Cloudflare deploys via Git integration (configured in the Cloudflare dashboard). On push to `main`:
+1. GitHub Actions runs lint/type-check/build as validation
+2. Cloudflare builds and deploys the Worker
+
+Runtime URL: `coms.rwb89mvwwg.workers.dev`
 
 ## Documentation Maintenance
 

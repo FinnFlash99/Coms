@@ -21,6 +21,7 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 ### Key Reference
 - [Project Structure](reference/project-structure.md) — Repository layout and file purposes
 - [Data Model](reference/data-model.md) — Contact, Conversation, and Message schemas
+- [Secrets and Credentials](reference/secrets-and-credentials.md) — OAuth, encryption keys, token lifecycle
 - [Design System](reference/design-system.md) — Nocturne design system usage
 - [Product Specification](reference/product-specification.md) — Complete feature specification
 - [OpenChannels Integration Plan](reference/openchannels-integration-plan.md) — Backend integration roadmap

@@ -14,14 +14,15 @@ export async function importKey(keyHex: string): Promise<CryptoKey> {
 // Encrypt a token
 export async function encryptToken(
 	plaintext: string,
-	keyHex: string
+	keyHex: string,
+	existingIvHex?: string
 ): Promise<{ encrypted: string; iv: string }> {
 	const key = await importKey(keyHex);
-	const iv = crypto.getRandomValues(new Uint8Array(12));
+	const iv = existingIvHex ? hexToBytes(existingIvHex) : crypto.getRandomValues(new Uint8Array(12));
 	const encodedData = new TextEncoder().encode(plaintext);
 
 	const encryptedBuffer = await crypto.subtle.encrypt(
-		{ name: ALGORITHM, iv },
+		{ name: ALGORITHM, iv: iv.buffer as ArrayBuffer },
 		key,
 		encodedData
 	);

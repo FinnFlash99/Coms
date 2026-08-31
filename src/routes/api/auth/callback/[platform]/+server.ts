@@ -259,7 +259,7 @@ export const GET: RequestHandler = async ({ params, url, cookies, platform }) =>
 			throw error(400, 'User ID not available');
 		}
 
-		// Encrypt tokens
+		// Encrypt tokens - use same IV for both so we only need to store one
 		const { encrypted: accessTokenEncrypted, iv: tokenIv } = await encryptToken(
 			tokens.accessToken,
 			encryptionKey
@@ -267,7 +267,8 @@ export const GET: RequestHandler = async ({ params, url, cookies, platform }) =>
 
 		let refreshTokenEncrypted: string | undefined;
 		if (tokens.refreshToken) {
-			const refreshResult = await encryptToken(tokens.refreshToken, encryptionKey);
+			// Reuse the same IV for the refresh token
+			const refreshResult = await encryptToken(tokens.refreshToken, encryptionKey, tokenIv);
 			refreshTokenEncrypted = refreshResult.encrypted;
 		}
 
