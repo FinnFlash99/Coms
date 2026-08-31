@@ -1,0 +1,13 @@
+- generic [ref=e4]:
+  - generic [ref=e5]: Coms
+  - heading "Sign in to Coms" [level=1] [ref=e6]
+  - paragraph [ref=e7]: Connect your accounts to see all your messages in one place.
+  - button "Continue with Google" [ref=e8] [cursor=pointer]
+  - paragraph [ref=e14]: We'll ask you to connect your messaging platforms next.
+  - paragraph [ref=e15]:
+    - text: By signing in, you agree to our
+    - link "Terms" [ref=e16] [cursor=pointer]:
+      - /url: /terms
+    - text: and
+    - link "Privacy Policy" [ref=e17] [cursor=pointer]:
+      - /url: /privacy

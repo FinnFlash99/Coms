@@ -50,6 +50,113 @@ async function createSession(
 	return sessionId;
 }
 
+/**
+ * Set up Gmail push notifications by calling watch() API
+ */
+async function setupGmailWatch(accessToken: string, topicName: string): Promise<void> {
+	const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/watch', {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			topicName,
+			labelIds: ['INBOX']
+		})
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		console.error('Gmail watch setup failed:', errorText);
+		// Don't throw - watch setup failure shouldn't block sign-in
+	} else {
+		const result = await response.json() as { historyId?: string };
+		console.log('Gmail watch setup successful, historyId:', result.historyId);
+	}
+}
+
+/**
+ * Fetch recent emails and sync them to the database
+ */
+async function syncRecentEmails(
+	accessToken: string,
+	userId: string
+): Promise<void> {
+	try {
+		// Fetch recent messages (last 20)
+		const listResponse = await fetch(
+			'https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=20&labelIds=INBOX',
+			{ headers: { Authorization: `Bearer ${accessToken}` } }
+		);
+
+		if (!listResponse.ok) {
+			console.error('Failed to list Gmail messages');
+			return;
+		}
+
+		const listData = await listResponse.json() as { messages?: Array<{ id: string; threadId: string }> };
+		if (!listData.messages || listData.messages.length === 0) {
+			console.log('No messages to sync');
+			return;
+		}
+
+		console.log(`Syncing ${listData.messages.length} recent emails...`);
+
+		// Fetch each message's details and forward to OpenChannels
+		const OPENCHANNELS_URL = 'https://openchannels-api.rwb89mvwwg.workers.dev';
+
+		for (const msg of listData.messages.slice(0, 10)) { // Limit to 10 for initial sync
+			const msgResponse = await fetch(
+				`https://gmail.googleapis.com/gmail/v1/users/me/messages/${msg.id}?format=metadata&metadataHeaders=From&metadataHeaders=Subject&metadataHeaders=Date`,
+				{ headers: { Authorization: `Bearer ${accessToken}` } }
+			);
+
+			if (!msgResponse.ok) continue;
+
+			const msgData = await msgResponse.json() as {
+				id: string;
+				threadId: string;
+				snippet: string;
+				internalDate: string;
+				payload?: { headers?: Array<{ name: string; value: string }> };
+			};
+
+			const headers = msgData.payload?.headers || [];
+			const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
+			const subject = headers.find(h => h.name === 'Subject')?.value || '(No subject)';
+
+			// Extract sender name and email
+			const fromMatch = from.match(/^(?:"?([^"<]*)"?\s*)?<?([^>]+)>?$/);
+			const senderName = fromMatch?.[1]?.trim() || fromMatch?.[2] || from;
+			const senderEmail = fromMatch?.[2] || from;
+
+			// Send to OpenChannels for processing
+			await fetch(`${OPENCHANNELS_URL}/api/ingest`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					userId,
+					platform: 'gmail',
+					platformThreadId: msgData.threadId,
+					platformMessageId: msgData.id,
+					senderName,
+					senderEmail,
+					subject,
+					content: msgData.snippet,
+					timestamp: parseInt(msgData.internalDate),
+					direction: 'inbound'
+				})
+			});
+		}
+
+		console.log('Initial email sync complete');
+	} catch (e) {
+		console.error('Email sync error:', e);
+		// Don't throw - sync failure shouldn't block sign-in
+	}
+}
+
 // GET /api/auth/callback/[platform] - OAuth callback
 export const GET: RequestHandler = async ({ params, url, cookies, platform }) => {
 	const platformName = params.platform as OAuthPlatform;
@@ -176,6 +283,27 @@ export const GET: RequestHandler = async ({ params, url, cookies, platform }) =>
 			tokenIv,
 			tokenExpiresAt
 		});
+
+		// For Gmail, set up push notifications and sync recent emails
+		if (platformName === 'gmail') {
+			const pubsubTopic = env.GMAIL_PUBSUB_TOPIC as string | undefined;
+
+			// Set up Gmail watch for push notifications (if topic configured)
+			if (pubsubTopic) {
+				await setupGmailWatch(tokens.accessToken, pubsubTopic);
+			} else {
+				console.log('GMAIL_PUBSUB_TOPIC not configured, skipping watch setup');
+			}
+
+			// Sync recent emails in the background
+			// Using waitUntil if available, otherwise just await
+			const syncPromise = syncRecentEmails(tokens.accessToken, userId);
+			if (platform?.context?.waitUntil) {
+				platform.context.waitUntil(syncPromise);
+			} else {
+				await syncPromise;
+			}
+		}
 
 		// Redirect based on flow type
 		if (isSignIn) {

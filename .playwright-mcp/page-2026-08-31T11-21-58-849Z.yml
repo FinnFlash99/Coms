@@ -1,0 +1,155 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - heading "CONNEXMEDIA" [level=1] [ref=f1e6]
+      - paragraph [ref=f1e7]: Software & Infrastructure for Digital Media and AdTech.We design, build and maintain secure, scalable and compliant systems.
+  - generic [ref=f1e14]:
+    - heading "Core Expertise" [level=2] [ref=f1e15]
+    - list [ref=f1e16]:
+      - listitem [ref=f1e17]:
+        - heading "Web Development & Backend Systems" [level=3] [ref=f1e18]
+        - paragraph [ref=f1e19]: Design and maintenance of web platforms, APIs, and internal dashboards.
+      - listitem [ref=f1e20]:
+        - heading "Ad Network Integration" [level=3] [ref=f1e21]
+        - paragraph [ref=f1e22]: Configuration and optimization of ad networks, tracking, analytics, and anti-fraud systems.
+      - listitem [ref=f1e23]:
+        - heading "Data & Performance Optimization" [level=3] [ref=f1e24]
+        - paragraph [ref=f1e25]: Site speed improvement, scalability engineering, and conversion analytics.
+      - listitem [ref=f1e26]:
+        - heading "Cloud Architecture & Cost Optimization" [level=3] [ref=f1e27]
+        - paragraph [ref=f1e28]: Design and optimization of cloud infrastructure for performance, reliability, and cost efficiency.
+      - listitem [ref=f1e29]:
+        - heading "DevOps & Server Administration" [level=3] [ref=f1e30]
+        - paragraph [ref=f1e31]: Kubernetes and Talos OS management, CI/CD pipelines, monitoring, and SLA-based support.
+      - listitem [ref=f1e32]:
+        - heading "SEO & Traffic Engineering" [level=3] [ref=f1e33]
+        - paragraph [ref=f1e34]: Technical optimization, analytics, and visibility improvement for digital media platforms.
+      - listitem [ref=f1e35]:
+        - heading "Automation & Infrastructure Audits" [level=3] [ref=f1e36]
+        - paragraph [ref=f1e37]: Process automation, infrastructure performance and security audits.
+      - listitem [ref=f1e38]:
+        - heading "Hosting & Maintenance" [level=3] [ref=f1e39]
+        - paragraph [ref=f1e40]: Managed hosting solutions with continuous monitoring and proactive updates.
+  - generic [ref=f1e42]:
+    - heading "Technology Stack" [level=2] [ref=f1e43]
+    - generic [ref=f1e44]:
+      - list [ref=f1e45]:
+        - listitem [ref=f1e46]:
+          - heading "Backend / Runtime" [level=3] [ref=f1e47]
+          - list [ref=f1e48]:
+            - listitem [ref=f1e49]:
+              - img "Node js" [ref=f1e50]
+              - text: Node.js
+            - listitem [ref=f1e51]:
+              - img "Go" [ref=f1e52]
+              - text: Go
+            - listitem [ref=f1e53]:
+              - img "Python" [ref=f1e54]
+              - text: Python
+            - listitem [ref=f1e55]:
+              - img "PHP" [ref=f1e56]
+              - text: PHP
+        - listitem [ref=f1e57]:
+          - heading "Frontend" [level=3] [ref=f1e58]
+          - list [ref=f1e59]:
+            - listitem [ref=f1e60]:
+              - img "React" [ref=f1e61]
+              - text: React
+            - listitem [ref=f1e62]:
+              - img "Next js" [ref=f1e63]
+              - text: Next.js
+            - listitem [ref=f1e64]:
+              - img "TypeScript" [ref=f1e65]
+              - text: TypeScript
+            - listitem [ref=f1e66]:
+              - img "Tailwind CSS" [ref=f1e67]
+              - text: Tailwind CSS
+            - listitem [ref=f1e68]:
+              - img "Angular" [ref=f1e69]
+              - text: Angular
+            - listitem [ref=f1e70]:
+              - img "Vite" [ref=f1e71]
+              - text: Vite
+        - listitem [ref=f1e72]:
+          - heading "Databases" [level=3] [ref=f1e73]
+          - list [ref=f1e74]:
+            - listitem [ref=f1e75]:
+              - img "PostgreSQL" [ref=f1e76]
+              - text: PostgreSQL
+            - listitem [ref=f1e77]:
+              - img "Redis" [ref=f1e78]
+              - text: Redis
+            - listitem [ref=f1e79]:
+              - img "MongoDB" [ref=f1e80]
+              - text: MongoDB
+            - listitem [ref=f1e81]:
+              - img "MySQL" [ref=f1e82]
+              - text: MySQL
+            - listitem [ref=f1e83]:
+              - img "Elasticsearch" [ref=f1e84]
+              - text: Elasticsearch
+      - list [ref=f1e85]:
+        - listitem [ref=f1e86]:
+          - heading "Cloud" [level=3] [ref=f1e87]
+          - list [ref=f1e88]:
+            - listitem [ref=f1e89]:
+              - img "AWS" [ref=f1e90]
+              - text: AWS
+            - listitem [ref=f1e91]:
+              - img "Google Cloud" [ref=f1e92]
+              - text: Google Cloud
+            - listitem [ref=f1e93]:
+              - img "Cloudflare" [ref=f1e94]
+              - text: Cloudflare
+            - listitem [ref=f1e95]:
+              - img "DigitalOcean" [ref=f1e96]
+              - text: DigitalOcean
+        - listitem [ref=f1e97]:
+          - heading "Infrastructure & DevOps" [level=3] [ref=f1e98]
+          - list [ref=f1e99]:
+            - listitem [ref=f1e100]:
+              - img "Docker" [ref=f1e101]
+              - text: Docker
+            - listitem [ref=f1e102]:
+              - img "Kubernetes" [ref=f1e103]
+              - text: Kubernetes
+            - listitem [ref=f1e104]:
+              - img "Helm" [ref=f1e105]
+              - text: Helm
+            - listitem [ref=f1e106]:
+              - img "Terraform" [ref=f1e107]
+              - text: Terraform
+            - listitem [ref=f1e108]:
+              - img "NGINX" [ref=f1e109]
+              - text: NGINX
+            - listitem [ref=f1e110]: GitHub Actions
+            - listitem [ref=f1e111]:
+              - img "GitLab CI" [ref=f1e112]
+              - text: GitLab CI
+        - listitem [ref=f1e113]:
+          - heading "Testing / Quality" [level=3] [ref=f1e114]
+          - list [ref=f1e115]:
+            - listitem [ref=f1e116]:
+              - img "Jest" [ref=f1e117]
+              - text: Jest
+            - listitem [ref=f1e118]:
+              - img "Playwright" [ref=f1e119]
+              - text: Playwright
+            - listitem [ref=f1e120]:
+              - img "Cypress" [ref=f1e121]
+              - text: Cypress
+            - listitem [ref=f1e122]:
+              - img "Postman" [ref=f1e123]
+              - text: Postman
+  - contentinfo [ref=f1e124]:
+    - generic [ref=f1e126]:
+      - generic [ref=f1e127]:
+        - img "qr" [ref=f1e128]
+        - generic [ref=f1e129]:
+          - paragraph [ref=f1e130]: Connex Media Services Ltd is registered in England and Wales (Company No. 13493947*)
+          - link "+44 7458 164451" [ref=f1e131] [cursor=pointer]:
+            - /url: tel:+447458164451
+      - generic [ref=f1e132]:
+        - paragraph [ref=f1e133]: "Registered office address: 7 Bell Yard, London, England, WC2A 2JR, United Kingdom"
+        - link "info@connexmedia.co.uk" [ref=f1e135] [cursor=pointer]:
+          - /url: mailto:info@connexmedia.co.uk
