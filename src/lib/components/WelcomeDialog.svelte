@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { welcomed } from '$lib/stores';
+	import { welcomed, user } from '$lib/stores';
 	import Blueprint from './Blueprint.svelte';
 	import Button from './Button.svelte';
 	import { Mail, CircleCheck, Clock } from 'lucide-svelte';
@@ -9,13 +9,15 @@
 	function enter() {
 		welcomed.enable();
 	}
+
+	const greeting = $derived($user?.name ? `Hi ${$user.name.split(' ')[0]}, welcome to Coms` : 'Welcome to Coms');
 </script>
 
 {#if visible}
 	<div class="welcome-backdrop">
 		<Blueprint class="welcome-card animate-pop">
 			<div class="card-kicker">Unified inbox</div>
-			<h1>Hi Maya, welcome to Coms</h1>
+			<h1>{greeting}</h1>
 			<p class="tagline">One place to see the status of all your conversations.</p>
 
 			<div class="features">
@@ -40,9 +42,6 @@
 			</div>
 
 			<Button variant="primary" onclick={enter}>Enter Coms</Button>
-			<p class="demo-note text-muted">
-				Demo mode with sample conversations. The full product syncs your platforms automatically.
-			</p>
 		</Blueprint>
 	</div>
 {/if}
@@ -96,10 +95,5 @@
 		place-items: center;
 		border: 1px solid var(--color-divider);
 		color: var(--color-accent);
-	}
-
-	.demo-note {
-		font-size: 12px;
-		margin: 16px 0 0;
 	}
 </style>

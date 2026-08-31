@@ -22,7 +22,8 @@
 		syncState,
 		lastSync,
 		runSync,
-		openComposeDialog
+		openComposeDialog,
+		user
 	} from '$lib/stores';
 	import { PLATFORMS, syncAgo } from '$lib/types';
 	import Button from '$components/Button.svelte';
@@ -31,7 +32,6 @@
 	import ConversationRow from '$components/ConversationRow.svelte';
 	import EmptyState from '$components/EmptyState.svelte';
 	import WelcomeDialog from '$components/WelcomeDialog.svelte';
-	import DemoBadge from '$components/DemoBadge.svelte';
 	import NotesPanel from '$components/NotesPanel.svelte';
 
 	// How many open thread deadlines are overdue or due within 3 days -- shown as
@@ -133,7 +133,7 @@
 <div class="inbox">
 	{#if !$greetDismissed}
 		<div class="greet-bar">
-			<span class="greet-text">Welcome back to Coms, Maya</span>
+			<span class="greet-text">Welcome back to Coms{$user?.name ? `, ${$user.name.split(' ')[0]}` : ''}</span>
 			<span class="spacer"></span>
 			<span class="greet-date">{todayFullDate}</span>
 		</div>
@@ -261,7 +261,6 @@
 </div>
 
 <WelcomeDialog visible={!$welcomed} />
-<DemoBadge />
 
 <style>
 	.home-shell.split {

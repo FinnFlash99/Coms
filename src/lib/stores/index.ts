@@ -23,7 +23,7 @@ import {
 	dueLabel,
 	timeText
 } from '$lib/types';
-import { DEMO_FOLLOWUPS } from './demo-data';
+// Demo data removed - all data comes from API
 import * as api from '$lib/api/openchannels';
 import * as calendarApi from '$lib/api/calendar';
 
@@ -170,7 +170,7 @@ export const events = writable<CalendarEvent[]>([]);
 export const eventsLoading = writable<boolean>(false);
 export const eventsError = writable<string | null>(null);
 export const calendarConnected = writable<boolean>(false);
-export const followUps = writable<FollowUp[]>(DEMO_FOLLOWUPS);
+export const followUps = writable<FollowUp[]>([]);
 
 // Load calendar events from API
 export async function loadCalendarEvents(start?: Date, end?: Date): Promise<void> {
@@ -239,8 +239,8 @@ export const groupFilter = writable<string>('all');
 // Free-text search across contact name, platform, and message content/subject
 export const searchQuery = writable<string>('');
 
-// A boolean flag persisted to localStorage under `key` -- backs the welcome/sign-in/
-// onboarding gates, each of which is just "has the user gotten past this screen once".
+// A boolean flag persisted to localStorage under `key` -- for local UI state
+// like whether the user has seen the welcome dialog.
 function createLocalFlagStore(key: string) {
 	let initial = false;
 	if (typeof window !== 'undefined') {
@@ -266,12 +266,29 @@ function createLocalFlagStore(key: string) {
 	};
 }
 
+// Welcome dialog flag - just UI state, not auth
 export const welcomed = createLocalFlagStore('coms.welcomed');
 
-// Demo-mode sign-in and onboarding gates -- simulated (no real OAuth), but persisted
-// the same way `welcomed` is so returning visitors don't see them again.
-export const authed = createLocalFlagStore('coms.authed');
+// Onboarding flag - whether user has completed platform connection setup
+// Persisted in localStorage since it's a preference, not auth state
 export const onboarded = createLocalFlagStore('coms.onboarded');
+
+// User store - set from server session data via +layout.server.ts
+// When null, user is not authenticated
+interface UserData {
+	id: string;
+	email: string;
+	name?: string;
+}
+export const user = writable<UserData | null>(null);
+
+// Derived auth state - user is authenticated if we have user data from server
+export const authed = derived(user, ($user) => $user !== null);
+
+// Initialize user from server data (called from +layout.svelte)
+export function initUser(userData: UserData | null) {
+	user.set(userData);
+}
 
 // "Welcome back" greeting bar on the home page — shown once per app load,
 // auto-dismissed after 11s. Not persisted: a fresh load shows it again.
@@ -364,20 +381,48 @@ export function togglePlatform(id: ConnectionId, name: string): void {
 	}
 }
 
-export function signIn() {
-	authed.enable();
+// Sign in - redirect to Google OAuth
+export async function signIn(): Promise<void> {
+	if (typeof window === 'undefined') return;
+
+	try {
+		const res = await fetch('/api/auth/signin', { method: 'POST' });
+		if (!res.ok) {
+			toast.show('Failed to start sign-in');
+			return;
+		}
+		const data = await res.json() as { authUrl?: string };
+		if (data.authUrl) {
+			window.location.href = data.authUrl;
+		}
+	} catch {
+		toast.show('Failed to start sign-in');
+	}
 }
 
 export function finishOnboarding() {
 	onboarded.enable();
 }
 
-export function signOut() {
+// Sign out - call API and clear local state
+export async function signOut(): Promise<void> {
+	if (typeof window === 'undefined') return;
+
+	try {
+		await fetch('/api/auth/logout', { method: 'POST' });
+	} catch {
+		// Continue with local cleanup even if API fails
+	}
+
+	// Clear local state
+	user.set(null);
 	welcomed.reset();
-	authed.reset();
 	onboarded.reset();
 	connections.set({ gmail: false, slack: false, whatsapp: false });
 	toast.show('Logged out');
+
+	// Reload to get fresh state from server
+	window.location.href = '/';
 }
 
 // Manual "refresh now" sync indicator. There's no real backend to sync with yet, so
@@ -915,10 +960,20 @@ export interface ComposeState {
 }
 
 export const showCompose = writable(false);
-export const composeState = writable<ComposeState>({ contactId: 'c1', platform: 'slack', content: '' });
+export const composeState = writable<ComposeState>({ contactId: '', platform: 'slack', content: '' });
 
 export function openComposeDialog(prefill?: Partial<ComposeState>) {
-	if (prefill) composeState.update((c) => ({ ...c, ...prefill }));
+	composeState.update((c) => {
+		const updated = { ...c, ...prefill };
+		// If no contact is selected, default to the first available contact
+		if (!updated.contactId) {
+			const allContacts = get(contacts);
+			if (allContacts.length > 0) {
+				updated.contactId = allContacts[0].id;
+			}
+		}
+		return updated;
+	});
 	showCompose.set(true);
 }
 

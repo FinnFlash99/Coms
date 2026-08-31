@@ -21,16 +21,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	// For demo mode, create a mock user if no session exists
-	// In production, remove this and require proper authentication
-	if (!event.locals.user && event.url.pathname.startsWith('/api/')) {
-		// Demo user for development
-		event.locals.user = {
-			id: 'demo-user-001',
-			email: 'maya@freelance.co',
-			name: 'Maya'
-		};
-	}
-
 	return resolve(event);
 };

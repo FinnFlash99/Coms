@@ -563,6 +563,8 @@ Not yet implemented:
 
 **Duration:** 1 week
 
+**Status: COMPLETE** — Demo mode removed, real authentication implemented via Google OAuth, session management with Cloudflare KV, dynamic user identity throughout the app.
+
 ### 6.1 Infrastructure
 
 | Component | Platform | Config |
@@ -625,9 +627,9 @@ WHATSAPP_VERIFY_TOKEN=
 | **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ COMPLETE |
 | **4. Calendar** | Google Calendar OAuth + event fetch | 1 week | ✅ COMPLETE |
 | **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ COMPLETE (all stores wired) |
-| 6. Deployment | Production cutover + remove demo mode | 1 week | Not started |
+| **6. Deployment** | Production cutover + remove demo mode | 1 week | ✅ COMPLETE (demo removed, real auth) |
 
-**Remaining: 1 week** (Phases 0-5 complete; only Phase 6 Deployment remaining)
+**All phases complete.** App is production-ready with real OAuth authentication.
 
 ---
 
@@ -655,12 +657,21 @@ Phase 3     Phase 4        Phase 5
                 │
                 ▼
           Phase 6 (Deployment)
+          ✅ COMPLETE
 ```
 
-**Current state:** Phases 0-5 complete. All stores wired to OpenChannels API. Gmail and Slack OAuth flows, webhooks, and send endpoint implemented. Google Calendar integration complete with event fetching and attendee matching. WhatsApp deferred.
+**Current state:** All phases complete. App is production-ready with:
+- Real Google OAuth sign-in flow
+- Session management via Cloudflare KV
+- Dynamic user identity throughout the app
+- All stores wired to OpenChannels API
+- Gmail and Slack OAuth flows, webhooks, and send endpoint
+- Google Calendar integration with event fetching and attendee matching
+- Demo mode completely removed
 
-**Next step:**
-- Phase 6: Deployment (production cutover, remove demo mode)
+**Future work:**
+- WhatsApp integration (deferred pending Meta Business verification)
+- Agentic features (v2 - see "Future: Agentic Features" section)
 
 ---
 

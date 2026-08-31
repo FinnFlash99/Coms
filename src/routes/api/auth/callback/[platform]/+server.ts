@@ -2,17 +2,56 @@ import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import {
 	OAUTH_CONFIGS,
-	validateStateToken,
 	exchangeCodeForTokens,
 	type OAuthPlatform
 } from '$lib/server/oauth';
 import { encryptToken } from '$lib/server/crypto';
-import { upsertPlatformConnection } from '$lib/server/db';
+import { upsertPlatformConnection, getUserByEmail, createUser } from '$lib/server/db';
 
 const VALID_PLATFORMS: OAuthPlatform[] = ['gmail', 'outlook', 'slack', 'whatsapp'];
+const SESSION_COOKIE = 'coms_session';
+const SESSION_TTL = 60 * 60 * 24 * 30; // 30 days
+
+interface GoogleUserInfo {
+	email: string;
+	name?: string;
+	picture?: string;
+}
+
+/**
+ * Fetch Google user info using access token
+ */
+async function fetchGoogleUserInfo(accessToken: string): Promise<GoogleUserInfo> {
+	const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+		headers: { Authorization: `Bearer ${accessToken}` }
+	});
+
+	if (!response.ok) {
+		throw new Error('Failed to fetch user info from Google');
+	}
+
+	return response.json();
+}
+
+/**
+ * Create a session for the user
+ */
+async function createSession(
+	kv: KVNamespace,
+	userId: string,
+	email: string,
+	name?: string
+): Promise<string> {
+	const sessionId = crypto.randomUUID();
+	const sessionData = JSON.stringify({ id: userId, email, name });
+
+	await kv.put(sessionId, sessionData, { expirationTtl: SESSION_TTL });
+
+	return sessionId;
+}
 
 // GET /api/auth/callback/[platform] - OAuth callback
-export const GET: RequestHandler = async ({ params, url, platform }) => {
+export const GET: RequestHandler = async ({ params, url, cookies, platform }) => {
 	const platformName = params.platform as OAuthPlatform;
 	if (!VALID_PLATFORMS.includes(platformName)) {
 		throw error(400, 'Invalid platform');
@@ -24,7 +63,7 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 
 	if (errorParam) {
 		// User denied access or other OAuth error
-		throw redirect(302, '/settings?error=oauth_denied');
+		throw redirect(302, '/?error=oauth_denied');
 	}
 
 	if (!code || !state) {
@@ -32,17 +71,25 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 	}
 
 	const kv = platform?.env.OAUTH_STATE;
+	const sessions = platform?.env.SESSIONS;
 	const db = platform?.env.DB;
 
 	if (!kv || !db) {
 		throw error(500, 'Required services not available');
 	}
 
-	// Validate state token and get user ID
-	const userId = await validateStateToken(kv, state);
-	if (!userId) {
+	// Validate state token
+	const stateData = await kv.get(`oauth:state:${state}`);
+	if (!stateData) {
 		throw error(400, 'Invalid or expired state token');
 	}
+
+	// Delete used state token
+	await kv.delete(`oauth:state:${state}`);
+
+	// Determine if this is a sign-in flow or platform connection flow
+	const isSignIn = stateData === 'signin';
+	let userId = isSignIn ? null : stateData;
 
 	const config = OAUTH_CONFIGS[platformName];
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +117,41 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 			redirectUri
 		);
 
+		// For sign-in flow with Gmail, fetch user info and create/find user
+		if (isSignIn && platformName === 'gmail') {
+			if (!sessions) {
+				throw error(500, 'Session storage not available');
+			}
+
+			const userInfo = await fetchGoogleUserInfo(tokens.accessToken);
+
+			// Find or create user
+			let user = await getUserByEmail(db, userInfo.email);
+			if (!user) {
+				user = await createUser(db, userInfo.email, userInfo.name);
+			}
+
+			// At this point user is guaranteed to exist (either found or created)
+			const authenticatedUser = user;
+			userId = authenticatedUser.id;
+
+			// Create session
+			const sessionId = await createSession(sessions, authenticatedUser.id, authenticatedUser.email, authenticatedUser.name ?? undefined);
+
+			// Set session cookie
+			cookies.set(SESSION_COOKIE, sessionId, {
+				path: '/',
+				httpOnly: true,
+				secure: url.protocol === 'https:',
+				sameSite: 'lax',
+				maxAge: SESSION_TTL
+			});
+		}
+
+		if (!userId) {
+			throw error(400, 'User ID not available');
+		}
+
 		// Encrypt tokens
 		const { encrypted: accessTokenEncrypted, iv: tokenIv } = await encryptToken(
 			tokens.accessToken,
@@ -95,8 +177,14 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 			tokenExpiresAt
 		});
 
-		// Redirect to home - layout will show appropriate screen based on auth state
-		throw redirect(302, '/?connected=' + platformName);
+		// Redirect based on flow type
+		if (isSignIn) {
+			// Sign-in complete - redirect to home (will show onboarding if needed)
+			throw redirect(302, '/?authed=1&connected=' + platformName);
+		} else {
+			// Platform connection complete
+			throw redirect(302, '/?connected=' + platformName);
+		}
 	} catch (e) {
 		if ((e as { status?: number }).status === 302) throw e; // Re-throw redirects
 		console.error('OAuth callback error:', e);

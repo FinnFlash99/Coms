@@ -33,7 +33,6 @@
 	import Tag from '$components/Tag.svelte';
 	import PlatformChip from '$components/PlatformChip.svelte';
 	import SegmentedControl from '$components/SegmentedControl.svelte';
-	import DemoBadge from '$components/DemoBadge.svelte';
 
 	const contactId = $derived($page.params.id);
 	const contact = $derived($contacts.find((c) => c.id === contactId));
@@ -253,8 +252,6 @@
 		<a href="/">Back to inbox</a>
 	</div>
 {/if}
-
-<DemoBadge />
 
 <style>
 	.detail {

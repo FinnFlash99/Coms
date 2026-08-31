@@ -15,7 +15,8 @@
 		loadConversations,
 		loadContacts,
 		loadConnections,
-		toast
+		toast,
+		initUser
 	} from '$lib/stores';
 	import type { TabId } from '$lib/types';
 	import { CONNECTIONS } from '$lib/types';
@@ -24,7 +25,12 @@
 	import SignInScreen from '$components/SignInScreen.svelte';
 	import OnboardingScreen from '$components/OnboardingScreen.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
+
+	// Initialize user from server data
+	$effect(() => {
+		initUser(data.user);
+	});
 
 	// Terms/Privacy are linked from the sign-in screen itself, so they must be
 	// reachable before signing in -- the only routes exempt from the auth gate below.
@@ -46,7 +52,7 @@
 		theme.set($preferences.theme);
 
 		// Load real connection status from API (for both onboarding and settings)
-		if ($authed) {
+		if (data.user) {
 			loadConnections();
 		}
 

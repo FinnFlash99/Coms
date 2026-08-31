@@ -48,14 +48,15 @@ export async function getUserByEmail(db: D1Database, email: string) {
 	);
 }
 
-export async function createUser(db: D1Database, email: string, name?: string) {
+export async function createUser(db: D1Database, email: string, name?: string): Promise<{ id: string; email: string; name: string | null }> {
 	const id = generateId();
+	const nameValue = name || null;
 	await execute(
 		db,
 		'INSERT INTO users (id, email, name) VALUES (?, ?, ?)',
-		[id, email, name || null]
+		[id, email, nameValue]
 	);
-	return { id, email, name };
+	return { id, email, name: nameValue };
 }
 
 // Contact operations

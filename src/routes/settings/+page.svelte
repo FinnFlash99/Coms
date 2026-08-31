@@ -10,14 +10,14 @@
 		connections,
 		connectionsLoading,
 		togglePlatform,
-		signOut
+		signOut,
+		user
 	} from '$lib/stores';
 	import { TABS, PLATFORMS, CONNECTIONS, type Theme, type DefaultTabId } from '$lib/types';
 	import Avatar from '$components/Avatar.svelte';
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import SegmentedControl from '$components/SegmentedControl.svelte';
-	import DemoBadge from '$components/DemoBadge.svelte';
 
 	let groupDraft = $state('');
 
@@ -246,10 +246,10 @@
 			<span class="field-label">Account</span>
 			<div class="text-muted signed-in-as">Signed in as</div>
 			<div class="account-row">
-				<Avatar name="Maya" size="sm" />
+				<Avatar name={$user?.name || $user?.email || 'User'} size="sm" />
 				<div class="account-info">
-					<div class="account-name">Maya</div>
-					<div class="account-email text-muted">maya@freelance.co</div>
+					<div class="account-name">{$user?.name || 'User'}</div>
+					<div class="account-email text-muted">{$user?.email || ''}</div>
 				</div>
 				<Button variant="secondary" onclick={handleLogout}>
 					<LogOut size={14} strokeWidth={1.5} />
@@ -259,8 +259,6 @@
 		</div>
 	</div>
 </div>
-
-<DemoBadge />
 
 <style>
 	.settings {
