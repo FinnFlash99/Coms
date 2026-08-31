@@ -454,7 +454,7 @@ This is a complete replacement, not an overlay.
 
 **Duration:** 1-2 weeks
 
-**Status: API CLIENT COMPLETE** — `src/lib/api/openchannels.ts` implemented with typed transformers. Store migration not started.
+**Status: COMPLETE** — API client and all store migrations done. App wired to live OpenChannels API.
 
 ### 5.1 API Client
 
