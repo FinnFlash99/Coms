@@ -244,45 +244,91 @@ export const onboarded = createLocalFlagStore('coms.onboarded');
 // auto-dismissed after 11s. Not persisted: a fresh load shows it again.
 export const greetDismissed = writable(false);
 
-// Demo account connections (Gmail/Slack/WhatsApp). Persisted like preferences so a
-// reload can't spuriously "reconnect" something the user disconnected -- the first
-// time there's nothing stored yet, it seeds from whether onboarding was completed.
-function persistConnections(c: Connections) {
-	if (typeof window !== 'undefined') {
-		try {
-			localStorage.setItem('coms.connections', JSON.stringify(c));
-		} catch {
-			// Ignore localStorage errors
+// Platform connections - fetched from API, with localStorage fallback for offline/demo
+export const connections = writable<Connections>({ gmail: false, slack: false, whatsapp: false });
+export const connectionsLoading = writable(false);
+
+// API response types for platform connections
+interface ConnectionsResponse {
+	connections: Array<{ platform: string; status: string; email?: string; lastSyncAt?: number }>;
+}
+
+interface ConnectResponse {
+	authUrl?: string;
+}
+
+// Load real connections from API
+export async function loadConnections(): Promise<void> {
+	if (typeof window === 'undefined') return;
+
+	connectionsLoading.set(true);
+	try {
+		const res = await fetch('/api/connections');
+		if (res.ok) {
+			const data: ConnectionsResponse = await res.json();
+			const state: Connections = { gmail: false, slack: false, whatsapp: false };
+			for (const conn of data.connections) {
+				if (conn.platform in state && conn.status === 'active') {
+					state[conn.platform as ConnectionId] = true;
+				}
+			}
+			connections.set(state);
 		}
+	} catch {
+		// API unavailable, keep current state
+	} finally {
+		connectionsLoading.set(false);
 	}
 }
 
-function initialConnections(): Connections {
-	if (typeof window !== 'undefined') {
-		try {
-			const stored = localStorage.getItem('coms.connections');
-			if (stored) return JSON.parse(stored);
-		} catch {
-			// Ignore localStorage errors
+// Start OAuth flow to connect a platform
+export async function connectPlatform(id: ConnectionId, name: string): Promise<void> {
+	try {
+		const res = await fetch(`/api/connections/${id}`, { method: 'POST' });
+		if (!res.ok) {
+			let message = `Failed to connect ${name}`;
+			try {
+				const err = (await res.json()) as { message?: string };
+				if (err.message) message = err.message;
+			} catch {
+				// Use default message
+			}
+			toast.show(message);
+			return;
 		}
+		const data: ConnectResponse = await res.json();
+		if (data.authUrl) {
+			// Redirect to OAuth provider
+			window.location.href = data.authUrl;
+		}
+	} catch {
+		toast.show(`Failed to connect ${name}`);
 	}
-	const wasOnboarded = typeof window !== 'undefined' && localStorage.getItem('coms.onboarded') === '1';
-	const seed: Connections = { gmail: wasOnboarded, slack: wasOnboarded, whatsapp: false };
-	persistConnections(seed);
-	return seed;
 }
 
-export const connections = writable<Connections>(initialConnections());
+// Disconnect a platform
+export async function disconnectPlatform(id: ConnectionId, name: string): Promise<void> {
+	try {
+		const res = await fetch(`/api/connections/${id}`, { method: 'DELETE' });
+		if (res.ok) {
+			connections.update((c) => ({ ...c, [id]: false }));
+			toast.show(`${name} disconnected`);
+		} else {
+			toast.show(`Failed to disconnect ${name}`);
+		}
+	} catch {
+		toast.show(`Failed to disconnect ${name}`);
+	}
+}
 
-export function togglePlatform(id: ConnectionId, name: string) {
-	let nowOn = false;
-	connections.update((c) => {
-		nowOn = !c[id];
-		const next = { ...c, [id]: nowOn };
-		persistConnections(next);
-		return next;
-	});
-	toast.show(`${name} ${nowOn ? 'connected' : 'disconnected'}`);
+// Toggle platform connection (connects or disconnects based on current state)
+export function togglePlatform(id: ConnectionId, name: string): void {
+	const current = get(connections);
+	if (current[id]) {
+		disconnectPlatform(id, name);
+	} else {
+		connectPlatform(id, name);
+	}
 }
 
 export function signIn() {
@@ -297,15 +343,7 @@ export function signOut() {
 	welcomed.reset();
 	authed.reset();
 	onboarded.reset();
-	const cleared: Connections = { gmail: false, slack: false, whatsapp: false };
-	connections.set(cleared);
-	if (typeof window !== 'undefined') {
-		try {
-			localStorage.removeItem('coms.connections');
-		} catch {
-			// Ignore localStorage errors
-		}
-	}
+	connections.set({ gmail: false, slack: false, whatsapp: false });
 	toast.show('Logged out');
 }
 

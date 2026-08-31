@@ -8,6 +8,7 @@
 		addGroup,
 		removeGroup,
 		connections,
+		connectionsLoading,
 		togglePlatform,
 		signOut
 	} from '$lib/stores';
@@ -116,7 +117,7 @@
 
 		<div class="field">
 			<span class="field-label">Connected platforms</span>
-			<div class="platform-list">
+			<div class="platform-list" class:loading={$connectionsLoading}>
 				{#each CONNECTIONS as p (p.id)}
 					{@const on = $connections[p.id]}
 					<div class="platform-row">
@@ -341,6 +342,12 @@
 		border: 1px solid var(--color-divider);
 		border-radius: var(--radius-md);
 		overflow: hidden;
+		transition: opacity 0.2s;
+	}
+
+	.platform-list.loading {
+		opacity: 0.5;
+		pointer-events: none;
 	}
 
 	.platform-row {

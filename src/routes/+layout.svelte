@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import {
 		theme,
@@ -12,9 +13,12 @@
 		onboarded,
 		loadNotes,
 		loadConversations,
-		loadContacts
+		loadContacts,
+		loadConnections,
+		toast
 	} from '$lib/stores';
 	import type { TabId } from '$lib/types';
+	import { CONNECTIONS } from '$lib/types';
 	import Toast from '$components/Toast.svelte';
 	import ComposeDialog from '$components/ComposeDialog.svelte';
 	import SignInScreen from '$components/SignInScreen.svelte';
@@ -40,6 +44,25 @@
 		// Initialize theme
 		theme.init();
 		theme.set($preferences.theme);
+
+		// Load real connection status from API (for both onboarding and settings)
+		if ($authed) {
+			loadConnections();
+		}
+
+		// Handle OAuth callback success/error (may come back during onboarding or after)
+		const connected = $page.url.searchParams.get('connected');
+		const error = $page.url.searchParams.get('error');
+
+		if (connected) {
+			const platformName = CONNECTIONS.find((c) => c.id === connected)?.name || connected;
+			toast.show(`${platformName} connected`);
+			goto('/', { replaceState: true });
+		} else if (error) {
+			const message = error === 'oauth_denied' ? 'Connection cancelled' : 'Connection failed';
+			toast.show(message);
+			goto('/', { replaceState: true });
+		}
 
 		// Apply the user's default tab -- either a status tab, or "pf:<platform>" to
 		// open filtered to a single platform via the category filter instead.

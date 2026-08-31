@@ -95,11 +95,11 @@ export const GET: RequestHandler = async ({ params, url, platform }) => {
 			tokenExpiresAt
 		});
 
-		// Redirect to settings with success message
-		throw redirect(302, '/settings?connected=' + platformName);
+		// Redirect to home - layout will show appropriate screen based on auth state
+		throw redirect(302, '/?connected=' + platformName);
 	} catch (e) {
 		if ((e as { status?: number }).status === 302) throw e; // Re-throw redirects
 		console.error('OAuth callback error:', e);
-		throw redirect(302, '/settings?error=oauth_failed');
+		throw redirect(302, '/?error=oauth_failed');
 	}
 };
