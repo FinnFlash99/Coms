@@ -89,7 +89,7 @@ async function findOrCreateContact(
 	senderName: string
 ): Promise<string> {
 	// First check if contact exists via contact_identities
-	const existing = await queryOne<{ contact_id: string }>(
+	const existingIdentity = await queryOne<{ contact_id: string }>(
 		db,
 		`SELECT ci.contact_id FROM contact_identities ci
 		 JOIN contacts c ON c.id = ci.contact_id
@@ -97,29 +97,66 @@ async function findOrCreateContact(
 		[userId, senderEmail]
 	);
 
-	if (existing) {
-		return existing.contact_id;
+	if (existingIdentity) {
+		return existingIdentity.contact_id;
+	}
+
+	// Also check contacts directly by handle (the unique constraint is on org_id, channel, handle)
+	const existingContact = await queryOne<{ id: string }>(
+		db,
+		`SELECT id FROM contacts WHERE channel = 'gmail' AND handle = ?`,
+		[senderEmail]
+	);
+
+	if (existingContact) {
+		// Contact exists but may be missing identity - ensure identity exists
+		const hasIdentity = await queryOne<{ id: string }>(
+			db,
+			`SELECT id FROM contact_identities WHERE contact_id = ? AND platform = 'gmail'`,
+			[existingContact.id]
+		);
+
+		if (!hasIdentity) {
+			const identityId = generateId();
+			await execute(
+				db,
+				`INSERT OR IGNORE INTO contact_identities (id, contact_id, platform, platform_user_id, display_name, email)
+				 VALUES (?, ?, 'gmail', ?, ?, ?)`,
+				[identityId, existingContact.id, senderEmail, senderName, senderEmail]
+			);
+		}
+
+		return existingContact.id;
 	}
 
 	// Create new contact
 	const contactId = generateId();
 	await execute(
 		db,
-		`INSERT INTO contacts (id, user_id, name, channel, handle, contact_type, connection_strength, created_at)
+		`INSERT OR IGNORE INTO contacts (id, user_id, name, channel, handle, contact_type, connection_strength, created_at)
 		 VALUES (?, ?, ?, 'gmail', ?, 'other', 'New', datetime('now'))`,
 		[contactId, userId, senderName, senderEmail]
 	);
 
-	// Create contact identity
+	// Check if our insert succeeded or if another concurrent insert won
+	const actualContact = await queryOne<{ id: string }>(
+		db,
+		`SELECT id FROM contacts WHERE channel = 'gmail' AND handle = ?`,
+		[senderEmail]
+	);
+
+	const finalContactId = actualContact?.id ?? contactId;
+
+	// Create contact identity (use INSERT OR IGNORE for safety)
 	const identityId = generateId();
 	await execute(
 		db,
-		`INSERT INTO contact_identities (id, contact_id, platform, platform_user_id, display_name, email)
+		`INSERT OR IGNORE INTO contact_identities (id, contact_id, platform, platform_user_id, display_name, email)
 		 VALUES (?, ?, 'gmail', ?, ?, ?)`,
-		[identityId, contactId, senderEmail, senderName, senderEmail]
+		[identityId, finalContactId, senderEmail, senderName, senderEmail]
 	);
 
-	return contactId;
+	return finalContactId;
 }
 
 /**
