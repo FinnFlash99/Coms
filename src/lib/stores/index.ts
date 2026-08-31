@@ -23,7 +23,8 @@ import {
 	dueLabel,
 	timeText
 } from '$lib/types';
-import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS, DEMO_NOTES } from './demo-data';
+import { DEMO_CONTACTS, DEMO_CONVERSATIONS, DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
+import * as api from '$lib/api/openchannels';
 
 // Theme store
 function createThemeStore() {
@@ -121,7 +122,27 @@ export const events = writable<CalendarEvent[]>(DEMO_EVENTS);
 export const followUps = writable<FollowUp[]>(DEMO_FOLLOWUPS);
 
 // Notes & tasks -- a lightweight scratchpad, separate from conversations/events.
-export const notes = writable<Note[]>(DEMO_NOTES);
+// Wired to OpenChannels API; starts empty and loads asynchronously.
+export const notes = writable<Note[]>([]);
+export const notesLoading = writable<boolean>(false);
+export const notesError = writable<string | null>(null);
+
+// Load notes from API
+export async function loadNotes(): Promise<void> {
+	if (typeof window === 'undefined') return;
+	notesLoading.set(true);
+	notesError.set(null);
+	try {
+		const items = await api.listNotes();
+		notes.set(items);
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : 'Failed to load notes';
+		notesError.set(msg);
+		console.error('Failed to load notes:', e);
+	} finally {
+		notesLoading.set(false);
+	}
+}
 
 // Notes panel UI state -- shared so the header button and the panel itself can both drive it.
 export const notesOpen = writable(false);
@@ -440,18 +461,71 @@ export function completeFollowUp(id: string) {
 	toast.show('Follow-up done');
 }
 
-export function addNote(text: string, kind: NoteKind) {
+export async function addNote(text: string, kind: NoteKind): Promise<void> {
 	const trimmed = text.trim();
 	if (!trimmed) return;
-	notes.update((list) => [{ id: 'n' + Date.now(), text: trimmed, kind, done: false, ts: Date.now() }, ...list]);
+
+	// Optimistic update with temp ID
+	const tempId = 'temp-' + Date.now();
+	const tempNote: Note = { id: tempId, text: trimmed, kind, done: false, ts: Date.now() };
+	notes.update((list) => [tempNote, ...list]);
+
+	try {
+		const created = await api.createNote(trimmed, kind);
+		// Replace temp note with real one
+		notes.update((list) => list.map((n) => (n.id === tempId ? created : n)));
+	} catch (e) {
+		// Revert on error
+		notes.update((list) => list.filter((n) => n.id !== tempId));
+		const msg = e instanceof Error ? e.message : 'Failed to create note';
+		toast.show(msg);
+		console.error('Failed to create note:', e);
+	}
 }
 
-export function toggleNote(id: string) {
-	notes.update((list) => list.map((n) => (n.id === id ? { ...n, done: !n.done } : n)));
+export async function toggleNote(id: string): Promise<void> {
+	// Optimistic update
+	let previousDone = false;
+	notes.update((list) =>
+		list.map((n) => {
+			if (n.id === id) {
+				previousDone = n.done;
+				return { ...n, done: !n.done };
+			}
+			return n;
+		})
+	);
+
+	try {
+		await api.updateNote(id, { done: !previousDone });
+	} catch (e) {
+		// Revert on error
+		notes.update((list) => list.map((n) => (n.id === id ? { ...n, done: previousDone } : n)));
+		const msg = e instanceof Error ? e.message : 'Failed to update note';
+		toast.show(msg);
+		console.error('Failed to toggle note:', e);
+	}
 }
 
-export function removeNote(id: string) {
-	notes.update((list) => list.filter((n) => n.id !== id));
+export async function removeNote(id: string): Promise<void> {
+	// Optimistic update - save removed note for potential revert
+	let removed: Note | undefined;
+	notes.update((list) => {
+		removed = list.find((n) => n.id === id);
+		return list.filter((n) => n.id !== id);
+	});
+
+	try {
+		await api.deleteNote(id);
+	} catch (e) {
+		// Revert on error
+		if (removed) {
+			notes.update((list) => [...list, removed!].sort((a, b) => b.ts - a.ts));
+		}
+		const msg = e instanceof Error ? e.message : 'Failed to delete note';
+		toast.show(msg);
+		console.error('Failed to delete note:', e);
+	}
 }
 
 export function toggleNotesPanel() {

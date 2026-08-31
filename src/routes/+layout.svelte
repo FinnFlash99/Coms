@@ -2,7 +2,16 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { theme, preferences, greetDismissed, activeTab, categoryFilter, authed, onboarded } from '$lib/stores';
+	import {
+		theme,
+		preferences,
+		greetDismissed,
+		activeTab,
+		categoryFilter,
+		authed,
+		onboarded,
+		loadNotes
+	} from '$lib/stores';
 	import type { TabId } from '$lib/types';
 	import Toast from '$components/Toast.svelte';
 	import ComposeDialog from '$components/ComposeDialog.svelte';
@@ -15,6 +24,13 @@
 	// reachable before signing in -- the only routes exempt from the auth gate below.
 	const PUBLIC_ROUTES = ['/terms', '/privacy'];
 	const isPublicRoute = $derived(PUBLIC_ROUTES.includes($page.url.pathname));
+
+	// Load notes from API when user is authenticated and onboarded
+	$effect(() => {
+		if ($authed && $onboarded) {
+			loadNotes();
+		}
+	});
 
 	onMount(() => {
 		// Initialize theme

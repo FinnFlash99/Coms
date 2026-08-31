@@ -16,7 +16,8 @@ import type {
 } from '$lib/types';
 
 // Configuration
-const API_BASE_URL = import.meta.env.VITE_OPENCHANNELS_URL || 'http://localhost:8787';
+const API_BASE_URL =
+	import.meta.env.VITE_OPENCHANNELS_URL || 'https://openchannels-api.rwb89mvwwg.workers.dev';
 
 // --- API Response Types (what OpenChannels returns) ---
 
