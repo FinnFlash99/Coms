@@ -1,7 +1,7 @@
 // OAuth configuration and helpers
 /// <reference types="@cloudflare/workers-types" />
 
-export type OAuthPlatform = 'gmail' | 'outlook' | 'slack' | 'discord';
+export type OAuthPlatform = 'gmail' | 'outlook' | 'slack' | 'whatsapp';
 
 export interface OAuthConfig {
 	authUrl: string;
@@ -15,30 +15,45 @@ export const OAUTH_CONFIGS: Record<OAuthPlatform, OAuthConfig> = {
 	gmail: {
 		authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
 		tokenUrl: 'https://oauth2.googleapis.com/token',
-		scopes: ['https://www.googleapis.com/auth/gmail.readonly', 'email', 'profile'],
+		scopes: [
+			'https://www.googleapis.com/auth/gmail.readonly',
+			'https://www.googleapis.com/auth/gmail.send',
+			'https://www.googleapis.com/auth/gmail.modify',
+			'https://www.googleapis.com/auth/calendar.readonly',
+			'email',
+			'profile'
+		],
 		clientIdEnvKey: 'GOOGLE_CLIENT_ID',
 		clientSecretEnvKey: 'GOOGLE_CLIENT_SECRET'
 	},
 	outlook: {
 		authUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
 		tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-		scopes: ['Mail.Read', 'User.Read', 'offline_access'],
+		scopes: ['Mail.Read', 'Mail.Send', 'User.Read', 'Calendars.Read', 'offline_access'],
 		clientIdEnvKey: 'MICROSOFT_CLIENT_ID',
 		clientSecretEnvKey: 'MICROSOFT_CLIENT_SECRET'
 	},
 	slack: {
 		authUrl: 'https://slack.com/oauth/v2/authorize',
 		tokenUrl: 'https://slack.com/api/oauth.v2.access',
-		scopes: ['channels:history', 'im:history', 'users:read', 'users:read.email'],
+		scopes: [
+			'channels:history',
+			'channels:read',
+			'chat:write',
+			'im:history',
+			'users:read',
+			'users:read.email'
+		],
 		clientIdEnvKey: 'SLACK_CLIENT_ID',
 		clientSecretEnvKey: 'SLACK_CLIENT_SECRET'
 	},
-	discord: {
-		authUrl: 'https://discord.com/api/oauth2/authorize',
-		tokenUrl: 'https://discord.com/api/oauth2/token',
-		scopes: ['identify', 'email', 'guilds', 'messages.read'],
-		clientIdEnvKey: 'DISCORD_CLIENT_ID',
-		clientSecretEnvKey: 'DISCORD_CLIENT_SECRET'
+	// WhatsApp uses Meta's Graph API OAuth flow (v26.0 as of Aug 2026)
+	whatsapp: {
+		authUrl: 'https://www.facebook.com/v26.0/dialog/oauth',
+		tokenUrl: 'https://graph.facebook.com/v26.0/oauth/access_token',
+		scopes: ['whatsapp_business_messaging', 'whatsapp_business_management'],
+		clientIdEnvKey: 'META_APP_ID',
+		clientSecretEnvKey: 'META_APP_SECRET'
 	}
 };
 

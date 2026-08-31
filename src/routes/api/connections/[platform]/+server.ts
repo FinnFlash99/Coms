@@ -8,7 +8,7 @@ import {
 } from '$lib/server/oauth';
 import { deletePlatformConnection } from '$lib/server/db';
 
-const VALID_PLATFORMS: OAuthPlatform[] = ['gmail', 'outlook', 'slack', 'discord'];
+const VALID_PLATFORMS: OAuthPlatform[] = ['gmail', 'outlook', 'slack', 'whatsapp'];
 
 // POST /api/connections/[platform] - Start OAuth flow
 export const POST: RequestHandler = async ({ params, url, locals, platform }) => {

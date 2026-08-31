@@ -9,7 +9,7 @@ import {
 import { encryptToken } from '$lib/server/crypto';
 import { upsertPlatformConnection } from '$lib/server/db';
 
-const VALID_PLATFORMS: OAuthPlatform[] = ['gmail', 'outlook', 'slack', 'discord'];
+const VALID_PLATFORMS: OAuthPlatform[] = ['gmail', 'outlook', 'slack', 'whatsapp'];
 
 // GET /api/auth/callback/[platform] - OAuth callback
 export const GET: RequestHandler = async ({ params, url, platform }) => {

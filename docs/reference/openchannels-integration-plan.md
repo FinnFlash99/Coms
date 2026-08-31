@@ -613,7 +613,7 @@ WHATSAPP_VERIFY_TOKEN=
 | Phase | Deliverable | Duration | Status |
 |-------|-------------|----------|--------|
 | **0. Frontend Prerequisites** | Auth flow, platform connections UI, loading states, dynamic user | 1-1.5 weeks | ✅ COMPLETE (design) |
-| **0.5 Platform Setup** | Google/Slack/Meta app configuration, OAuth credentials | 1-2 days | Not started |
+| **0.5 Platform Setup** | Google/Slack/Meta app configuration, OAuth credentials | 1-2 days | ✅ COMPLETE (Gmail + Slack; WhatsApp deferred) |
 | **1. Foundation** | Forked OpenChannels + Coms schema + base API | 2 weeks | ✅ COMPLETE |
 | 2. Messaging | Gmail + Slack + WhatsApp OAuth, webhooks, send | 3-4 weeks | Not started |
 | **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ COMPLETE |
@@ -621,7 +621,7 @@ WHATSAPP_VERIFY_TOKEN=
 | **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ COMPLETE (all stores wired) |
 | 6. Deployment | Production cutover + remove demo mode | 1 week | Not started |
 
-**Remaining: 4-5 weeks** (Phases 0, 1, 3, 5 complete; need 0.5, 2, 4, 6)
+**Remaining: 4-5 weeks** (Phases 0, 0.5, 1, 3, 5 complete; need 2, 4, 6)
 
 ---
 
@@ -633,6 +633,7 @@ Phase 0 (Frontend Prerequisites) ✅ COMPLETE
     ├──────────────────────────────┐
     ▼                              ▼
 Phase 0.5 (Platform Setup)    Phase 1 (Foundation) ✅ COMPLETE
+✅ COMPLETE (Gmail+Slack)
     │                              │
     └──────────────┬───────────────┘
                    ▼
@@ -650,12 +651,12 @@ Phase 3     Phase 4        Phase 5
           Phase 6 (Deployment)
 ```
 
-**Current state:** Phases 0, 1, 3, 5 complete. All stores wired to OpenChannels API at `openchannels-api.rwb89mvwwg.workers.dev`. App shows empty inbox until OAuth connections bring real data from Gmail/Slack/WhatsApp.
+**Current state:** Phases 0, 0.5, 1, 3, 5 complete. All stores wired to OpenChannels API at `openchannels-api.rwb89mvwwg.workers.dev`. Gmail and Slack OAuth credentials configured; WhatsApp deferred.
 
 **Next steps:**
-- Phase 0.5: Configure Google/Slack/Meta apps and obtain OAuth credentials
-- Phase 2: Implement OAuth flows and message ingestion
+- Phase 2: Implement OAuth flows and message ingestion (Gmail + Slack)
 - Phase 4: Google Calendar integration
+- Phase 6: Deployment
 
 Phase 2 (Messaging) requires Phase 0.5 (credentials). Phase 1 (API infrastructure) is already complete.
 
