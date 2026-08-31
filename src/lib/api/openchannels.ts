@@ -15,9 +15,8 @@ import type {
 	MessageDirection
 } from '$lib/types';
 
-// Configuration
-const API_BASE_URL =
-	import.meta.env.VITE_OPENCHANNELS_URL || 'https://openchannels-api.rwb89mvwwg.workers.dev';
+// Configuration - use relative URLs to call the Coms API on the same origin
+const API_BASE_URL = '';
 
 // --- API Response Types (what OpenChannels returns) ---
 
