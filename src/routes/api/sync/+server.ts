@@ -88,28 +88,15 @@ async function findOrCreateContact(
 	senderEmail: string,
 	senderName: string
 ): Promise<string> {
-	// First check if contact exists via contact_identities
-	const existingIdentity = await queryOne<{ contact_id: string }>(
+	// Check if contact exists for this user (unique constraint is on user_id, channel, handle)
+	const existingContact = await queryOne<{ id: string }>(
 		db,
-		`SELECT ci.contact_id FROM contact_identities ci
-		 JOIN contacts c ON c.id = ci.contact_id
-		 WHERE c.user_id = ? AND ci.email = ?`,
+		`SELECT id FROM contacts WHERE user_id = ? AND channel = 'gmail' AND handle = ?`,
 		[userId, senderEmail]
 	);
 
-	if (existingIdentity) {
-		return existingIdentity.contact_id;
-	}
-
-	// Also check contacts directly by handle (the unique constraint is on org_id, channel, handle)
-	const existingContact = await queryOne<{ id: string }>(
-		db,
-		`SELECT id FROM contacts WHERE channel = 'gmail' AND handle = ?`,
-		[senderEmail]
-	);
-
 	if (existingContact) {
-		// Contact exists but may be missing identity - ensure identity exists
+		// Contact exists - ensure identity exists too
 		const hasIdentity = await queryOne<{ id: string }>(
 			db,
 			`SELECT id FROM contact_identities WHERE contact_id = ? AND platform = 'gmail'`,
@@ -129,7 +116,7 @@ async function findOrCreateContact(
 		return existingContact.id;
 	}
 
-	// Create new contact
+	// Create new contact for this user
 	const contactId = generateId();
 	await execute(
 		db,
@@ -138,16 +125,16 @@ async function findOrCreateContact(
 		[contactId, userId, senderName, senderEmail]
 	);
 
-	// Check if our insert succeeded or if another concurrent insert won
+	// Query to get actual contact_id (handles race condition where concurrent insert won)
 	const actualContact = await queryOne<{ id: string }>(
 		db,
-		`SELECT id FROM contacts WHERE channel = 'gmail' AND handle = ?`,
-		[senderEmail]
+		`SELECT id FROM contacts WHERE user_id = ? AND channel = 'gmail' AND handle = ?`,
+		[userId, senderEmail]
 	);
 
 	const finalContactId = actualContact?.id ?? contactId;
 
-	// Create contact identity (use INSERT OR IGNORE for safety)
+	// Create contact identity
 	const identityId = generateId();
 	await execute(
 		db,
