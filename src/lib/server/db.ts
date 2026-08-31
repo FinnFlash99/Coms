@@ -181,8 +181,6 @@ export async function updateConversation(
 
 	if (setClauses.length === 0) return;
 
-	setClauses.push('updated_at = ?');
-	params.push(Math.floor(Date.now() / 1000));
 	params.push(id);
 
 	await execute(
