@@ -216,14 +216,19 @@ Before OAuth integrations can work, external platform apps must be configured. T
 
 **Duration:** 2 weeks
 
+**Status: COMPLETE** — OpenChannels forked, adapted for D1, deployed to Workers.
+
 ### 1.1 Fork & Adapt OpenChannels
 
-| Task | Details |
-|------|---------|
-| Fork repo | `clawnify/OpenChannels` → your GitHub |
-| Strip React frontend | Keep API layer only |
-| Adapt for Cloudflare | Hono already works on Workers; adapt SQLite → D1 bindings |
-| Disable agent features | Comment out agent-mediated reply logic; keep ingest/outbox structure |
+| Task | Details | Status |
+|------|---------|--------|
+| Fork repo | [`FinnFlash99/OpenChannels`](https://github.com/FinnFlash99/OpenChannels) | ✅ Done |
+| Strip React frontend | Removed `src/client/` entirely | ✅ Done |
+| Adapt for Cloudflare | Hono + Drizzle for D1; removed Clawnify deps | ✅ Done |
+| Disable agent features | Agent-mediated reply logic removed; direct send path | ✅ Done |
+| Deploy | [`openchannels-api.rwb89mvwwg.workers.dev`](https://openchannels-api.rwb89mvwwg.workers.dev/health) | ✅ Done |
+
+**Local path:** `~/Projects/OpenChannels`
 
 ### 1.2 Schema Extensions
 
@@ -271,23 +276,28 @@ CREATE TABLE sessions (
 
 ### 1.3 API Endpoint Mapping
 
-| Coms Need | OpenChannels Endpoint | Adaptation |
-|-----------|----------------------|------------|
-| List conversations | Extend existing | Add Coms status fields to response |
-| Get conversation | Extend existing | Include messages + Coms metadata |
-| Mark read | **New** | `PATCH /api/conversations/:id/read` |
-| Mark responded | **New** | `PATCH /api/conversations/:id/responded` |
-| Set importance | **New** | `PATCH /api/conversations/:id/importance` |
-| Toggle time-sensitive | **New** | `PATCH /api/conversations/:id/urgent` |
-| Set due date | **New** | `PATCH /api/conversations/:id/due` |
-| Send message | Use outbox | Direct send (no agent approval) |
-| Ingest from platform | `POST /api/ingest` | Use as-is |
-| List contacts | Extend existing | Add Coms type/connection fields |
-| Update contact | Extend existing | Support type/connection updates |
-| User preferences | **New** | Full CRUD |
-| Notes/tasks | **New** | Full CRUD |
-| Auth/session | **New** | `/api/auth/*` endpoints |
-| Platform connections | **New** | `/api/connections/*` endpoints |
+**Status: COMPLETE** — All endpoints implemented in OpenChannels fork.
+
+| Coms Need | OpenChannels Endpoint | Status |
+|-----------|----------------------|--------|
+| List conversations | `GET /api/conversations` | ✅ Done |
+| Get conversation | `GET /api/conversations/:id` | ✅ Done |
+| Mark read | `PATCH /api/conversations/:id/read` | ✅ Done |
+| Mark responded | `PATCH /api/conversations/:id/responded` | ✅ Done |
+| Set importance | `PATCH /api/conversations/:id/importance` | ✅ Done |
+| Toggle time-sensitive | `PATCH /api/conversations/:id/urgent` | ✅ Done |
+| Set due date | `PATCH /api/conversations/:id/due` | ✅ Done |
+| Set status | `PATCH /api/conversations/:id/status` | ✅ Done |
+| Ingest from platform | `POST /api/ingest` | ✅ Done |
+| List contacts | `GET /api/contacts` | ✅ Done |
+| Update contact | `PATCH /api/contacts/:id` | ✅ Done |
+| Notes/tasks | `GET/POST/PATCH/DELETE /api/notes` | ✅ Done |
+| Health check | `GET /health` | ✅ Done |
+
+**Not yet implemented (Phase 2+):**
+- Send message (requires platform OAuth)
+- Auth/session endpoints
+- Platform connections CRUD
 
 ---
 
@@ -352,14 +362,16 @@ User clicks Send → POST /api/conversations/:id/send
 
 **Duration:** 1 week
 
+**Status: BACKEND COMPLETE** — API endpoints implemented in OpenChannels. Frontend still uses demo data.
+
 ### 3.1 API Endpoints
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/notes` | GET | List user's notes/tasks |
-| `/api/notes` | POST | Create note or task |
-| `/api/notes/:id` | PATCH | Update text, toggle done |
-| `/api/notes/:id` | DELETE | Remove note/task |
+| Endpoint | Method | Purpose | Status |
+|----------|--------|---------|--------|
+| `/api/notes` | GET | List user's notes/tasks | ✅ Done |
+| `/api/notes` | POST | Create note or task | ✅ Done |
+| `/api/notes/:id` | PATCH | Update text, toggle done | ✅ Done |
+| `/api/notes/:id` | DELETE | Remove note/task | ✅ Done |
 
 ### 3.2 Data Model
 
@@ -442,9 +454,13 @@ This is a complete replacement, not an overlay.
 
 **Duration:** 1-2 weeks
 
+**Status: API CLIENT COMPLETE** — `src/lib/api/openchannels.ts` implemented with typed transformers. Store migration not started.
+
 ### 5.1 API Client
 
-Create centralized API client:
+**Status: COMPLETE** — Implemented at [`src/lib/api/openchannels.ts`](../../src/lib/api/openchannels.ts).
+
+Reference implementation (actual code differs slightly with type transformers):
 
 ```typescript
 // src/lib/api/client.ts
@@ -583,14 +599,14 @@ WHATSAPP_VERIFY_TOKEN=
 |-------|-------------|----------|--------|
 | **0. Frontend Prerequisites** | Auth flow, platform connections UI, loading states, dynamic user | 1-1.5 weeks | ✅ COMPLETE (design) |
 | **0.5 Platform Setup** | Google/Slack/Meta app configuration, OAuth credentials | 1-2 days | Not started |
-| 1. Foundation | Forked OpenChannels + Coms schema + base API | 2 weeks | Not started |
+| **1. Foundation** | Forked OpenChannels + Coms schema + base API | 2 weeks | ✅ COMPLETE |
 | 2. Messaging | Gmail + Slack + WhatsApp OAuth, webhooks, send | 3-4 weeks | Not started |
-| 3. Notes/Tasks | CRUD endpoints + frontend migration | 1 week | Not started |
+| **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ Backend done, frontend pending |
 | 4. Calendar | Google Calendar OAuth + event fetch | 1 week | Not started |
-| 5. Frontend Integration | API client + store migration | 1-2 weeks | Not started |
+| **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ API client done, store migration pending |
 | 6. Deployment | Production cutover + remove demo mode | 1 week | Not started |
 
-**Remaining: 9-12 weeks** (Phase 0 design complete; Phase 0.5 can run in parallel with Phase 1)
+**Remaining: 5-7 weeks** (Phases 0, 1 complete; Phase 3 backend + Phase 5 API client complete)
 
 ---
 
@@ -601,16 +617,17 @@ Phase 0 (Frontend Prerequisites) ✅ COMPLETE
     │
     ├──────────────────────────────┐
     ▼                              ▼
-Phase 0.5 (Platform Setup)    Phase 1 (Foundation)
+Phase 0.5 (Platform Setup)    Phase 1 (Foundation) ✅ COMPLETE
     │                              │
     └──────────────┬───────────────┘
                    ▼
-            Phase 2 (Messaging) ← Needs both 0.5 and 1
+            Phase 2 (Messaging) ← Needs 0.5 (1 is done)
                    │
     ├───────────┬──┴───────────┐
     ▼           ▼              ▼
 Phase 3     Phase 4        Phase 5
 (Notes)    (Calendar)    (Frontend Integration)
+✅ API       Not started   ✅ API client
     │           │              │
     └───────────┴──────────────┘
                 │
@@ -618,13 +635,13 @@ Phase 3     Phase 4        Phase 5
           Phase 6 (Deployment)
 ```
 
-**Current state:** Phase 0 design work is complete. The frontend has simulated auth, onboarding, and platform connections using localStorage.
+**Current state:** Phase 0 design and Phase 1 foundation are complete. OpenChannels backend is deployed at `openchannels-api.rwb89mvwwg.workers.dev`. API client exists in Coms frontend. Frontend still uses demo data (store migration not done).
 
 **Next steps (can run in parallel):**
 - Phase 0.5: Configure Google/Slack/Meta apps and obtain OAuth credentials
-- Phase 1: Fork OpenChannels, adapt for D1, add Coms schema
+- Phase 5.2: Migrate frontend stores from demo data to API calls (Notes can be done now without OAuth)
 
-Phase 2 requires both Phase 0.5 (credentials) and Phase 1 (API infrastructure) to be complete.
+Phase 2 (Messaging) requires Phase 0.5 (credentials). Phase 1 (API infrastructure) is already complete.
 
 ---
 
