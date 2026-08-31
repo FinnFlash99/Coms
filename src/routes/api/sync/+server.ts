@@ -5,6 +5,21 @@ import { decryptToken } from '$lib/server/crypto';
 import { refreshAccessToken } from '$lib/server/oauth';
 
 /**
+ * Decode HTML entities in a string
+ */
+function decodeHtmlEntities(text: string): string {
+	return text
+		.replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
+		.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+		.replace(/&amp;/g, '&')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&apos;/g, "'")
+		.replace(/&nbsp;/g, ' ');
+}
+
+/**
  * Get decrypted access token, refreshing if needed
  */
 async function getAccessToken(
@@ -244,14 +259,17 @@ async function syncGmailEmails(
 				// Find or create contact
 				const contactId = await findOrCreateContact(db, userId, senderEmail, senderName);
 
+				// Decode HTML entities in snippet
+				const snippet = decodeHtmlEntities(msgData.snippet);
+
 				// Find or create conversation
 				const conversationId = await findOrCreateConversation(
-					db, userId, contactId, msgData.threadId, subject, timestamp, msgData.snippet
+					db, userId, contactId, msgData.threadId, subject, timestamp, snippet
 				);
 
 				// Create message if it doesn't exist
 				const created = await createMessageIfNotExists(
-					db, conversationId, msgData.id, msgData.snippet, senderName
+					db, conversationId, msgData.id, snippet, senderName
 				);
 
 				if (created) {
