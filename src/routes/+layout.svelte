@@ -51,13 +51,9 @@
 		theme.init();
 		theme.set($preferences.theme);
 
-		console.log('[Layout] onMount - data.user:', data.user);
-		console.log('[Layout] onMount - $authed:', $authed, '$onboarded:', $onboarded);
-
 		// Load real connection status from API (for both onboarding and settings)
 		// Also load conversations/contacts/notes if user is authenticated
 		if (data.user) {
-			console.log('[Layout] Loading data for authenticated user');
 			loadConnections();
 			loadConversations();
 			loadContacts();

@@ -108,7 +108,8 @@ async function findOrCreateConversation(
 	contactId: string,
 	threadId: string,
 	subject: string,
-	timestamp: number
+	timestamp: number,
+	preview: string
 ): Promise<string> {
 	// Check if conversation exists
 	const existing = await queryOne<{ id: string }>(
@@ -119,12 +120,12 @@ async function findOrCreateConversation(
 	);
 
 	if (existing) {
-		// Update last message time if this is newer
+		// Update last message time and preview if this is newer
 		await execute(
 			db,
-			`UPDATE conversations SET last_message_at = ?, subject = ?
+			`UPDATE conversations SET last_message_at = ?, subject = ?, last_message_preview = ?
 			 WHERE id = ? AND (last_message_at IS NULL OR last_message_at < ?)`,
-			[timestamp, subject, existing.id, timestamp]
+			[timestamp, subject, preview, existing.id, timestamp]
 		);
 		return existing.id;
 	}
@@ -133,9 +134,9 @@ async function findOrCreateConversation(
 	const convId = generateId();
 	await execute(
 		db,
-		`INSERT INTO conversations (id, user_id, contact_id, platform, channel, subject, last_message_at, created_at, is_read, is_responded, importance, is_time_sensitive)
-		 VALUES (?, ?, ?, 'gmail', 'gmail', ?, ?, datetime('now'), 0, 0, 'normal', 0)`,
-		[convId, userId, contactId, subject, timestamp]
+		`INSERT INTO conversations (id, user_id, contact_id, platform, channel, subject, last_message_at, last_message_preview, created_at, is_read, is_responded, importance, is_time_sensitive)
+		 VALUES (?, ?, ?, 'gmail', 'gmail', ?, ?, ?, datetime('now'), 0, 0, 'normal', 0)`,
+		[convId, userId, contactId, subject, timestamp, preview]
 	);
 
 	return convId;
@@ -245,7 +246,7 @@ async function syncGmailEmails(
 
 				// Find or create conversation
 				const conversationId = await findOrCreateConversation(
-					db, userId, contactId, msgData.threadId, subject, timestamp
+					db, userId, contactId, msgData.threadId, subject, timestamp, msgData.snippet
 				);
 
 				// Create message if it doesn't exist
