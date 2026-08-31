@@ -23,6 +23,7 @@ This documentation follows the [Diátaxis framework](https://diataxis.fr/), orga
 - [Data Model](reference/data-model.md) — Contact, Conversation, and Message schemas
 - [Design System](reference/design-system.md) — Nocturne design system usage
 - [Product Specification](reference/product-specification.md) — Complete feature specification
+- [OpenChannels Integration Plan](reference/openchannels-integration-plan.md) — Backend integration roadmap
 
 ### Development
 - [Updating the Design](how-to/update-design.md) — Import new Claude Design exports
