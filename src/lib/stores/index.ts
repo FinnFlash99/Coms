@@ -164,6 +164,24 @@ export async function loadConversations(): Promise<void> {
 	}
 }
 
+// Load messages for a specific conversation and update the store
+export async function loadMessages(conversationId: string): Promise<void> {
+	if (typeof window === 'undefined') return;
+
+	const convs = get(conversations);
+	const conv = convs.find(c => c.id === conversationId);
+	if (!conv) return;
+
+	try {
+		const messages = await api.getConversationMessages(conversationId, conv.platform);
+		conversations.update(all =>
+			all.map(c => c.id === conversationId ? { ...c, messages } : c)
+		);
+	} catch (e) {
+		console.error('Failed to load messages:', e);
+	}
+}
+
 // Calendar events and follow-up reminders
 // Events are loaded from Google Calendar API when connected; empty otherwise
 export const events = writable<CalendarEvent[]>([]);

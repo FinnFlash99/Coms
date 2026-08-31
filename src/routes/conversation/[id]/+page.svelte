@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	import { ChevronLeft, Flag, ExternalLink, Send, LoaderCircle } from 'lucide-svelte';
 	import {
 		contacts,
@@ -15,7 +16,8 @@
 		toggleTimeSensitive,
 		updateConversationImportance,
 		allTypes,
-		toast
+		toast,
+		loadMessages
 	} from '$lib/stores';
 	import {
 		type ConnectionStrength,
@@ -41,6 +43,16 @@
 	const contactConversations = $derived(
 		$conversations.filter((c) => c.contactId === contactId).sort((a, b) => b.lastMessageAt - a.lastMessageAt)
 	);
+
+	// Load messages for all conversations when page loads
+	onMount(() => {
+		const convs = $conversations.filter((c) => c.contactId === contactId);
+		convs.forEach(conv => {
+			if (conv.messages.length === 0) {
+				loadMessages(conv.id);
+			}
+		});
+	});
 
 	const platformSummary = $derived(
 		[...new Set(contactConversations.map((c) => PLATFORMS[c.platform].label))].join(', ')
