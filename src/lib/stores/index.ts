@@ -141,11 +141,17 @@ export const conversationsError = writable<string | null>(null);
 
 // Load conversations from API (also populates contacts from embedded contact data)
 export async function loadConversations(): Promise<void> {
-	if (typeof window === 'undefined') return;
+	console.log('[loadConversations] Called');
+	if (typeof window === 'undefined') {
+		console.log('[loadConversations] Skipping - SSR');
+		return;
+	}
 	conversationsLoading.set(true);
 	conversationsError.set(null);
 	try {
+		console.log('[loadConversations] Fetching...');
 		const result = await api.listConversations({ status: 'all' });
+		console.log('[loadConversations] Got', result.conversations.length, 'conversations');
 		conversations.set(result.conversations);
 		// Merge contacts from conversations into contacts store
 		if (result.contacts.size > 0) {
