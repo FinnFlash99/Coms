@@ -23,8 +23,9 @@ import {
 	dueLabel,
 	timeText
 } from '$lib/types';
-import { DEMO_EVENTS, DEMO_FOLLOWUPS } from './demo-data';
+import { DEMO_FOLLOWUPS } from './demo-data';
 import * as api from '$lib/api/openchannels';
+import * as calendarApi from '$lib/api/calendar';
 
 // Theme store
 function createThemeStore() {
@@ -164,8 +165,40 @@ export async function loadConversations(): Promise<void> {
 }
 
 // Calendar events and follow-up reminders
-export const events = writable<CalendarEvent[]>(DEMO_EVENTS);
+// Events are loaded from Google Calendar API when connected; empty otherwise
+export const events = writable<CalendarEvent[]>([]);
+export const eventsLoading = writable<boolean>(false);
+export const eventsError = writable<string | null>(null);
+export const calendarConnected = writable<boolean>(false);
 export const followUps = writable<FollowUp[]>(DEMO_FOLLOWUPS);
+
+// Load calendar events from API
+export async function loadCalendarEvents(start?: Date, end?: Date): Promise<void> {
+	if (typeof window === 'undefined') return;
+	eventsLoading.set(true);
+	eventsError.set(null);
+	try {
+		const result = await calendarApi.fetchCalendarEvents(start, end);
+		events.set(result.events);
+		calendarConnected.set(result.connected);
+	} catch (e) {
+		const msg = e instanceof Error ? e.message : 'Failed to load calendar events';
+		eventsError.set(msg);
+		console.error('Failed to load calendar events:', e);
+		// On error, show empty state (not demo data)
+		events.set([]);
+	} finally {
+		eventsLoading.set(false);
+	}
+}
+
+// Load calendar events for the current month
+export async function loadCurrentMonthEvents(): Promise<void> {
+	const now = new Date();
+	const start = new Date(now.getFullYear(), now.getMonth(), 1);
+	const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+	return loadCalendarEvents(start, end);
+}
 
 // Notes & tasks -- a lightweight scratchpad, separate from conversations/events.
 // Wired to OpenChannels API; starts empty and loads asynchronously.

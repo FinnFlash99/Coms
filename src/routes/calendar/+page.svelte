@@ -1,7 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { ChevronLeft, ChevronRight } from 'lucide-svelte';
-	import { events, conversations, contacts, followUps, setDue, completeFollowUp } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { ChevronLeft, ChevronRight, Calendar } from 'lucide-svelte';
+	import {
+		events,
+		eventsLoading,
+		calendarConnected,
+		conversations,
+		contacts,
+		followUps,
+		setDue,
+		completeFollowUp,
+		loadCalendarEvents,
+		connections
+	} from '$lib/stores';
 	import {
 		EVENT_KINDS,
 		PLATFORMS,
@@ -15,11 +27,30 @@
 	import Button from '$components/Button.svelte';
 	import Tag from '$components/Tag.svelte';
 	import EventPrepDialog from '$components/EventPrepDialog.svelte';
-	import DemoBadge from '$components/DemoBadge.svelte';
 
 	let calView = $state<'month' | 'today'>('month');
 	let monthOffset = $state(0);
 	let prepEventId = $state<string | null>(null);
+
+	// Load calendar events when page mounts and when month changes
+	onMount(() => {
+		loadEventsForCurrentView();
+	});
+
+	// Reload when month changes
+	$effect(() => {
+		// Track monthOffset to trigger reload - using void to suppress unused warning
+		void monthOffset;
+		loadEventsForCurrentView();
+	});
+
+	function loadEventsForCurrentView() {
+		const now = new Date();
+		const base = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
+		const start = new Date(base.getFullYear(), base.getMonth(), 1);
+		const end = new Date(base.getFullYear(), base.getMonth() + 1, 0, 23, 59, 59);
+		loadCalendarEvents(start, end);
+	}
 
 	const viewOptions: Array<{ value: 'month' | 'today'; label: string }> = [
 		{ value: 'month', label: 'Month' },
@@ -412,7 +443,26 @@
 </div>
 
 <EventPrepDialog eventId={prepEventId} onclose={() => (prepEventId = null)} />
-<DemoBadge />
+
+{#if !$calendarConnected && !$eventsLoading}
+	<div class="connect-overlay">
+		<div class="connect-card">
+			<Calendar size={40} strokeWidth={1.2} class="connect-icon" />
+			<h3>Connect Google Calendar</h3>
+			<p class="text-muted">
+				See your schedule, prep for meetings, and track conversation deadlines all in one place.
+			</p>
+			{#if $connections.gmail}
+				<p class="text-muted connect-note">
+					Your Gmail is connected but calendar access may need to be re-authorized.
+				</p>
+			{/if}
+			<Button variant="primary" onclick={() => goto('/settings')}>
+				{$connections.gmail ? 'Check Settings' : 'Connect in Settings'}
+			</Button>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.calendar {
@@ -778,5 +828,49 @@
 		min-height: 30px;
 		font-size: 12.5px;
 		padding: 3px 8px;
+	}
+
+	/* Connect calendar overlay */
+	.connect-overlay {
+		position: fixed;
+		inset: 0;
+		background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 100;
+		backdrop-filter: blur(4px);
+	}
+
+	.connect-card {
+		background: var(--color-surface);
+		border: 1px solid var(--color-divider);
+		border-radius: var(--radius-lg);
+		padding: 40px 48px;
+		max-width: 380px;
+		text-align: center;
+	}
+
+	.connect-card :global(.connect-icon) {
+		color: var(--color-accent);
+		margin-bottom: 16px;
+	}
+
+	.connect-card h3 {
+		font-family: var(--font-heading);
+		font-size: 22px;
+		font-weight: 500;
+		margin: 0 0 12px;
+	}
+
+	.connect-card p {
+		font-size: 14px;
+		line-height: 1.5;
+		margin: 0 0 20px;
+	}
+
+	.connect-note {
+		font-size: 12px !important;
+		color: var(--color-alert-text);
 	}
 </style>

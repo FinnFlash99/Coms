@@ -406,27 +406,31 @@ export const notes = createAsyncStore<Note[]>([], () =>
 
 **Duration:** 1 week
 
+**Status: COMPLETE** — Calendar API endpoints implemented, events store wired to API, attendee matching implemented, empty state shown when calendar not connected.
+
 ### 4.1 OAuth
 
-| Provider | Scopes |
-|----------|--------|
-| Google | `calendar.readonly` |
+| Provider | Scopes | Status |
+|----------|--------|--------|
+| Google | `calendar.readonly` | ✅ Already included in Gmail OAuth |
 
 ### 4.2 API Endpoints
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/calendar/events` | GET | Fetch events for date range |
-| `/api/calendar/events/:id` | GET | Single event + attendee enrichment |
+| Endpoint | Method | Purpose | Status |
+|----------|--------|---------|--------|
+| `/api/calendar/events` | GET | Fetch events for date range | ✅ Done |
+| `/api/calendar/events/:id` | GET | Single event + attendee enrichment | ✅ Done |
 
 ### 4.3 Attendee Matching
+
+**Status: COMPLETE** — Implemented in `src/lib/server/google-calendar.ts` and `/api/calendar/events/[id]` endpoint.
 
 Link calendar attendees to Coms contacts:
 
 ```
 Calendar event attendees (emails)
         ↓
-Match against contacts in D1
+Match against contact_identities in D1
         ↓
 Enrich event with contact metadata (type, connection, recent messages)
         ↓
@@ -439,14 +443,16 @@ Calendar data is fetched on demand from Google API. Optional: cache in Cloudflar
 
 ### 4.5 Demo Data Replacement
 
-**Important:** The current `DEMO_EVENTS` in `src/lib/stores/demo-data.ts` are placeholder data for the prototype. When the Google Calendar integration is complete:
+**Status: COMPLETE** — Demo events removed. Calendar page now shows:
+- Real Google Calendar events when connected
+- "Connect Google Calendar" overlay when not connected
+- Loading state while fetching
 
-- Demo events are **fully replaced** by Google Calendar data
-- No merge or sync between demo and real data
-- The `events` store switches from `writable<CalendarEvent[]>(DEMO_EVENTS)` to an async fetch from `/api/calendar/events`
-- If the user hasn't connected Google Calendar, show an empty state (not demo data)
-
-This is a complete replacement, not an overlay.
+Implementation:
+- `events` store starts empty (`writable<CalendarEvent[]>([])`)
+- `loadCalendarEvents()` function fetches from `/api/calendar/events`
+- `calendarConnected` store tracks whether Google Calendar is accessible
+- Calendar page (`src/routes/calendar/+page.svelte`) shows connection overlay if not connected
 
 ---
 
@@ -617,11 +623,11 @@ WHATSAPP_VERIFY_TOKEN=
 | **1. Foundation** | Forked OpenChannels + Coms schema + base API | 2 weeks | ✅ COMPLETE |
 | **2. Messaging** | Gmail + Slack + WhatsApp OAuth, webhooks, send | 3-4 weeks | ✅ COMPLETE (Gmail + Slack; WhatsApp deferred) |
 | **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ COMPLETE |
-| 4. Calendar | Google Calendar OAuth + event fetch | 1 week | Not started |
+| **4. Calendar** | Google Calendar OAuth + event fetch | 1 week | ✅ COMPLETE |
 | **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ COMPLETE (all stores wired) |
 | 6. Deployment | Production cutover + remove demo mode | 1 week | Not started |
 
-**Remaining: 2 weeks** (Phases 0, 0.5, 1, 2, 3, 5 complete; need 4, 6)
+**Remaining: 1 week** (Phases 0-5 complete; only Phase 6 Deployment remaining)
 
 ---
 
@@ -643,7 +649,7 @@ Phase 0.5 (Platform Setup)    Phase 1 (Foundation) ✅ COMPLETE
     ▼           ▼              ▼
 Phase 3     Phase 4        Phase 5
 (Notes)    (Calendar)    (Frontend Integration)
-✅ COMPLETE  Not started   ✅ COMPLETE
+✅ COMPLETE  ✅ COMPLETE    ✅ COMPLETE
     │           │              │
     └───────────┴──────────────┘
                 │
@@ -651,11 +657,10 @@ Phase 3     Phase 4        Phase 5
           Phase 6 (Deployment)
 ```
 
-**Current state:** Phases 0, 0.5, 1, 2, 3, 5 complete. All stores wired to OpenChannels API. Gmail and Slack OAuth flows, webhooks, and send endpoint implemented. WhatsApp deferred.
+**Current state:** Phases 0-5 complete. All stores wired to OpenChannels API. Gmail and Slack OAuth flows, webhooks, and send endpoint implemented. Google Calendar integration complete with event fetching and attendee matching. WhatsApp deferred.
 
-**Next steps:**
-- Phase 4: Google Calendar integration
-- Phase 6: Deployment
+**Next step:**
+- Phase 6: Deployment (production cutover, remove demo mode)
 
 ---
 
