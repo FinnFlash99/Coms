@@ -362,7 +362,7 @@ User clicks Send → POST /api/conversations/:id/send
 
 **Duration:** 1 week
 
-**Status: BACKEND COMPLETE** — API endpoints implemented in OpenChannels. Frontend still uses demo data.
+**Status: COMPLETE** — Backend API and frontend wiring both done. Notes persist to OpenChannels API.
 
 ### 3.1 API Endpoints
 
@@ -601,12 +601,12 @@ WHATSAPP_VERIFY_TOKEN=
 | **0.5 Platform Setup** | Google/Slack/Meta app configuration, OAuth credentials | 1-2 days | Not started |
 | **1. Foundation** | Forked OpenChannels + Coms schema + base API | 2 weeks | ✅ COMPLETE |
 | 2. Messaging | Gmail + Slack + WhatsApp OAuth, webhooks, send | 3-4 weeks | Not started |
-| **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ Backend done, frontend pending |
+| **3. Notes/Tasks** | CRUD endpoints + frontend migration | 1 week | ✅ COMPLETE |
 | 4. Calendar | Google Calendar OAuth + event fetch | 1 week | Not started |
-| **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ API client done, store migration pending |
+| **5. Frontend Integration** | API client + store migration | 1-2 weeks | ✅ API client done, notes wired, conversations/contacts pending |
 | 6. Deployment | Production cutover + remove demo mode | 1 week | Not started |
 
-**Remaining: 5-7 weeks** (Phases 0, 1 complete; Phase 3 backend + Phase 5 API client complete)
+**Remaining: 5-6 weeks** (Phases 0, 1, 3 complete; Phase 5 partially complete)
 
 ---
 
@@ -627,7 +627,7 @@ Phase 0.5 (Platform Setup)    Phase 1 (Foundation) ✅ COMPLETE
     ▼           ▼              ▼
 Phase 3     Phase 4        Phase 5
 (Notes)    (Calendar)    (Frontend Integration)
-✅ API       Not started   ✅ API client
+✅ COMPLETE  Not started   ✅ API client + notes wired
     │           │              │
     └───────────┴──────────────┘
                 │
@@ -635,11 +635,11 @@ Phase 3     Phase 4        Phase 5
           Phase 6 (Deployment)
 ```
 
-**Current state:** Phase 0 design and Phase 1 foundation are complete. OpenChannels backend is deployed at `openchannels-api.rwb89mvwwg.workers.dev`. API client exists in Coms frontend. Frontend still uses demo data (store migration not done).
+**Current state:** Phases 0, 1, 3 complete. OpenChannels backend deployed at `openchannels-api.rwb89mvwwg.workers.dev`. Notes store wired to live API. Conversations/contacts still use demo data.
 
 **Next steps (can run in parallel):**
 - Phase 0.5: Configure Google/Slack/Meta apps and obtain OAuth credentials
-- Phase 5.2: Migrate frontend stores from demo data to API calls (Notes can be done now without OAuth)
+- Phase 5.2: Wire conversations/contacts stores to API (requires OAuth for real data)
 
 Phase 2 (Messaging) requires Phase 0.5 (credentials). Phase 1 (API infrastructure) is already complete.
 
