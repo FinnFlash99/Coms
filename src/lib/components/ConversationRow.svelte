@@ -38,7 +38,9 @@
 	const isMail = $derived(isMailPlatform(conversation.platform));
 	const lastMessage = $derived(conversation.messages[conversation.messages.length - 1]);
 	const previewText = $derived(
-		isMail ? lastMessage?.subject || lastMessage?.content || '' : lastMessage?.content || conversation.lastMessagePreview
+		isMail
+			? lastMessage?.subject || lastMessage?.content || conversation.lastMessagePreview
+			: lastMessage?.content || conversation.lastMessagePreview
 	);
 	const platformLabel = $derived(PLATFORMS[conversation.platform].label);
 	const isPriority = $derived(($preferences.priority || []).includes(contact.id));
