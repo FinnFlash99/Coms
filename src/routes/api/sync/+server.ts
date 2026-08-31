@@ -1,10 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getPlatformConnection } from '$lib/server/db';
+import { getPlatformConnection, queryOne, execute } from '$lib/server/db';
 import { decryptToken } from '$lib/server/crypto';
 import { refreshAccessToken } from '$lib/server/oauth';
-
-const OPENCHANNELS_URL = 'https://openchannels-api.rwb89mvwwg.workers.dev';
 
 /**
  * Get decrypted access token, refreshing if needed
@@ -54,15 +52,139 @@ async function getAccessToken(
 	return accessToken;
 }
 
+function generateId(): string {
+	return crypto.randomUUID();
+}
+
 /**
- * Sync recent emails from Gmail
+ * Find or create a contact for an email sender
+ */
+async function findOrCreateContact(
+	db: D1Database,
+	userId: string,
+	senderEmail: string,
+	senderName: string
+): Promise<string> {
+	// First check if contact exists via contact_identities
+	const existing = await queryOne<{ contact_id: string }>(
+		db,
+		`SELECT ci.contact_id FROM contact_identities ci
+		 JOIN contacts c ON c.id = ci.contact_id
+		 WHERE c.user_id = ? AND ci.email = ?`,
+		[userId, senderEmail]
+	);
+
+	if (existing) {
+		return existing.contact_id;
+	}
+
+	// Create new contact
+	const contactId = generateId();
+	await execute(
+		db,
+		`INSERT INTO contacts (id, user_id, name, contact_type, connection_strength)
+		 VALUES (?, ?, ?, 'other', 'New')`,
+		[contactId, userId, senderName]
+	);
+
+	// Create contact identity
+	const identityId = generateId();
+	await execute(
+		db,
+		`INSERT INTO contact_identities (id, contact_id, platform, platform_user_id, display_name, email)
+		 VALUES (?, ?, 'gmail', ?, ?, ?)`,
+		[identityId, contactId, senderEmail, senderName, senderEmail]
+	);
+
+	return contactId;
+}
+
+/**
+ * Find or create a conversation for a Gmail thread
+ */
+async function findOrCreateConversation(
+	db: D1Database,
+	userId: string,
+	contactId: string,
+	threadId: string,
+	subject: string,
+	timestamp: number
+): Promise<string> {
+	// Check if conversation exists
+	const existing = await queryOne<{ id: string }>(
+		db,
+		`SELECT id FROM conversations
+		 WHERE user_id = ? AND platform = 'gmail' AND contact_id = ?`,
+		[userId, contactId]
+	);
+
+	if (existing) {
+		// Update last message time if this is newer
+		await execute(
+			db,
+			`UPDATE conversations SET last_message_at = ?, subject = ?
+			 WHERE id = ? AND (last_message_at IS NULL OR last_message_at < ?)`,
+			[timestamp, subject, existing.id, timestamp]
+		);
+		return existing.id;
+	}
+
+	// Create new conversation
+	const convId = generateId();
+	await execute(
+		db,
+		`INSERT INTO conversations (id, user_id, contact_id, platform, channel, subject, last_message_at, is_read, is_responded, importance, is_time_sensitive)
+		 VALUES (?, ?, ?, 'gmail', 'gmail', ?, ?, 0, 0, 'normal', 0)`,
+		[convId, userId, contactId, subject, timestamp]
+	);
+
+	return convId;
+}
+
+/**
+ * Create a message record if it doesn't exist
+ */
+async function createMessageIfNotExists(
+	db: D1Database,
+	conversationId: string,
+	messageId: string,
+	content: string,
+	senderName: string
+): Promise<boolean> {
+	// Check if message already exists
+	const existing = await queryOne<{ id: string }>(
+		db,
+		`SELECT id FROM messages WHERE external_id = ?`,
+		[messageId]
+	);
+
+	if (existing) {
+		return false; // Already exists
+	}
+
+	// Create message
+	const id = generateId();
+	await execute(
+		db,
+		`INSERT INTO messages (id, conversation_id, external_id, body, author_name, kind, created_at)
+		 VALUES (?, ?, ?, ?, ?, 'inbound', datetime('now'))`,
+		[id, conversationId, messageId, content, senderName]
+	);
+
+	return true;
+}
+
+/**
+ * Sync recent emails from Gmail directly to D1
  */
 async function syncGmailEmails(
+	db: D1Database,
 	accessToken: string,
 	userId: string,
 	maxResults = 20
-): Promise<{ synced: number; errors: number }> {
+): Promise<{ synced: number; skipped: number; errors: number }> {
 	let synced = 0;
+	let skipped = 0;
 	let errors = 0;
 
 	try {
@@ -74,7 +196,7 @@ async function syncGmailEmails(
 
 		if (!listResponse.ok) {
 			console.error('Failed to list Gmail messages:', await listResponse.text());
-			return { synced: 0, errors: 1 };
+			return { synced: 0, skipped: 0, errors: 1 };
 		}
 
 		const listData = await listResponse.json() as {
@@ -82,7 +204,7 @@ async function syncGmailEmails(
 		};
 
 		if (!listData.messages || listData.messages.length === 0) {
-			return { synced: 0, errors: 0 };
+			return { synced: 0, skipped: 0, errors: 0 };
 		}
 
 		console.log(`Syncing ${listData.messages.length} emails...`);
@@ -111,34 +233,30 @@ async function syncGmailEmails(
 				const headers = msgData.payload?.headers || [];
 				const from = headers.find(h => h.name === 'From')?.value || 'Unknown';
 				const subject = headers.find(h => h.name === 'Subject')?.value || '(No subject)';
+				const timestamp = parseInt(msgData.internalDate);
 
 				// Extract sender name and email
 				const fromMatch = from.match(/^(?:"?([^"<]*)"?\s*)?<?([^>]+)>?$/);
 				const senderName = fromMatch?.[1]?.trim() || fromMatch?.[2] || from;
 				const senderEmail = fromMatch?.[2] || from;
 
-				// Send to OpenChannels for processing
-				const ingestResponse = await fetch(`${OPENCHANNELS_URL}/api/ingest`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						userId,
-						platform: 'gmail',
-						platformThreadId: msgData.threadId,
-						platformMessageId: msgData.id,
-						senderName,
-						senderEmail,
-						subject,
-						content: msgData.snippet,
-						timestamp: parseInt(msgData.internalDate),
-						direction: 'inbound'
-					})
-				});
+				// Find or create contact
+				const contactId = await findOrCreateContact(db, userId, senderEmail, senderName);
 
-				if (ingestResponse.ok) {
+				// Find or create conversation
+				const conversationId = await findOrCreateConversation(
+					db, userId, contactId, msgData.threadId, subject, timestamp
+				);
+
+				// Create message if it doesn't exist
+				const created = await createMessageIfNotExists(
+					db, conversationId, msgData.id, msgData.snippet, senderName
+				);
+
+				if (created) {
 					synced++;
 				} else {
-					errors++;
+					skipped++;
 				}
 			} catch (e) {
 				console.error('Error processing message:', e);
@@ -146,13 +264,13 @@ async function syncGmailEmails(
 			}
 		}
 
-		console.log(`Sync complete: ${synced} synced, ${errors} errors`);
+		console.log(`Sync complete: ${synced} new, ${skipped} skipped, ${errors} errors`);
 	} catch (e) {
 		console.error('Sync error:', e);
 		errors++;
 	}
 
-	return { synced, errors };
+	return { synced, skipped, errors };
 }
 
 // POST /api/sync - Manually trigger email sync
@@ -183,12 +301,13 @@ export const POST: RequestHandler = async ({ locals, platform }) => {
 			return json({ success: false, message: 'Gmail not connected', synced: 0 });
 		}
 
-		const result = await syncGmailEmails(accessToken, user.id);
+		const result = await syncGmailEmails(db, accessToken, user.id);
 
 		return json({
 			success: true,
-			message: `Synced ${result.synced} emails`,
+			message: result.synced > 0 ? `Synced ${result.synced} new emails` : 'No new emails',
 			synced: result.synced,
+			skipped: result.skipped,
 			errors: result.errors
 		});
 	} catch (e) {
