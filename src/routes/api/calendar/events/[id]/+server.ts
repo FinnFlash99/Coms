@@ -19,11 +19,19 @@ async function getAccessToken(
 	const connection = await getPlatformConnection(db, userId, 'gmail');
 	if (!connection) return null;
 
-	let accessToken = await decryptToken(
-		connection.access_token_encrypted,
-		connection.token_iv,
-		encryptionKey
-	);
+	const userEmail = connection.platform_email || 'unknown';
+
+	let accessToken: string;
+	try {
+		accessToken = await decryptToken(
+			connection.access_token_encrypted,
+			connection.token_iv,
+			encryptionKey
+		);
+	} catch (e) {
+		console.error(`Token decryption failed for user ${userEmail}:`, e);
+		return null;
+	}
 
 	const needsRefresh = connection.token_expires_at
 		? connection.token_expires_at < Math.floor(Date.now() / 1000) + 60
@@ -46,7 +54,7 @@ async function getAccessToken(
 
 			accessToken = newToken;
 		} catch (e) {
-			console.error('Token refresh failed:', e);
+			console.error(`Token refresh failed for user ${userEmail}:`, e);
 		}
 	}
 

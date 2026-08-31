@@ -236,6 +236,8 @@ export async function getPlatformConnection(db: D1Database, userId: string, plat
 		refresh_token_encrypted: string | null;
 		token_iv: string;
 		token_expires_at: number | null;
+		platform_user_id: string | null;
+		platform_email: string | null;
 		status: string;
 		sync_cursor: string | null;
 	}>(

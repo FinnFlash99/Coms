@@ -47,7 +47,8 @@ interface GmailHistoryResponse {
 async function getAccessToken(
 	db: D1Database,
 	userId: string,
-	encryptionKey: string
+	encryptionKey: string,
+	userEmail: string
 ): Promise<{ token: string; needsRefresh: boolean } | null> {
 	const connection = await queryOne<{
 		access_token_encrypted: string;
@@ -62,11 +63,17 @@ async function getAccessToken(
 
 	if (!connection) return null;
 
-	const token = await decryptToken(
-		connection.access_token_encrypted,
-		connection.token_iv,
-		encryptionKey
-	);
+	let token: string;
+	try {
+		token = await decryptToken(
+			connection.access_token_encrypted,
+			connection.token_iv,
+			encryptionKey
+		);
+	} catch (e) {
+		console.error(`Token decryption failed for user ${userEmail}:`, e);
+		return null;
+	}
 
 	const needsRefresh = connection.token_expires_at
 		? connection.token_expires_at < Math.floor(Date.now() / 1000) + 60
@@ -83,7 +90,8 @@ async function refreshAndUpdateToken(
 	userId: string,
 	encryptionKey: string,
 	clientId: string,
-	clientSecret: string
+	clientSecret: string,
+	userEmail: string
 ): Promise<string | null> {
 	const connection = await queryOne<{
 		refresh_token_encrypted: string | null;
@@ -96,11 +104,17 @@ async function refreshAndUpdateToken(
 
 	if (!connection?.refresh_token_encrypted) return null;
 
-	const refreshToken = await decryptToken(
-		connection.refresh_token_encrypted,
-		connection.token_iv,
-		encryptionKey
-	);
+	let refreshToken: string;
+	try {
+		refreshToken = await decryptToken(
+			connection.refresh_token_encrypted,
+			connection.token_iv,
+			encryptionKey
+		);
+	} catch (e) {
+		console.error(`Refresh token decryption failed for user ${userEmail}:`, e);
+		return null;
+	}
 
 	try {
 		const { accessToken, expiresIn } = await refreshAccessToken(
@@ -141,7 +155,7 @@ async function refreshAndUpdateToken(
 
 		return accessToken;
 	} catch (e) {
-		console.error('Token refresh failed:', e);
+		console.error(`Token refresh failed for user ${userEmail}:`, e);
 		return null;
 	}
 }
@@ -354,9 +368,9 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 
 	// Get access token
-	let tokenResult = await getAccessToken(db, userId, encryptionKey);
+	let tokenResult = await getAccessToken(db, userId, encryptionKey, notification.emailAddress);
 	if (!tokenResult) {
-		console.error('No Gmail connection found for user:', userId);
+		console.error(`No Gmail connection found for user ${notification.emailAddress}`);
 		return json({ ok: true });
 	}
 
@@ -367,12 +381,13 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			userId,
 			encryptionKey,
 			clientId,
-			clientSecret
+			clientSecret,
+			notification.emailAddress
 		);
 		if (newToken) {
 			tokenResult = { token: newToken, needsRefresh: false };
 		} else {
-			console.error('Failed to refresh Gmail token for user:', userId);
+			console.error(`Failed to refresh Gmail token for user ${notification.emailAddress}`);
 			return json({ ok: true });
 		}
 	}
