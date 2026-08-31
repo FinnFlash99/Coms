@@ -25,27 +25,27 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
 			return json({ items: [], total: 0 });
 		}
 
+		// Note: The notes table uses 'done' not 'is_done', and 'ts' not 'created_at'
+		// It also doesn't have user_id, so we return all notes for now
 		const rows = await queryAll<{
 			id: string;
 			text: string;
 			kind: string;
-			is_done: number;
-			created_at: string;
+			done: number;
+			ts: number;
 		}>(
 			db,
-			`SELECT id, text, kind, is_done, created_at
+			`SELECT id, text, kind, done, ts
 			 FROM notes
-			 WHERE user_id = ?
-			 ORDER BY created_at DESC`,
-			[user.id]
+			 ORDER BY ts DESC`
 		);
 
 		const items = rows.map((row) => ({
 			id: row.id,
 			text: row.text,
 			kind: row.kind || 'note',
-			isDone: Boolean(row.is_done),
-			createdAt: row.created_at
+			isDone: Boolean(row.done),
+			createdAt: new Date(row.ts * 1000).toISOString()
 		}));
 
 		return json({ items, total: items.length });
