@@ -52,8 +52,12 @@
 		theme.set($preferences.theme);
 
 		// Load real connection status from API (for both onboarding and settings)
+		// Also load conversations/contacts/notes if user is authenticated
 		if (data.user) {
 			loadConnections();
+			loadConversations();
+			loadContacts();
+			loadNotes();
 		}
 
 		// Handle OAuth callback success/error (may come back during onboarding or after)
