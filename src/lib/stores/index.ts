@@ -425,19 +425,35 @@ export async function signOut(): Promise<void> {
 	window.location.href = '/';
 }
 
-// Manual "refresh now" sync indicator. There's no real backend to sync with yet, so
-// this always succeeds -- it exists to show the interaction, not to model failure.
+// Manual "refresh now" sync - calls the actual sync API
 export const syncState = writable<'idle' | 'syncing'>('idle');
 export const lastSync = writable<number>(Date.now());
-const SYNC_DELAY_MS = 1300;
 
-export function runSync() {
+export async function runSync(): Promise<void> {
 	if (get(syncState) === 'syncing') return;
+	if (typeof window === 'undefined') return;
+
 	syncState.set('syncing');
-	setTimeout(() => {
+
+	try {
+		const response = await fetch('/api/sync', { method: 'POST' });
+		const data = await response.json() as { success: boolean; message: string; synced: number };
+
+		if (data.success && data.synced > 0) {
+			toast.show(`Synced ${data.synced} emails`);
+			// Reload conversations to show new emails
+			await loadConversations();
+			await loadContacts();
+		} else if (data.message) {
+			toast.show(data.message);
+		}
+	} catch (e) {
+		console.error('Sync failed:', e);
+		toast.show('Sync failed');
+	} finally {
 		syncState.set('idle');
 		lastSync.set(Date.now());
-	}, SYNC_DELAY_MS);
+	}
 }
 
 // Toast notification store
