@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { queryAll } from '$lib/server/db';
+import { queryAll, execute } from '$lib/server/db';
 
 // GET /api/notes - List all notes for current user
 export const GET: RequestHandler = async ({ locals, platform }) => {
@@ -53,5 +53,49 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
 		console.error('Error fetching notes:', e);
 		// Return empty array if table doesn't exist or other error
 		return json({ items: [], total: 0 });
+	}
+};
+
+// POST /api/notes - Create a new note
+export const POST: RequestHandler = async ({ request, locals, platform }) => {
+	const user = locals.user;
+	if (!user) {
+		throw error(401, 'Unauthorized');
+	}
+
+	const db = platform?.env.DB;
+	if (!db) {
+		throw error(500, 'Database not available');
+	}
+
+	try {
+		const body = (await request.json()) as { text: string; kind?: 'note' | 'task' };
+		const { text, kind = 'note' } = body;
+
+		if (!text || typeof text !== 'string') {
+			throw error(400, 'Text is required');
+		}
+
+		const id = crypto.randomUUID();
+		const ts = Math.floor(Date.now() / 1000);
+
+		await execute(
+			db,
+			`INSERT INTO notes (id, text, kind, done, ts)
+			 VALUES (?, ?, ?, 0, ?)`,
+			[id, text.trim(), kind, ts]
+		);
+
+		return json({
+			id,
+			text: text.trim(),
+			kind,
+			done: false,
+			ts
+		});
+	} catch (e) {
+		if ((e as { status?: number }).status) throw e;
+		console.error('Error creating note:', e);
+		throw error(500, 'Failed to create note');
 	}
 };

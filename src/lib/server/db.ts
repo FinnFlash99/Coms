@@ -157,6 +157,8 @@ export async function updateConversation(
 		is_responded?: boolean;
 		importance?: string;
 		is_time_sensitive?: boolean;
+		due_ts?: number | null;
+		status?: 'open' | 'closed';
 	}
 ) {
 	const setClauses: string[] = [];
@@ -177,6 +179,14 @@ export async function updateConversation(
 	if (updates.is_time_sensitive !== undefined) {
 		setClauses.push('is_time_sensitive = ?');
 		params.push(updates.is_time_sensitive ? 1 : 0);
+	}
+	if (updates.due_ts !== undefined) {
+		setClauses.push('due_ts = ?');
+		params.push(updates.due_ts);
+	}
+	if (updates.status !== undefined) {
+		setClauses.push('status = ?');
+		params.push(updates.status);
 	}
 
 	if (setClauses.length === 0) return;
