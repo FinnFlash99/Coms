@@ -155,7 +155,7 @@ function toComsNote(api: ApiNote): Note {
 		text: api.text,
 		kind: api.kind === 'task' ? 'task' : 'note',
 		done: api.done,
-		ts: api.ts
+		ts: api.ts * 1000 // Convert seconds to milliseconds
 	};
 }
 
