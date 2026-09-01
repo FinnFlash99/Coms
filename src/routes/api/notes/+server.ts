@@ -44,8 +44,8 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
 			id: row.id,
 			text: row.text,
 			kind: row.kind || 'note',
-			isDone: Boolean(row.done),
-			createdAt: new Date(row.ts * 1000).toISOString()
+			done: Boolean(row.done),
+			ts: row.ts
 		}));
 
 		return json({ items, total: items.length });
